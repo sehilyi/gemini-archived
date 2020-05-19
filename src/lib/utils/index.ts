@@ -10,6 +10,12 @@ export const TRACK_LOCATIONS: TrackPosition[] = [
     'gallery'
 ];
 
+export function generateReadableTrackUid(pre: string | undefined, n: number) {
+    // TODO: Add track type
+    if (pre) return `${pre}-track-${n}`;
+    else return `track-${n}`;
+}
+
 export function hgToHlTrackType(t: HLTrackType, p: TrackPosition) {
     switch (t) {
         case "heatmap":

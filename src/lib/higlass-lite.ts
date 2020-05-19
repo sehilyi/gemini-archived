@@ -1,10 +1,10 @@
 import Ajv from 'ajv';
 import HiGlassSchema from "./higlass.schema.json";
-import { HiGlassLiteSpec } from "./higlass-lite.schema";
-import { HiGlassSpec } from "./higlass.schema";
+import { HiGlassLiteSpec, TrackPosition } from "./higlass-lite.schema";
+import { HiGlassSpec, Track as HGTrack } from "./higlass.schema";
 import { HiGlassModel } from './higlass-model';
 import { HiGlassLiteModel } from './higlass-lite-model';
-import { parseServerAndTilesetUidFromUrl, hgToHlTrackType } from './utils';
+import { parseServerAndTilesetUidFromUrl, hgToHlTrackType, generateReadableTrackUid } from './utils';
 
 // TODO: Auto-generate readable uids.
 
@@ -26,6 +26,8 @@ export function compile(ihl: HiGlassLiteSpec): HiGlassSpec {
 
         hg.addNewView(view);
 
+        let numTracks = 1;
+        let tracksToAddLastly: { p: TrackPosition, t: HGTrack }[] = [];
         for (let t = 0; t < view.tracks.length; t++) {
             const track = view.tracks[t];
 
@@ -33,20 +35,26 @@ export function compile(ihl: HiGlassLiteSpec): HiGlassSpec {
              * Axis on the top or left.
              */
             if (track.xAxis === true || track.xAxis === "top") {
-                const axisP = track.position === "center" ? "top" : track.position;
-                hg.addTrack(axisP, {
+                const p = track.position === "center" ? "top" : track.position;
+                const t: HGTrack = {
+                    uid: track.uniqueName ? track.uniqueName : generateReadableTrackUid(hg.getLastView()?.uid, numTracks++),
                     type: "horizontal-chromosome-labels",
                     chromInfoPath: hl.spec().config?.chromInfoPath,
                     height: 30 // TODO: default value.
-                });
+                };
+                if (track.position === "center") tracksToAddLastly.push({ p, t });
+                else hg.addTrack(p, t);
             }
             if (track.yAxis === true || track.yAxis === "left") {
-                const axisP = track.position === "center" ? "left" : track.position;
-                hg.addTrack(axisP, {
+                const p = track.position === "center" ? "left" : track.position;
+                const t: HGTrack = {
+                    uid: track.uniqueName ? track.uniqueName : generateReadableTrackUid(hg.getLastView()?.uid, numTracks++),
                     type: "vertical-chromosome-labels",
                     chromInfoPath: hl.spec().config?.chromInfoPath,
                     height: 30 // TODO: default value.
-                });
+                }
+                if (track.position === "center") tracksToAddLastly.push({ p, t });
+                else hg.addTrack(p, t);
             }
 
             /**
@@ -54,7 +62,7 @@ export function compile(ihl: HiGlassLiteSpec): HiGlassSpec {
              */
             const { server, tilesetUid } = parseServerAndTilesetUidFromUrl(track.data);
             hg.addTrack(track.position, {
-                uid: track.uniqueName,
+                uid: track.uniqueName ? track.uniqueName : generateReadableTrackUid(hg.getLastView()?.uid, numTracks++),
                 type: hgToHlTrackType(track.type, track.position),
                 server: server,
                 tilesetUid: tilesetUid,
@@ -66,22 +74,29 @@ export function compile(ihl: HiGlassLiteSpec): HiGlassSpec {
              * Axis on the bottom or right.
              */
             if (track.xAxis === "bottom") {
-                const axisP = track.position === "center" ? "bottom" : track.position;
-                hg.addTrack("bottom", {
+                const p = track.position === "center" ? "bottom" : track.position;
+                const t: HGTrack = {
+                    uid: track.uniqueName ? track.uniqueName : generateReadableTrackUid(hg.getLastView()?.uid, numTracks++),
                     type: "horizontal-chromosome-labels",
                     chromInfoPath: hl.spec().config?.chromInfoPath,
                     height: 30 // TODO: default value.
-                });
+                };
+                hg.addTrack(p, t);
             }
             if (track.yAxis === true || track.yAxis === "right") {
-                const axisP = track.position === "center" ? "right" : track.position;
-                hg.addTrack(axisP, {
+                const p = track.position === "center" ? "right" : track.position;
+                const t: HGTrack = {
+                    uid: track.uniqueName ? track.uniqueName : generateReadableTrackUid(hg.getLastView()?.uid, numTracks++),
                     type: "vertical-chromosome-labels",
                     chromInfoPath: hl.spec().config?.chromInfoPath,
                     height: 30 // TODO: default value.
-                });
+                }
+                hg.addTrack(p, t);
             }
         }
+
+        // For axes that need to be added last.
+        tracksToAddLastly.forEach(({ p, t }) => hg.addTrack(p, t));
     }
 
     // TODO: Validate.

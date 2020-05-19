@@ -15,6 +15,10 @@ export class HiGlassModel {
         return this.hg;
     }
 
+    public getLastView() {
+        return this.hg.views?.[this.hg.views?.length - 1];
+    }
+
     public setEditable(editable: boolean | undefined) {
         this.hg.editable = editable;
         return this;
@@ -32,7 +36,10 @@ export class HiGlassModel {
     }
 
     public addNewView(view: HLView) {
+        const viewNum = this.hg.views?.length ? this.hg.views?.length + 1 : 1;
+        const uid = view.uniqueName ? view.uniqueName : `view-${viewNum}`;
         this.hg.views?.push({
+            uid,
             layout: {
                 w: view.w as number,
                 h: view.h as number,
