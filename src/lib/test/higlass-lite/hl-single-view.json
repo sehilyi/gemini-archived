@@ -7,7 +7,25 @@
                     "position": "center",
                     "type": "heatmap",
                     "data": "https://higlass.io/api/v1/tileset_info/?d=CQMd6V_cRw6iCI_-Unl3PQ",
-                    "xAxis": "top"
+                    "xAxis": "top",
+                    "yAxis": "left",
+                    "width": 500,
+                    "height": 500
+                },
+                {
+                    "uniqueName": "top-gene-annotation",
+                    "position": "top",
+                    "type": "gene-annotation",
+                    "data": "https://higlass.io/api/v1/tileset_info/?d=OHJakQICQD6gTD7skx4EWA",
+                    "width": 500,
+                    "height": 100
+                },
+                {
+                    "uniqueName": "left-gene-annotation",
+                    "position": "left",
+                    "type": "gene-annotation",
+                    "data": "https://higlass.io/api/v1/tileset_info/?d=OHJakQICQD6gTD7skx4EWA",
+                    "width": 100
                 }
             ]
         }
