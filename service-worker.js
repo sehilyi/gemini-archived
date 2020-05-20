@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/higlass-lite/precache-manifest.f60d26cf0f99b824ea15cb6a97289d21.js"
+  "/higlass-lite/precache-manifest.ae5cc829982f45e1241e232dc3aae821.js"
 );
 
 self.addEventListener('message', (event) => {
