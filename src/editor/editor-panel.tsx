@@ -7,10 +7,11 @@ const DEBUG_WITHOUT_DIAGNOSIS = true;
 
 function EditorPanel(props: {
     code: string,
-    onChange: (code: string) => void
+    readOnly?: boolean,
+    onChange?: (code: string) => void
 }) {
 
-    const { code: templateCode } = props;
+    const { code: templateCode, readOnly } = props;
     const editor = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
     const [code, setCode] = useState(templateCode);
 
@@ -46,7 +47,7 @@ function EditorPanel(props: {
 
     function onChangeHandle(code: string, e: any) {
         setCode(code);
-        props.onChange(code);
+        if (props.onChange) props.onChange(code);
         // console.log('onChange', code, e);
 
         setupDiagnostics();
@@ -81,7 +82,8 @@ function EditorPanel(props: {
                     wordWrap: "on",
                     lineNumbers: "off",
                     renderLineHighlight: "line",
-                    renderIndentGuides: true
+                    renderIndentGuides: true,
+                    readOnly
                 }}
                 onChange={onChangeHandle}
                 editorDidMount={editorDidMount}
