@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import EditorPanel from './editor-panel';
 import stringify from 'json-stringify-pretty-compact';
 import SplitPane from 'react-split-pane';
@@ -30,7 +30,8 @@ function Editor() {
         // });
     }, [hl]);
 
-    function hglass(hg: HiGlassSpec) {
+    // Renders HiGlass by compiling the edited HiGlass-Lite code.
+    const hglass = useMemo(() => {
         return <HiGlassComponent
             ref={hgRef}
             options={{
@@ -40,9 +41,9 @@ function Editor() {
                 containerPaddingY: 0,
                 sizeMode: 'default'
             }}
-            viewConfig={hg}
+            viewConfig={compile(JSON.parse(hl))}
         />
-    }
+    }, [hl]);
 
     return (
         <div className="editor">
@@ -62,7 +63,7 @@ function Editor() {
                         readOnly={true}
                     />
                     {/* HiGlass Output */}
-                    {!DEBUG_DO_NOT_RENDER_HIGLASS && hglass(JSON.parse(hg))}
+                    {!DEBUG_DO_NOT_RENDER_HIGLASS && hglass}
                 </SplitPane>
             </SplitPane>
         </div>
