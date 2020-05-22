@@ -1,8 +1,8 @@
 {
   "files": {
-    "main.css": "/higlass-lite/static/css/main.dcd1bf25.chunk.css",
-    "main.js": "/higlass-lite/static/js/main.4fff2079.chunk.js",
-    "main.js.map": "/higlass-lite/static/js/main.4fff2079.chunk.js.map",
+    "main.css": "/higlass-lite/static/css/main.803983b1.chunk.css",
+    "main.js": "/higlass-lite/static/js/main.289d3fd7.chunk.js",
+    "main.js.map": "/higlass-lite/static/js/main.289d3fd7.chunk.js.map",
     "runtime-main.js": "/higlass-lite/static/js/runtime-main.553dedba.js",
     "runtime-main.js.map": "/higlass-lite/static/js/runtime-main.553dedba.js.map",
     "static/css/2.6a3367f7.chunk.css": "/higlass-lite/static/css/2.6a3367f7.chunk.css",
@@ -15,10 +15,10 @@
     "index.html": "/higlass-lite/index.html",
     "json.worker.js": "/higlass-lite/json.worker.js",
     "json.worker.js.map": "/higlass-lite/json.worker.js.map",
-    "precache-manifest.d7080fa3f460b9eedbe1b5bb060728fc.js": "/higlass-lite/precache-manifest.d7080fa3f460b9eedbe1b5bb060728fc.js",
+    "precache-manifest.ebe94269fb71512130a67ecf38bc41a7.js": "/higlass-lite/precache-manifest.ebe94269fb71512130a67ecf38bc41a7.js",
     "service-worker.js": "/higlass-lite/service-worker.js",
     "static/css/2.6a3367f7.chunk.css.map": "/higlass-lite/static/css/2.6a3367f7.chunk.css.map",
-    "static/css/main.dcd1bf25.chunk.css.map": "/higlass-lite/static/css/main.dcd1bf25.chunk.css.map",
+    "static/css/main.803983b1.chunk.css.map": "/higlass-lite/static/css/main.803983b1.chunk.css.map",
     "static/js/2.48fcf942.chunk.js.LICENSE.txt": "/higlass-lite/static/js/2.48fcf942.chunk.js.LICENSE.txt",
     "static/media/codicon.css": "/higlass-lite/static/media/codicon.a609dc0f.ttf"
   },
@@ -26,7 +26,7 @@
     "static/js/runtime-main.553dedba.js",
     "static/css/2.6a3367f7.chunk.css",
     "static/js/2.48fcf942.chunk.js",
-    "static/css/main.dcd1bf25.chunk.css",
-    "static/js/main.4fff2079.chunk.js"
+    "static/css/main.803983b1.chunk.css",
+    "static/js/main.289d3fd7.chunk.js"
   ]
 }

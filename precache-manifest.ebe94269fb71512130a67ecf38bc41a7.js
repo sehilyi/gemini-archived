@@ -4,7 +4,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/higlass-lite/editor.worker.js"
   },
   {
-    "revision": "7907fd3dfee658979e25b58f7a9056a3",
+    "revision": "cdfeab6ce8658080c8eabcdc58ca62e2",
     "url": "/higlass-lite/index.html"
   },
   {
@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/higlass-lite/static/css/2.6a3367f7.chunk.css"
   },
   {
-    "revision": "f4e382520f18e8fae721",
-    "url": "/higlass-lite/static/css/main.dcd1bf25.chunk.css"
+    "revision": "26c901bf549864f80974",
+    "url": "/higlass-lite/static/css/main.803983b1.chunk.css"
   },
   {
     "revision": "d549045ab74cbd1127bf",
@@ -32,8 +32,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/higlass-lite/static/js/3.feb71ce2.chunk.js"
   },
   {
-    "revision": "f4e382520f18e8fae721",
-    "url": "/higlass-lite/static/js/main.4fff2079.chunk.js"
+    "revision": "26c901bf549864f80974",
+    "url": "/higlass-lite/static/js/main.289d3fd7.chunk.js"
   },
   {
     "revision": "964c31b3e5c246a82a7b",
