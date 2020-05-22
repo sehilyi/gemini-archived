@@ -18,7 +18,7 @@ export interface HiGlassLiteSpec {
 }
 
 export interface View {
-    uniqueName?: string;  // EQ_TO uid
+    // uniqueName?: string;  // EQ_TO uid // Do we really need this?
     // TODO: change these two similar to that in altair?
     xDomain?: number[]; // EQ_TO initialXDomain // TODO: Can we use more readable format? (e.g., chr1.12322)
     yDomain?: number[]; // EQ_TO initialYDomain

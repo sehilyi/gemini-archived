@@ -54,7 +54,7 @@ function Editor() {
             }}
             viewConfig={JSON.parse(hg)}
         />
-    }, [hl]);
+    }, [hl, hg]);
 
     return (
         <>
@@ -80,7 +80,7 @@ function Editor() {
                         readOnly={false}
                         onChange={debounce(newHl => {
                             setHl(newHl);
-                        }, 2000)}
+                        }, 1000)}
                     />
                     <SplitPane split="vertical" defaultSize="50%" onChange={() => { }}>
                         {/* HiGlass Editor */}

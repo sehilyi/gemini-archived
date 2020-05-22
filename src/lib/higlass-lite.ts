@@ -8,8 +8,6 @@ import { parseServerAndTilesetUidFromUrl, hgToHlTrackType, generateReadableTrack
 import { isObject } from 'util';
 import mapper from './compile-mapper';
 
-// TODO: Auto-generate readable uids.
-
 export function compile(_hl: HiGlassLiteSpec): HiGlassSpec {
 
     // TODO: Early return with invalid specs.
