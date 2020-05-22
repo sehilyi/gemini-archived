@@ -1,32 +1,32 @@
 {
   "files": {
-    "main.css": "/higlass-lite/static/css/main.9912c02d.chunk.css",
-    "main.js": "/higlass-lite/static/js/main.c521299a.chunk.js",
-    "main.js.map": "/higlass-lite/static/js/main.c521299a.chunk.js.map",
-    "runtime-main.js": "/higlass-lite/static/js/runtime-main.fb1698eb.js",
-    "runtime-main.js.map": "/higlass-lite/static/js/runtime-main.fb1698eb.js.map",
+    "main.css": "/higlass-lite/static/css/main.dcd1bf25.chunk.css",
+    "main.js": "/higlass-lite/static/js/main.4fff2079.chunk.js",
+    "main.js.map": "/higlass-lite/static/js/main.4fff2079.chunk.js.map",
+    "runtime-main.js": "/higlass-lite/static/js/runtime-main.553dedba.js",
+    "runtime-main.js.map": "/higlass-lite/static/js/runtime-main.553dedba.js.map",
     "static/css/2.6a3367f7.chunk.css": "/higlass-lite/static/css/2.6a3367f7.chunk.css",
-    "static/js/2.47b45a97.chunk.js": "/higlass-lite/static/js/2.47b45a97.chunk.js",
-    "static/js/2.47b45a97.chunk.js.map": "/higlass-lite/static/js/2.47b45a97.chunk.js.map",
-    "static/js/3.bd68b42a.chunk.js": "/higlass-lite/static/js/3.bd68b42a.chunk.js",
-    "static/js/3.bd68b42a.chunk.js.map": "/higlass-lite/static/js/3.bd68b42a.chunk.js.map",
+    "static/js/2.48fcf942.chunk.js": "/higlass-lite/static/js/2.48fcf942.chunk.js",
+    "static/js/2.48fcf942.chunk.js.map": "/higlass-lite/static/js/2.48fcf942.chunk.js.map",
+    "static/js/3.feb71ce2.chunk.js": "/higlass-lite/static/js/3.feb71ce2.chunk.js",
+    "static/js/3.feb71ce2.chunk.js.map": "/higlass-lite/static/js/3.feb71ce2.chunk.js.map",
     "editor.worker.js": "/higlass-lite/editor.worker.js",
     "editor.worker.js.map": "/higlass-lite/editor.worker.js.map",
     "index.html": "/higlass-lite/index.html",
     "json.worker.js": "/higlass-lite/json.worker.js",
     "json.worker.js.map": "/higlass-lite/json.worker.js.map",
-    "precache-manifest.ae5cc829982f45e1241e232dc3aae821.js": "/higlass-lite/precache-manifest.ae5cc829982f45e1241e232dc3aae821.js",
+    "precache-manifest.d7080fa3f460b9eedbe1b5bb060728fc.js": "/higlass-lite/precache-manifest.d7080fa3f460b9eedbe1b5bb060728fc.js",
     "service-worker.js": "/higlass-lite/service-worker.js",
     "static/css/2.6a3367f7.chunk.css.map": "/higlass-lite/static/css/2.6a3367f7.chunk.css.map",
-    "static/css/main.9912c02d.chunk.css.map": "/higlass-lite/static/css/main.9912c02d.chunk.css.map",
-    "static/js/2.47b45a97.chunk.js.LICENSE.txt": "/higlass-lite/static/js/2.47b45a97.chunk.js.LICENSE.txt",
+    "static/css/main.dcd1bf25.chunk.css.map": "/higlass-lite/static/css/main.dcd1bf25.chunk.css.map",
+    "static/js/2.48fcf942.chunk.js.LICENSE.txt": "/higlass-lite/static/js/2.48fcf942.chunk.js.LICENSE.txt",
     "static/media/codicon.css": "/higlass-lite/static/media/codicon.a609dc0f.ttf"
   },
   "entrypoints": [
-    "static/js/runtime-main.fb1698eb.js",
+    "static/js/runtime-main.553dedba.js",
     "static/css/2.6a3367f7.chunk.css",
-    "static/js/2.47b45a97.chunk.js",
-    "static/css/main.9912c02d.chunk.css",
-    "static/js/main.c521299a.chunk.js"
+    "static/js/2.48fcf942.chunk.js",
+    "static/css/main.dcd1bf25.chunk.css",
+    "static/js/main.4fff2079.chunk.js"
   ]
 }
