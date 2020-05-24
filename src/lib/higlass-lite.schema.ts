@@ -44,6 +44,7 @@ export type TrackType = "heatmap" | "gene-annotation";
 export interface Track {
     uniqueName?: string;
     description?: string;
+    mark: Mark;
     type: TrackType;
     data: string;   // URL of data (format: `${server}${tilesetUid}`).
     // TOOD: should we support for non-genomic axis?
@@ -63,6 +64,11 @@ export interface Track {
     // fromViewUid?: null | string;
     // x?: number;
     // y?: number;
+}
+export type Mark = MarkType | MarkDeep;
+export type MarkType = "point" | "rect" | "custom";
+export type MarkDeep = {
+    type: MarkType;
 }
 
 export type TrackPosition = "center" | "left" | "top" | "right" | "bottom" | "gallery" | "whole";
