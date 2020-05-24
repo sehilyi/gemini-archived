@@ -65,9 +65,11 @@ export interface Track {
     // x?: number;
     // y?: number;
 }
-export type Mark = MarkType | MarkDeep;
-export type MarkType = "point" | "rect" | "custom";
+export type Mark = MarkType | "custom" | CustomMarkPredevined | MarkDeep;
+export type MarkType = "point" | "rect" | "symbol" | "text";
+export type CustomMarkPredevined = undefined;   // TODO: Not yet supported.
 export type MarkDeep = {
+    // TODO: Refer to how 
     type: MarkType;
 }
 
