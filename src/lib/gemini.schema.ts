@@ -7,7 +7,7 @@
  * - Make the names that are internally used to be consistent to HG.
  */
 
-export interface HiGlassLiteSpec {
+export interface GeminiSpec {
     servers?: string | string[]; // EQ_TO trackSourceServers
 
     views: View[];

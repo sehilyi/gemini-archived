@@ -1,10 +1,10 @@
 /**
- * This file stands for converting HiGlass-Lite options to HiGlass options.
+ * This file stands for converting Gemini options to HiGlass options.
  */
 
-import { Track as HLTrack } from "./higlass-lite.schema";
+import { Track } from "./gemini.schema";
 
-function sizeToWidthOrHeight(track: HLTrack) {
+function sizeToWidthOrHeight(track: Track) {
     const { position, size, width: hlwidth, height: hlheight } = track;
     let width: number | undefined, height: number | undefined;
     if (position === "center") return { width: size ? size : hlwidth, height: size ? size : hlheight };

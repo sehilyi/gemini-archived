@@ -2,11 +2,11 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import EditorPanel from './editor-panel';
 import stringify from 'json-stringify-pretty-compact';
 import SplitPane from 'react-split-pane';
-import { compile } from '../lib/higlass-lite';
+import { compile } from '../lib/gemini';
 // @ts-ignore
 import { HiGlassComponent } from 'higlass';
 import './editor.css';
-import { HiGlassLiteSpec } from '../lib/higlass-lite.schema';
+import { GeminiSpec } from '../lib/gemini.schema';
 import { debounce } from "lodash";
 import { demos } from './examples';
 
@@ -16,20 +16,20 @@ const DEBUG_INIT_DEMO_INDEX = 0;
 function Editor() {
 
     const [demo, setDemo] = useState(demos[DEBUG_INIT_DEMO_INDEX]);
-    const [hl, setHl] = useState(stringify(demos[DEBUG_INIT_DEMO_INDEX].hl as HiGlassLiteSpec));
-    const [hg, setHg] = useState(stringify(compile(demos[DEBUG_INIT_DEMO_INDEX].hl as HiGlassLiteSpec)));
+    const [gm, setGm] = useState(stringify(demos[DEBUG_INIT_DEMO_INDEX].gm as GeminiSpec));
+    const [hg, setHg] = useState(stringify(compile(demos[DEBUG_INIT_DEMO_INDEX].gm as GeminiSpec)));
 
     const hgRef = useRef<typeof HiGlassComponent>();
 
     useEffect(() => {
-        setHl(stringify(demo.hl as HiGlassLiteSpec));
-        setHg(stringify(compile(demo.hl as HiGlassLiteSpec)));
+        setGm(stringify(demo.gm as GeminiSpec));
+        setHg(stringify(compile(demo.gm as GeminiSpec)));
     }, [demo]);
 
     useEffect(() => {
         let newHg;
         try {
-            newHg = stringify(compile(JSON.parse(hl)));
+            newHg = stringify(compile(JSON.parse(gm)));
             setHg(newHg);
         } catch (e) {
             console.warn("Invalid HiGlass spec.");
@@ -39,7 +39,7 @@ function Editor() {
         // hgRef?.current?.api.setViewConfig(JSON.parse(newHg)).then(() => {
         //     console.log("onSetViewConfig");
         // });
-    }, [hl]);
+    }, [gm]);
 
     // Renders HiGlass by compiling the edited HiGlass-Lite code.
     const hglass = useMemo(() => {
@@ -54,12 +54,12 @@ function Editor() {
             }}
             viewConfig={JSON.parse(hg)}
         />
-    }, [hl, hg]);
+    }, [gm, hg]);
 
     return (
         <>
             <div className="demo-navbar">
-                HiGlass <span>Lite</span> <code>Editor</code>
+                Gemini <code>Editor</code>
                 <select
                     onChange={e => {
                         setDemo(demos.find(d => d.name === e.target.value) as any);
@@ -74,12 +74,12 @@ function Editor() {
             </div>
             <div className="editor">
                 <SplitPane split="vertical" defaultSize="30%" onChange={() => { }}>
-                    {/* HiGlass-Lite Editor */}
+                    {/* Gemini Editor */}
                     <EditorPanel
-                        code={hl}
+                        code={gm}
                         readOnly={false}
                         onChange={debounce(newHl => {
-                            setHl(newHl);
+                            setGm(newHl);
                         }, 1000)}
                     />
                     <SplitPane split="vertical" defaultSize="50%" onChange={() => { }}>

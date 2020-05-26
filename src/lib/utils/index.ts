@@ -1,4 +1,4 @@
-import { TrackPosition, TrackType as HLTrackType } from "../higlass-lite.schema";
+import { TrackPosition, TrackType } from "../gemini.schema";
 import uuid from "uuid";
 
 export const TRACK_LOCATIONS: TrackPosition[] = [
@@ -15,13 +15,13 @@ export function generateReadableTrackUid(pre: string | undefined, n: number) {
     // TODO: Add track type
 
     // TODO: This is to properly update higlass upon editor changes. Ultimately, remove this.
-    // (Refer to https://github.com/sehilyi/higlass-lite/issues/7)
+    // (Refer to https://github.com/sehilyi/gemini/issues/7)
     const id = uuid.v1();
     if (pre) return `${pre}-track-${n}-(${id})`;
     else return `track-${n}-${id}`;
 }
 
-export function hgToHlTrackType(t: HLTrackType, p: TrackPosition) {
+export function hgToHlTrackType(t: TrackType, p: TrackPosition) {
     switch (t) {
         case "heatmap":
             return "heatmap";

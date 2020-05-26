@@ -1,5 +1,5 @@
 import { HiGlassSpec, View as HGView, Track as HGTrack } from "./higlass.schema";
-import { TrackPosition } from "./higlass-lite.schema";
+import { TrackPosition } from "./gemini.schema";
 
 export class HiGlassModel {
     private hg: HiGlassSpec;

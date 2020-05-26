@@ -1,47 +1,47 @@
 import Ajv from 'ajv';
 import HiGlassSchema from "./higlass.schema.json";
-import { HiGlassLiteSpec, TrackPosition } from "./higlass-lite.schema";
+import { GeminiSpec, TrackPosition } from "./gemini.schema";
 import { HiGlassSpec, Track as HGTrack, GenomePositionSearchBox } from "./higlass.schema";
 import { HiGlassModel } from './higlass-model';
-import { HiGlassLiteModel } from './higlass-lite-model';
+import { GeminiModel } from './gemini-model';
 import { parseServerAndTilesetUidFromUrl, hgToHlTrackType, generateReadableTrackUid } from './utils';
 import { isObject } from 'util';
 import mapper from './compile-mapper';
 
-export function compile(_hl: HiGlassLiteSpec): HiGlassSpec {
+export function compile(_hl: GeminiSpec): HiGlassSpec {
 
     // TODO: Early return with invalid specs.
     // ...
 
-    const hl = new HiGlassLiteModel(_hl);
+    const gm = new GeminiModel(_hl);
     const hg = new HiGlassModel();
 
     /**
      * Top-level Configurations.
      */
-    hg.setEditable(hl.spec().config?.editable)
-        .setChromInfoPath(hl.spec().config?.chromInfoPath);
+    hg.setEditable(gm.spec().config?.editable)
+        .setChromInfoPath(gm.spec().config?.chromInfoPath);
 
     // Genome Search Box
-    const genomePositionSearchBoxVisible = hl.spec().config?.searchBox !== undefined;
-    const isSearchBoxObject = isObject(hl.spec().config?.searchBox);
+    const genomePositionSearchBoxVisible = gm.spec().config?.searchBox !== undefined;
+    const isSearchBoxObject = isObject(gm.spec().config?.searchBox);
     const genomePositionSearchBox: GenomePositionSearchBox = {
         chromInfoId: isSearchBoxObject ?
-            (hl.spec().config?.searchBox as GenomePositionSearchBox)?.chromInfoId
+            (gm.spec().config?.searchBox as GenomePositionSearchBox)?.chromInfoId
             : "hg19",
         chromInfoServer: isSearchBoxObject ?
-            (hl.spec().config?.searchBox as GenomePositionSearchBox)?.chromInfoServer
+            (gm.spec().config?.searchBox as GenomePositionSearchBox)?.chromInfoServer
             : "//higlass.io/api/v1",
-        autocompleteId: (hl.spec().config?.searchBox as GenomePositionSearchBox)?.autocompleteId,
-        autocompleteServer: (hl.spec().config?.searchBox as GenomePositionSearchBox)?.autocompleteServer,
+        autocompleteId: (gm.spec().config?.searchBox as GenomePositionSearchBox)?.autocompleteId,
+        autocompleteServer: (gm.spec().config?.searchBox as GenomePositionSearchBox)?.autocompleteServer,
         visible: genomePositionSearchBoxVisible
     };
 
     /**
      * Views.
      */
-    for (let v = 0; v < hl.spec().views.length; v++) {
-        const view = hl.spec().views[v];
+    for (let v = 0; v < gm.spec().views.length; v++) {
+        const view = gm.spec().views[v];
         /**
          * View.
          */
@@ -80,7 +80,7 @@ export function compile(_hl: HiGlassLiteSpec): HiGlassSpec {
                 const t: HGTrack = {
                     uid: track.uniqueName ? track.uniqueName : generateReadableTrackUid(hg.getLastView()?.uid, numTracks++),
                     type: "horizontal-chromosome-labels",
-                    chromInfoPath: hl.spec().config?.chromInfoPath,
+                    chromInfoPath: gm.spec().config?.chromInfoPath,
                     height: 30
                 };
                 if (track.position === "center") tracksToAddLastly.push({ p, t });
@@ -91,7 +91,7 @@ export function compile(_hl: HiGlassLiteSpec): HiGlassSpec {
                 const t: HGTrack = {
                     uid: track.uniqueName ? track.uniqueName : generateReadableTrackUid(hg.getLastView()?.uid, numTracks++),
                     type: "vertical-chromosome-labels",
-                    chromInfoPath: hl.spec().config?.chromInfoPath,
+                    chromInfoPath: gm.spec().config?.chromInfoPath,
                     width: 30
                 }
                 if (track.position === "center") tracksToAddLastly.push({ p, t });
@@ -119,7 +119,7 @@ export function compile(_hl: HiGlassLiteSpec): HiGlassSpec {
                 const t: HGTrack = {
                     uid: track.uniqueName ? track.uniqueName : generateReadableTrackUid(hg.getLastView()?.uid, numTracks++),
                     type: "horizontal-chromosome-labels",
-                    chromInfoPath: hl.spec().config?.chromInfoPath,
+                    chromInfoPath: gm.spec().config?.chromInfoPath,
                     height: 30
                 };
                 hg.addTrack(p, t);
@@ -129,7 +129,7 @@ export function compile(_hl: HiGlassLiteSpec): HiGlassSpec {
                 const t: HGTrack = {
                     uid: track.uniqueName ? track.uniqueName : generateReadableTrackUid(hg.getLastView()?.uid, numTracks++),
                     type: "vertical-chromosome-labels",
-                    chromInfoPath: hl.spec().config?.chromInfoPath,
+                    chromInfoPath: gm.spec().config?.chromInfoPath,
                     width: 30
                 }
                 hg.addTrack(p, t);
