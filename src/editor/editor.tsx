@@ -41,7 +41,7 @@ function Editor() {
         // });
     }, [gm]);
 
-    // Renders HiGlass by compiling the edited HiGlass-Lite code.
+    // Renders HiGlass by compiling the edited Gemini code.
     const hglass = useMemo(() => {
         return <HiGlassComponent
             ref={hgRef}
