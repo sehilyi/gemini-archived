@@ -65,12 +65,16 @@ export interface Track {
     // x?: number;
     // y?: number;
 }
-export type Mark = MarkType | "custom" | CustomMarkPredevined | MarkDeep;
-export type MarkType = "point" | "rect" | "symbol" | "text";
-export type CustomMarkPredevined = undefined;   // TODO: Not yet supported.
+export type Mark = PrimitiveMarkType | GlyphMarkPredevined | MarkDeep;
+export type PrimitiveMarkType = "bar" | "point" | "rect" | "symbol" | "text";
+export type GlyphMarkPredevined = undefined;   // TODO: Not yet supported.
 export type MarkDeep = {
-    // TODO: Refer to how 
-    type: MarkType;
+    type: PrimitiveMarkType | "glyph";
+    id: string; // A reference column for making `glyph`.
+    name: string;
+    // TODO: Positioning for nominal fields: center of x and y
+    // Positioning for quantitative fields: left and bottom
+    // TODO: Should GlyphMark has specifications of field type constraints?
 }
 
 export type TrackPosition = "center" | "left" | "top" | "right" | "bottom" | "gallery" | "whole";

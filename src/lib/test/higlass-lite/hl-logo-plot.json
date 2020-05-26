@@ -1,0 +1,18 @@
+{
+    "type": "glyph",
+    "name": "logo",
+    "elements": [
+        {
+            "mark": "bar"
+        },
+        {
+            "mark": "text",
+            "height": {
+                "bind": "y"
+            },
+            "xOffset": "center",
+            "yOffset": "center",
+            "color": "black"
+        }
+    ]
+}
