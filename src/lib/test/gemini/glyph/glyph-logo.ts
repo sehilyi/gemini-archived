@@ -1,8 +1,10 @@
-export const logoPlot = {
+import { Mark } from "../../../gemini.schema";
+
+export const GLYPH_LOGO: Mark = {
     "type": "glyph",
     "name": "logo",
-    "required": [
-        "x1", "x2", "y", "height",
+    "requiredChannels": [
+        "x", "x1", "y"
     ],
     "elements": [
         {
@@ -10,9 +12,6 @@ export const logoPlot = {
         },
         {
             "mark": "text",
-            "height": { "bind": "y" },
-            "xOffset": "center",
-            "yOffset": "center",
             "color": "black"
         }
     ]

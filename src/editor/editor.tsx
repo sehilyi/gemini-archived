@@ -1,60 +1,42 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import EditorPanel from './editor-panel';
 import stringify from 'json-stringify-pretty-compact';
 import SplitPane from 'react-split-pane';
-import { compile } from '../lib/gemini';
-// @ts-ignore
-import { HiGlassComponent } from 'higlass';
-import './editor.css';
-import { GeminiSpec } from '../lib/gemini.schema';
+import { GeminiSpec, MarkDeep } from '../lib/gemini.schema';
 import { debounce } from "lodash";
 import { demos } from './examples';
+import './editor.css';
+import { renderGlyphPreview } from '../lib/visualizations/glyph-preview';
 
-const DEBUG_DO_NOT_RENDER_HIGLASS = false;
 const DEBUG_INIT_DEMO_INDEX = 0;
 
 function Editor() {
 
+    const glyphSvg = useRef<SVGSVGElement>(null);
+    const layoutSvg = useRef<SVGSVGElement>(null);
     const [demo, setDemo] = useState(demos[DEBUG_INIT_DEMO_INDEX]);
-    const [gm, setGm] = useState(stringify(demos[DEBUG_INIT_DEMO_INDEX].gm as GeminiSpec));
-    const [hg, setHg] = useState(stringify(compile(demos[DEBUG_INIT_DEMO_INDEX].gm as GeminiSpec)));
-
-    const hgRef = useRef<typeof HiGlassComponent>();
+    const [gm, setGm] = useState(stringify(demos[DEBUG_INIT_DEMO_INDEX].spec as GeminiSpec));
 
     useEffect(() => {
-        setGm(stringify(demo.gm as GeminiSpec));
-        setHg(stringify(compile(demo.gm as GeminiSpec)));
+        setGm(stringify(demo.spec as GeminiSpec));
     }, [demo]);
 
     useEffect(() => {
-        let newHg;
+        let editedGm;
         try {
-            newHg = stringify(compile(JSON.parse(gm)));
-            setHg(newHg);
+            editedGm = JSON.parse(gm);
         } catch (e) {
-            console.warn("Invalid HiGlass spec.");
+            console.warn("Cannnot parse the edited code.");
         }
+        if (!editedGm) return;
 
-        // TODO: Do we need this?
-        // hgRef?.current?.api.setViewConfig(JSON.parse(newHg)).then(() => {
-        //     console.log("onSetViewConfig");
-        // });
+        const findGlyph = (editedGm as GeminiSpec).views?.[0].tracks?.find(
+            d => (d.mark as MarkDeep)?.type === "glyph"
+        )?.mark;
+        if (!findGlyph) return;
+
+        renderGlyphPreview(glyphSvg.current as SVGSVGElement, findGlyph as MarkDeep);
     }, [gm]);
-
-    // Renders HiGlass by compiling the edited Gemini code.
-    const hglass = useMemo(() => {
-        return <HiGlassComponent
-            ref={hgRef}
-            options={{
-                bounded: true,
-                pixelPreciseMarginPadding: true,
-                containerPaddingX: 0,
-                containerPaddingY: 0,
-                sizeMode: "default"
-            }}
-            viewConfig={JSON.parse(hg)}
-        />
-    }, [gm, hg]);
 
     return (
         <>
@@ -73,7 +55,7 @@ function Editor() {
                 </select>
             </div>
             <div className="editor">
-                <SplitPane split="vertical" defaultSize="30%" onChange={() => { }}>
+                <SplitPane split="vertical" defaultSize="50%" onChange={() => { }}>
                     {/* Gemini Editor */}
                     <EditorPanel
                         code={gm}
@@ -82,14 +64,16 @@ function Editor() {
                             setGm(newHl);
                         }, 1000)}
                     />
-                    <SplitPane split="vertical" defaultSize="50%" onChange={() => { }}>
-                        {/* HiGlass Editor */}
-                        <EditorPanel
-                            code={hg}
-                            readOnly={true}
-                        />
-                        {/* HiGlass Output */}
-                        {!DEBUG_DO_NOT_RENDER_HIGLASS && hglass}
+                    {/* D3 Visualizations */}
+                    <SplitPane split="horizontal" defaultSize="50%" onChange={() => { }}>
+                        <div className="preview-container">
+                            <b>Glyph Preview</b>
+                            <div><svg ref={glyphSvg} /></div>
+                        </div>
+                        <div className="preview-container">
+                            <b>Layout Preview</b>
+                            <div><svg ref={layoutSvg} /></div>
+                        </div>
                     </SplitPane>
                 </SplitPane>
             </div>

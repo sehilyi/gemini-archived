@@ -1,83 +1,83 @@
 // Refer to the following url for dealing with defaults:
 // https://github.com/vega/vega-lite/blob/23fe2b9c6a82551f321ccab751370ca48ae002c9/src/channeldef.ts#L961
 
-/**
- * Some rules in naming variables/interfaces.
- * - Make the names that are shown to users simple and short.
- * - Make the names that are internally used to be consistent to HG.
- */
+import { PREDEFINED_GLYPHS_TYPE } from "./test/gemini/glyph";
 
 export interface GeminiSpec {
-    servers?: string | string[]; // EQ_TO trackSourceServers
-
     views: View[];
-
-    consistency?: Consistency[];
-
-    config?: HLTopLevelConfig;
+}
+interface View {
+    tracks: Track[];
 }
 
-export interface View {
-    uniqueName?: string;  // EQ_TO uid
-    // TODO: change these two similar to that in altair?
-    xDomain?: number[]; // EQ_TO initialXDomain // TODO: Can we use more readable format? (e.g., chr1.12322)
-    yDomain?: number[]; // EQ_TO initialYDomain
-    ///
-    // TODO: should we just provide absolute position using the `Track.width and Track.height`?
-    w?: number; // EQ_TO `layout.width`, range (0 - 12) (Default: 12)
-    h?: number; // EQ_TO `layout.height`, range (0 - 12) (Default: 12)
-    x?: number;  // EQ_TO `layout.x`, range (0 - 12) (Default: 0)
-    y?: number;  // EQ_TO `layout.y`, range (0 - 12) (Default: 0)
-    ///
-    tracks: Track[];
+type ChannelType = "x" | "y" | "color" | "x1" | "y1" | "category" | "category1";
 
-    // TODO: overlays?: Overlay[];
-    // TODO: selectionView?
+interface Track {
+    // Primitive.
+    data: string;
+    mark: Mark;
+    x?: Channel;
+    y?: Channel;
+    color?: Channel;
 
-    config?: HLTopLevelConfig;
+    x1?: Channel;
+    y1?: Channel;
+
+    category?: Channel;
+    category1?: Channel;
+
+    // Styles.
+    width?: number;
+    height?: number;
+}
+
+export type Mark = PrimitiveMarkType | GlyphMarkPredevined | MarkDeep;
+type PrimitiveMarkType = "bar" | "point" | "line" | "rect" | "text" | SymbolMarkType;
+type SymbolMarkType = "triangle-l" | "triangle-r";
+type GlyphMarkType = "glyph";
+type GlyphMarkPredevined = PREDEFINED_GLYPHS_TYPE;
+
+export type MarkDeep = {
+    type: PrimitiveMarkType | GlyphMarkType;
+    name: string;
+    referenceColumn?: string;   // A reference column for making `glyph`.
+    requiredChannels: ChannelType[];    // Channels that must be assigned.
+    elements: GlyphElement[];
 }
 
 /**
- * Currently covering "heatmap" and "*-gene-annotations" in `EnumTrack`
+ * Custom Glyph.
  */
-export type TrackType = "heatmap" | "gene-annotation";
-export interface Track {
-    uniqueName?: string;
+interface GlyphElement {
     description?: string;
-    mark: Mark;
-    type: TrackType;
-    data: string;   // URL of data (format: `${server}${tilesetUid}`).
-    // TOOD: should we support for non-genomic axis?
-    xAxis: true | false | "top" | "bottom"; // Default: top
-    yAxis: true | false | "left" | "right"; // Default: right
-    ///
-    position: TrackPosition;
-    chromInfoPath?: string;
-    size?: number;  // Used only for `top`, `left`, `right`, and `bottom` tracks.
-    width?: number;     // (Default: ?)
-    height?: number;    // (Default: ?)
+    select?: { channel: "category" | "category1", equal: string }[];
+    mark: PrimitiveMarkType;
 
-    // TODO: Investigate these more:
-    // position?: string; // EQ_TO Track.position. What is this for?
-    // options?: Object;
-    // data?: Data; // ?
-    // fromViewUid?: null | string;
-    // x?: number;
-    // y?: number;
-}
-export type Mark = PrimitiveMarkType | GlyphMarkPredevined | MarkDeep;
-export type PrimitiveMarkType = "bar" | "point" | "rect" | "symbol" | "text";
-export type GlyphMarkPredevined = undefined;   // TODO: Not yet supported.
-export type MarkDeep = {
-    type: PrimitiveMarkType | "glyph";
-    id: string; // A reference column for making `glyph`.
-    name: string;
-    // TODO: Positioning for nominal fields: center of x and y
-    // Positioning for quantitative fields: left and bottom
-    // TODO: Should GlyphMark has specifications of field type constraints?
+    x?: null | GlyphChannel;
+    y?: null | GlyphChannel;
+    x1?: null | GlyphChannel;
+    y1?: null | GlyphChannel;
+    color?: null | string | GlyphChannel;
+    size?: null | number | GlyphChannel;
 }
 
-export type TrackPosition = "center" | "left" | "top" | "right" | "bottom" | "gallery" | "whole";
+interface GlyphMarkDeep {
+    field: string;
+    domain: string[];
+    range: PrimitiveMarkType[];
+}
+type Aggregate = "max" | "min" | "mean";
+
+interface GlyphChannel {
+    bind: ChannelType;
+    aggregate?: Aggregate;
+}
+
+interface Channel {
+    field: string;
+    type: "nominal" | "quantitative";
+    aggregate?: Aggregate;
+}
 
 interface Data {
     type?: string;  // TODO: What kinds of types exist?
@@ -100,30 +100,3 @@ interface Consistency {
     zoomScale?: "shared" | "independent" | true | false;
     zoomCenter?: "shared" | "independent" | true | false;
 }
-
-interface HLTopLevelConfig {
-    /**
-     * This can be applied to the top level, i.e., in HiGlassLiteSpec.
-     */
-    chromInfoPath: string; // TODO: Can we aggregate multiple of these to one?
-    exportViewUrl?: string // /api/v1/viewconfs
-    // TODO: How about aggregating these three options?
-    editable?: boolean; // true
-    viewEditable?: boolean; // true
-    tracksEditable?: boolean; // true
-    zoomFixed?: boolean; // false
-    //
-    searchBox?: boolean | GenomePositionSearchBox; // EQ_TO genomePositionSearchBox
-}
-
-interface GenomePositionSearchBox {
-    // TODO: Can we remove these or aggregate with others?
-    autocompleteServer?: string, // "//higlass.io/api/v1"
-    autocompleteId?: string, // "OHJakQICQD6gTD7skx4EWA"
-    chromInfoServer: string, // "//higlass.io/api/v1"
-    chromInfoId: string, // "hg19"
-    //
-}
-
-// TODO: Huge tasks here: Need to include options for each track.
-// This can be found in `configs/index.js` at `higlass/higlass`.

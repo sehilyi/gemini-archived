@@ -2,9 +2,7 @@
  * This file stands for converting Gemini options to HiGlass options.
  */
 
-import { Track } from "./gemini.schema";
-
-function sizeToWidthOrHeight(track: Track) {
+function sizeToWidthOrHeight(track: any) {
     const { position, size, width: hlwidth, height: hlheight } = track;
     let width: number | undefined, height: number | undefined;
     if (position === "center") return { width: size ? size : hlwidth, height: size ? size : hlheight };
