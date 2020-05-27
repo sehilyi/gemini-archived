@@ -54,4 +54,16 @@ function renderGuidelines(g: d3.Selection<SVGGElement, any, any, any>, w: number
         .attr("y1", 0)
         .attr("y2", h)
         .attr("class", "preview-guideline");
+    g.append("line")
+        .attr("x1", 0)
+        .attr("x2", w)
+        .attr("y1", h / 2)
+        .attr("y2", h / 2)
+        .attr("class", "preview-guideline");
+    g.append("line")
+        .attr("x1", w / 2)
+        .attr("x2", w / 2)
+        .attr("y1", 0)
+        .attr("y2", h)
+        .attr("class", "preview-guideline");
 }
