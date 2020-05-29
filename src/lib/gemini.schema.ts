@@ -5,6 +5,7 @@ import { PREDEFINED_GLYPHS_TYPE as PREDEFINED_GLYPHS } from "./test/gemini/glyph
 
 export interface GeminiSpec {
     tracks: TrackExtended[];
+    // ...
 }
 
 /**
@@ -12,31 +13,37 @@ export interface GeminiSpec {
  */
 type ChannelType = "x" | "y" | "color" | "x1" | "y1" | string;
 export type TrackExtended = Track | AnyChannels;
+export interface Datum {
+    [key: string]: number | string;
+}
 interface Track {
     // Primitive.
-    data: string;
+    data: string | Datum[];
     mark: Mark;
-    x?: Channel;
-    y?: Channel;
-    color?: Channel;
 
-    x1?: Channel;
-    y1?: Channel;
+    x?: ChannelFlexible;
+    y?: ChannelFlexible;
+    color?: ChannelFlexible;
+    opacity?: ChannelFlexible;
+
+    x1?: ChannelFlexible;
+    y1?: ChannelFlexible;
+    // TODO: add a reference column for glyph
 
     // Styles.
     width?: number;
     height?: number;
 }
-interface AnyChannels {
+export interface AnyChannels {
     // Allow defining any kinds of chennels for Glyph
-    [key: string]: Channel;
+    [key: string]: ChannelFlexible;
 }
 
 /**
  * Marks
  */
 export type Mark = PrimitiveMarkType | GlyphMarkPredefined | MarkDeep;
-type PrimitiveMarkType = "bar" | "point" | "line" | "rect" | "text" | "rule" | SymbolMarkType;
+type PrimitiveMarkType = "bar" | "point" | "line" | "rect" | "text" | "rule" | "opacity" | SymbolMarkType;
 type SymbolMarkType = "triangle-l" | "triangle-r";
 type GlyphMarkType = "glyph";
 export interface GlyphMarkPredefined {
@@ -55,7 +62,7 @@ export type MarkDeep = {
 /**
  * Glyph
  */
-interface GlyphElement {
+export interface GlyphElement {
     description?: string;
     select?: { channel: ChannelType, equal: string }[];
     mark: PrimitiveMarkType | GlyphMarkDeep;
@@ -66,21 +73,28 @@ interface GlyphElement {
     y1?: null | GlyphChannel;
     color?: null | string | GlyphChannel;
     size?: null | number | GlyphChannel;
+    opacity?: null | number | GlyphChannel;
 }
 
-interface GlyphMarkDeep {
+export interface GlyphMarkDeep {
     bind: string;
     domain: string[];
     range: PrimitiveMarkType[];
 }
 type Aggregate = "max" | "min" | "mean";
 
-interface GlyphChannel {
+export interface GlyphChannel {
     bind: ChannelType;
     aggregate?: Aggregate;
 }
+export interface AnyGlyphChannels {
+    // Allow defining any kinds of chennels for binding data in Glyph
+    [key: string]: GlyphChannel;
+}
 
-interface Channel {
+export type ChannelFlexible = Value | Channel;
+export type Value = string | number;
+export interface Channel {
     field: string;
     type: "nominal" | "quantitative";
     aggregate?: Aggregate;

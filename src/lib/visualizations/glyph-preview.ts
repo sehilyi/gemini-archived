@@ -1,59 +1,72 @@
 import { TrackExtended } from "../gemini.schema";
 import * as d3 from "d3";
+import { renderGlyph } from "./glyph";
 
 export function renderGlyphPreview(svg: SVGSVGElement, track: TrackExtended) {
     if (!svg || !track) return;
-    const { data, mark } = track;
     d3.select(svg).selectAll("*").remove();
 
-    console.log("renderGlyphPreview.mark", mark);
-
     // Styles
-    const WIDTH = 300, HEIGHT = 300;
-    const PADDING = 30;
+    const WIDTH = 300, HEIGHT = 300, PADDING_X = 30, PADDING_Y = 100;
 
-    d3.select(svg)
-        .attr("width", WIDTH)
-        .attr("height", HEIGHT);
+    // BG and Guidelines
+    renderBackground(svg, WIDTH, HEIGHT, PADDING_X, PADDING_Y);
 
-    const g = d3.select(svg).append("g");
-    g.append("rect")
-        .attr("width", WIDTH)
-        .attr("height", HEIGHT)
-        .attr("stroke", "lightgray")
-        .attr("fill", "white");
+    const innerG = d3.select(svg).append("g")
+        .attr("width", WIDTH - PADDING_X * 2)
+        .attr("height", HEIGHT - PADDING_Y * 2)
+        .attr("transform", `translate(${PADDING_X},${PADDING_Y})`);
 
-    // Guidelines
-    renderGuidelines(g, WIDTH, HEIGHT, PADDING);
+    // TODO: Select a subset of data tuples for a single glyph.
+    // ...
 
-    const innerG = g.append("g")
-        .attr("width", WIDTH - PADDING * 2)
-        .attr("height", HEIGHT - PADDING * 2)
-        .attr("transform", `translate(${PADDING},${PADDING})`);
+    // TODO: Should aggregate data when specified? (e.g., x: {..., aggregate: "mean"})
+    // ...
+
+    renderGlyph(
+        innerG,
+        track,
+        { x: 0, x1: WIDTH - PADDING_X * 2, y: 0, y1: HEIGHT - PADDING_Y * 2 }
+    );
 }
 
-function renderGuidelines(g: d3.Selection<SVGGElement, any, any, any>, w: number, h: number, p: number) {
+function renderBackground(
+    svg: SVGGElement,
+    w: number,
+    h: number,
+    px: number,
+    py: number
+) {
+    d3.select(svg)
+        .attr("width", w)
+        .attr("height", h);
+    const g = d3.select(svg).append("g");
+    g.append("rect")
+        .attr("width", w)
+        .attr("height", h)
+        .attr("stroke", "lightgray")
+        .attr("fill", "white");
     g.append("line")
         .attr("x1", 0)
         .attr("x2", w)
-        .attr("y1", p)
-        .attr("y2", p)
+        .attr("y1", py)
+        .attr("y2", py)
         .attr("class", "preview-guideline");
     g.append("line")
         .attr("x1", 0)
         .attr("x2", w)
-        .attr("y1", h - p)
-        .attr("y2", h - p)
+        .attr("y1", h - py)
+        .attr("y2", h - py)
         .attr("class", "preview-guideline");
     g.append("line")
-        .attr("x1", p)
-        .attr("x2", p)
+        .attr("x1", px)
+        .attr("x2", px)
         .attr("y1", 0)
         .attr("y2", h)
         .attr("class", "preview-guideline");
     g.append("line")
-        .attr("x1", w - p)
-        .attr("x2", w - p)
+        .attr("x1", w - px)
+        .attr("x2", w - px)
         .attr("y1", 0)
         .attr("y2", h)
         .attr("class", "preview-guideline");

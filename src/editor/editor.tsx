@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import * as d3 from "d3"; // TODO: performance
 import EditorPanel from './editor-panel';
 import stringify from 'json-stringify-pretty-compact';
 import SplitPane from 'react-split-pane';
@@ -30,14 +31,17 @@ function Editor() {
         }
         if (!editedGm) return;
 
-        const glyphTrack = (editedGm as GeminiSpec)?.tracks?.find(
+        const track = (editedGm as GeminiSpec)?.tracks?.find(
             d => (d.mark as MarkDeep)?.type === "glyph"
         );
-        if (!glyphTrack) return;
+        if (!track) return;
 
-        renderGlyphPreview(
-            glyphSvg.current as SVGSVGElement,
-            glyphTrack as TrackExtended
+        // TODO: Faster way of this?
+        d3.csv(track.data as string).then(data =>
+            renderGlyphPreview(
+                glyphSvg.current as SVGSVGElement,
+                { ...track, data } as TrackExtended
+            )
         );
     }, [gm]);
 
@@ -63,8 +67,8 @@ function Editor() {
                     <EditorPanel
                         code={gm}
                         readOnly={false}
-                        onChange={debounce(newHl => {
-                            setGm(newHl);
+                        onChange={debounce(code => {
+                            setGm(code);
                         }, 1000)}
                     />
                     {/* D3 Visualizations */}
