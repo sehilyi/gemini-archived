@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import EditorPanel from './editor-panel';
 import stringify from 'json-stringify-pretty-compact';
 import SplitPane from 'react-split-pane';
-import { GeminiSpec, MarkDeep } from '../lib/gemini.schema';
+import { GeminiSpec, MarkDeep, TrackExtended } from '../lib/gemini.schema';
 import { debounce } from "lodash";
 import { demos } from './examples';
 import './editor.css';
@@ -30,12 +30,15 @@ function Editor() {
         }
         if (!editedGm) return;
 
-        const findGlyph = (editedGm as GeminiSpec).views?.[0].tracks?.find(
+        const glyphTrack = (editedGm as GeminiSpec)?.tracks?.find(
             d => (d.mark as MarkDeep)?.type === "glyph"
-        )?.mark;
-        if (!findGlyph) return;
+        );
+        if (!glyphTrack) return;
 
-        renderGlyphPreview(glyphSvg.current as SVGSVGElement, findGlyph as MarkDeep);
+        renderGlyphPreview(
+            glyphSvg.current as SVGSVGElement,
+            glyphTrack as TrackExtended
+        );
     }, [gm]);
 
     return (
@@ -65,7 +68,7 @@ function Editor() {
                         }, 1000)}
                     />
                     {/* D3 Visualizations */}
-                    <SplitPane split="horizontal" defaultSize="50%" onChange={() => { }}>
+                    <SplitPane split="horizontal" defaultSize="35%" onChange={() => { }}>
                         <div className="preview-container">
                             <b>Glyph Preview</b>
                             <div><svg ref={glyphSvg} /></div>

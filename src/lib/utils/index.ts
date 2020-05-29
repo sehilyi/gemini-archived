@@ -1,16 +1,14 @@
 import Ajv from 'ajv';
 import uuid from "uuid";
-import { GeminiSpec, Mark } from '../gemini.schema';
-import { PREDEFINED_GLYPHS_TYPES, PREDEFINED_GLYPHS_TYPE, PREDEFINED_GLYPHS } from "../test/gemini/glyph";
+import { GeminiSpec, Mark, GlyphMarkPredefined } from '../gemini.schema';
+import { PREDEFINED_GLYPHS_TYPES, PREDEFINED_GLYPHS } from "../test/gemini/glyph";
 
 export function replaceGlyphs(spec: GeminiSpec): GeminiSpec {
-    for (let i = 0; i < spec.views.length; i++) {
-        const view = spec.views[i];
-        for (let j = 0; j < view.tracks.length; j++) {
-            const track = view.tracks[j];
-            if (PREDEFINED_GLYPHS_TYPES.includes(track.mark as PREDEFINED_GLYPHS_TYPE)) {
-                track.mark = PREDEFINED_GLYPHS.find(d => d.name === track.mark as PREDEFINED_GLYPHS_TYPE)?.mark as Mark;
-            }
+    for (let i = 0; i < spec.tracks.length; i++) {
+        const track = spec.tracks[i];
+        const predefinedGlyph = (track.mark as GlyphMarkPredefined)?.type;
+        if (PREDEFINED_GLYPHS_TYPES.includes(predefinedGlyph)) {
+            track.mark = PREDEFINED_GLYPHS.find(d => d.name === predefinedGlyph)?.mark as Mark;
         }
     }
     return spec;

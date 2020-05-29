@@ -1,17 +1,17 @@
 // Refer to the following url for dealing with defaults:
 // https://github.com/vega/vega-lite/blob/23fe2b9c6a82551f321ccab751370ca48ae002c9/src/channeldef.ts#L961
 
-import { PREDEFINED_GLYPHS_TYPE } from "./test/gemini/glyph";
+import { PREDEFINED_GLYPHS_TYPE as PREDEFINED_GLYPHS } from "./test/gemini/glyph";
 
 export interface GeminiSpec {
-    views: View[];
-}
-interface View {
-    tracks: Track[];
+    tracks: TrackExtended[];
 }
 
-type ChannelType = "x" | "y" | "color" | "x1" | "y1" | "category" | "category1";
-
+/**
+ * Tracks
+ */
+type ChannelType = "x" | "y" | "color" | "x1" | "y1" | string;
+export type TrackExtended = Track | AnyChannels;
 interface Track {
     // Primitive.
     data: string;
@@ -23,19 +23,26 @@ interface Track {
     x1?: Channel;
     y1?: Channel;
 
-    category?: Channel;
-    category1?: Channel;
-
     // Styles.
     width?: number;
     height?: number;
 }
+interface AnyChannels {
+    // Allow defining any kinds of chennels for Glyph
+    [key: string]: Channel;
+}
 
-export type Mark = PrimitiveMarkType | GlyphMarkPredevined | MarkDeep;
-type PrimitiveMarkType = "bar" | "point" | "line" | "rect" | "text" | SymbolMarkType;
+/**
+ * Marks
+ */
+export type Mark = PrimitiveMarkType | GlyphMarkPredefined | MarkDeep;
+type PrimitiveMarkType = "bar" | "point" | "line" | "rect" | "text" | "rule" | SymbolMarkType;
 type SymbolMarkType = "triangle-l" | "triangle-r";
 type GlyphMarkType = "glyph";
-type GlyphMarkPredevined = PREDEFINED_GLYPHS_TYPE;
+export interface GlyphMarkPredefined {
+    type: PREDEFINED_GLYPHS;
+    server: string; // Doesn't mean anything now.
+}
 
 export type MarkDeep = {
     type: PrimitiveMarkType | GlyphMarkType;
@@ -46,12 +53,12 @@ export type MarkDeep = {
 }
 
 /**
- * Custom Glyph.
+ * Glyph
  */
 interface GlyphElement {
     description?: string;
-    select?: { channel: "category" | "category1", equal: string }[];
-    mark: PrimitiveMarkType;
+    select?: { channel: ChannelType, equal: string }[];
+    mark: PrimitiveMarkType | GlyphMarkDeep;
 
     x?: null | GlyphChannel;
     y?: null | GlyphChannel;
@@ -62,7 +69,7 @@ interface GlyphElement {
 }
 
 interface GlyphMarkDeep {
-    field: string;
+    bind: string;
     domain: string[];
     range: PrimitiveMarkType[];
 }
@@ -86,6 +93,9 @@ interface Data {
     tilesetInfo?: Object;
 }
 
+/**
+ * Consistency
+ */
 interface Consistency {
     /**
      * `true` and `false` correspond to "shared" and "independent", respectively.

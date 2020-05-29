@@ -5,53 +5,56 @@ export const GLYPH_GENE_ANNOTATAION: Mark = {
     "name": "gene-annotation",
     "requiredChannels": [
         "x", "x1", "y",
-        "category", // genes or exons?
-        "category1" // + or - strand?
+        "geneOrExon", // genes or exons?
+        "strand" // + or - strand?
     ],
     "elements": [
         {
-            // Should render only one line
+            // Should render once
             "description": "horizontal line",
             "mark": "line",
             "color": "black",
             "x": { "bind": "x", "aggregate": "min" },
-            "x1": { "bind": "x1", "aggregate": "max" },
+            "x1": { "bind": "x1" }, // Defining only on `x` should work.
             "size": 2
         },
         {
-            "description": "gene left head",
+            "description": "gene left",
             "select": [
-                { "channel": "category", "equal": "gene" },
-                { "channel": "category1", "equal": "+" }
+                { "channel": "geneOrExon", "equal": "gene" },
             ],
-            "mark": "triangle-l", // TODO: Should provide conditional mark
+            "mark": {
+                "bind": "strand",
+                "domain": ["+", "-"],
+                "range": ["triangle-l", "rule"]
+            },
+            "size": 12,
             "x1": null,
         },
         {
-            "description": "gene left tail",
+            "description": "gene right",
             "select": [
-                { "channel": "category", "equal": "gene" },
-                { "channel": "category1", "equal": "+" }
+                { "channel": "geneOrExon", "equal": "gene" },
             ],
-            "mark": "rect"
-        },
-        {
-            "description": "gene right head",
-            "select": [
-                { "channel": "category", "equal": "gene" },
-                { "channel": "category1", "equal": "-" }
-            ],
-            "mark": "triangle-r",
+            "mark": {
+                "bind": "strand",
+                "domain": ["+", "-"],
+                "range": ["rule", "triangle-r"]
+            },
+            "size": 12,
             "x": { "bind": "x1" },
-            "x1": null,
         },
         {
             "description": "exon",
+            "select": [
+                { "channel": "geneOrExon", "equal": "exon" },
+            ],
             "mark": "rect",
         },
         {
             "mark": "text",
             "color": "black"
+            // Offset
         }
     ]
 }

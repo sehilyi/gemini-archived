@@ -1,26 +1,29 @@
-import { MarkDeep } from "../gemini.schema";
+import { TrackExtended } from "../gemini.schema";
 import * as d3 from "d3";
 
-export function renderGlyphPreview(ref: SVGSVGElement, mark: MarkDeep) {
-    if (!ref) return;
-    d3.select(ref).selectAll("*").remove();
+export function renderGlyphPreview(svg: SVGSVGElement, track: TrackExtended) {
+    if (!svg || !track) return;
+    const { data, mark } = track;
+    d3.select(svg).selectAll("*").remove();
 
-    // Constants
+    console.log("renderGlyphPreview.mark", mark);
+
+    // Styles
     const WIDTH = 300, HEIGHT = 300;
     const PADDING = 30;
 
-    const svg = d3.select(ref)
+    d3.select(svg)
         .attr("width", WIDTH)
         .attr("height", HEIGHT);
 
-    const g = d3.select(ref).append("g");
+    const g = d3.select(svg).append("g");
     g.append("rect")
         .attr("width", WIDTH)
         .attr("height", HEIGHT)
         .attr("stroke", "lightgray")
         .attr("fill", "white");
 
-    // guidelines
+    // Guidelines
     renderGuidelines(g, WIDTH, HEIGHT, PADDING);
 
     const innerG = g.append("g")
