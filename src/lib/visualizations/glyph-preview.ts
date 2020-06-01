@@ -7,7 +7,7 @@ export function renderGlyphPreview(svg: SVGSVGElement, track: Track | GenericTyp
     d3.select(svg).selectAll("*").remove();
 
     // Styles
-    const WIDTH = 300, HEIGHT = 300, PADDING_X = 30, PADDING_Y = 100;
+    const WIDTH = 600, HEIGHT = 300, PADDING_X = 60, PADDING_Y = 100;
 
     // BG and Guidelines
     renderBackground(svg, WIDTH, HEIGHT, PADDING_X, PADDING_Y);

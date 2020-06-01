@@ -27,6 +27,7 @@ export interface Track {
     x1?: Channel
     y1?: Channel
     size?: Channel
+    text?: Channel
     // styles
     width?: number
     height?: number
@@ -49,7 +50,8 @@ export const ChannelTypes = {
     y1: 'y1',
     color: 'color',
     opacity: 'opacity',
-    size: 'size'
+    size: 'size',
+    text: 'text'
 } as const;
 
 export type ChannelType = keyof typeof ChannelTypes | string
@@ -114,6 +116,13 @@ export interface GlyphElement {
     color?: ChannelBind | ChannelValue | null
     size?: ChannelBind | ChannelValue | null
     opacity?: ChannelBind | ChannelValue | null
+    text?: ChannelBind | ChannelValue | null
+    styles?: Style
+}
+
+export interface Style {
+    dashed?: string
+    dy?: number;
 }
 
 export interface MarkBind {

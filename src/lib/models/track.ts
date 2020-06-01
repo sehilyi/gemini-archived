@@ -140,7 +140,8 @@ export class TrackModel {
         const DEFAULT_ENCODING: { [k: string]: number | string } = {
             'opacity': 1,
             'size': 10,
-            'color': 'black'
+            'color': 'black',
+            'text': ''
         }
         ////
 
@@ -151,7 +152,17 @@ export class TrackModel {
                 case 'size':
                 case 'opacity':
                 case 'color':
+                case 'text':
                     return (element[c] as any).value;
+            }
+        }
+        else if (IsChannelValue(this.track[c])) {
+            switch (c) {
+                case 'size':
+                case 'opacity':
+                case 'color':
+                case 'text':
+                    return (this.track[c] as any).value;
             }
         }
         else if (this.scales[scaleChannel]) {
@@ -159,16 +170,19 @@ export class TrackModel {
                 ? this.getFieldByChannel((element[c] as ChannelBind).bind)
                 : this.getFieldByChannel(c);
             return this.scales[scaleChannel](datum[field] as any);
+        } else if (c === 'text') {
+            const field = IsChannelBind(element.text)
+                ? this.getFieldByChannel(element.text.bind)
+                : IsChannelDeep(this.track.text)
+                    ? this.track.text.field
+                    : undefined;
+            if (field) {
+                return datum[field];
+            }
         }
         else {
-            switch (c) {
-                case 'size':
-                case 'opacity':
-                case 'color':
-                    return IsChannelValue(this.track[c])
-                        ? (this.track[c] as any).value  // TODO: Remove `any`
-                        : DEFAULT_ENCODING[c]; // If not specified, use default value.
-            }
+            // If not specified, use default value.
+            return DEFAULT_ENCODING[c];
         }
     }
 
