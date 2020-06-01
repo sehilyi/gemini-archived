@@ -18,8 +18,8 @@ export const PREDEFINED_GLYPHS = [
 }[];
 
 export type PREDEFINED_GLYPHS_TYPE =
-    "glyph-gene-annotation-v1" |
-    "glyph-logo-plot-v1";
+    | "glyph-gene-annotation-v1"
+    | "glyph-logo-plot-v1";
 
 export const PREDEFINED_GLYPHS_TYPES: PREDEFINED_GLYPHS_TYPE[] = [
     "glyph-gene-annotation-v1",

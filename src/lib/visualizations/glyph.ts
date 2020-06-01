@@ -1,17 +1,17 @@
 import * as d3 from "d3";
 import { BoundingBox } from "./bounding-box";
-import { TrackExtended, MarkDeep, Datum, Channel, AnyChannels, GlyphMarkDeep, GlyphElement, GlyphChannel } from "../gemini.schema";
+import { Track, Datum, ChannelDeep, GenericType, GlyphElement, ChannelBind, IsChannelDeep, Channel, MarkGlyph, IsGlyphMark, MarkDeep, ChannelValue, IsChannelValue } from "../gemini.schema";
 import { transformData, FilterSpec } from "../utils/data-process";
 import { deepToLongElements } from "../utils/spec-preprocess";
 import { DEFAULT_VISUAL_PROPERTIES } from "./defaults";
+import { TrackModel } from "../models/track";
 
 export function renderGlyph(
-    g: d3.Selection<SVGGElement, any, any, any>,
-    track: TrackExtended,
-    bb: BoundingBox
+    gSelection: d3.Selection<SVGGElement, any, any, any>,
+    track: Track | GenericType<Channel>,
+    boundingBox: BoundingBox
 ) {
     const {
-        data,
         mark,
         x,
         x1,
@@ -21,24 +21,21 @@ export function renderGlyph(
         opacity
     } = track;
 
-    const info = data as Datum[];
-    if (!info) {
+    const trackModel = new TrackModel(track);
+
+    // checks
+    const data = track.data as Datum[];
+    if (!data) {
         console.warn("No array of a JSON object suggested.");
         return;
     }
 
-    console.log("renderGlyph.track", track);
-    console.log("renderGlyph.data", data);
-    console.log("renderGlyph.mark", mark);
-
-    // TODO: Check if required channels specified.
-    // ...
-
-    const markDeep = mark as MarkDeep;
-    if (!markDeep || markDeep.type !== "glyph") {
-        console.warn("Tried to render glyph but it is not defined.");
+    const markDeep = mark as MarkGlyph;
+    if (!IsGlyphMark(markDeep)) {
+        console.warn("Glyph is not defined.");
         return;
     }
+    /////////////
 
     const {
         name,
@@ -49,45 +46,41 @@ export function renderGlyph(
     // TODO: Add title using `name`
     // ...
 
-    const longElements = deepToLongElements(elements);
-
     // Fields
-    const xField = typeof x === "object" ? x?.field : undefined;
-    const x1Field = typeof x1 === "object" ? x1?.field : undefined;
-    const yField = typeof y === "object" ? y?.field : undefined;
-    const y1Field = typeof y1 === "object" ? y1?.field : undefined;
+    const xField = IsChannelDeep(x) ? x.field : undefined;
+    const x1Field = IsChannelDeep(x1) ? x1.field : undefined;
+    const yField = IsChannelDeep(y) ? y.field : undefined;
+    const y1Field = IsChannelDeep(y1) ? y1.field : undefined;
 
     // Channels
-    const channelsToFields: { [k: string]: any } = {};
+    const channelsToFields: { [k: string]: string } = {};
     requiredChannels.forEach(c => {
-        channelsToFields[c] = ((track as AnyChannels)[c] as Channel)?.field;
+        channelsToFields[c] = ((track as GenericType<Channel>)[c] as ChannelDeep)?.field;
     });
 
     // Scales
     let xValues: any[] = [], yValues: any[] = [];
     if (xField) {
-        xValues = xValues.concat(info.map(d => d[xField]));
+        xValues = xValues.concat(data.map(d => d[xField]));
     }
     if (x1Field) {
-        xValues = xValues.concat(info.map(d => d[x1Field]));
+        xValues = xValues.concat(data.map(d => d[x1Field]));
     }
     if (yField) {
-        yValues = yValues.concat(info.map(d => d[yField]));
+        yValues = yValues.concat(data.map(d => d[yField]));
     }
     if (y1Field) {
-        yValues = yValues.concat(info.map(d => d[y1Field]));
+        yValues = yValues.concat(data.map(d => d[y1Field]));
     }
     const xDomain = d3.extent(xValues) as number[];
     const yDomain = d3.set(yValues).values();
-    const xRange = [bb.x, bb.x1];
-    const yRange = [bb.y, bb.y1];
+    const xRange = [boundingBox.x, boundingBox.x1];
+    const yRange = [boundingBox.y, boundingBox.y1];
     const xScale = d3.scaleLinear().domain(xDomain).range(xRange);
     const yScale = d3.scaleOrdinal().domain(yDomain).range(xRange);
 
-    console.log(longElements);
-
     // Render each element
-    longElements.forEach(element => {
+    trackModel.getElements().forEach(element => {
         const {
             description: descriptionE,
             select: selectE,
@@ -113,79 +106,78 @@ export function renderGlyph(
         const glyphChannelsToFields: { [k: string]: any } = {};
         requiredChannels.forEach(_c => {
             const c = _c as keyof GlyphElement;
-            const boundChannel = (element[c] as GlyphChannel)?.bind;
-            glyphChannelsToFields[c] = boundChannel ? channelsToFields[boundChannel] : channelsToFields[c];
+            glyphChannelsToFields[c] =
+                channelsToFields[(element[c] as ChannelBind)?.bind] ??
+                channelsToFields[c];
         });
 
-        // console.log(glyphChannelsToFields);
-
         // Render glyph
-        const transformed_data = transformData(info, filters);
+        const transformed_data = transformData(data, filters);
         if (markE === "line") {
             const isAggregate = true;
             if (isAggregate) {
                 // TODO:
-                g.selectAll()
+                gSelection.selectAll()
                     .data(transformed_data)
                     .enter()
                     .append('line')
-                    .attr('stroke', colorE as string)
+                    .attr('stroke', (colorE as ChannelValue).value)
                     .attr('x1', d => {
-                        return xScale(d[glyphChannelsToFields['x']] as number) as number;
+                        return xScale(d[glyphChannelsToFields['x']] as number);
                     })
-                    .attr('x2', d => xScale(d[glyphChannelsToFields['x1']] as number) as number)
+                    .attr('x2', d => xScale(d[glyphChannelsToFields['x1']] as number))
                     .attr('y1', d => yScale(d[glyphChannelsToFields['y']] as string) as number)
                     .attr('y2', d => yScale(d[glyphChannelsToFields['y']] as string) as number)
-                    .attr('stroke-width', sizeE as number)
-                    .attr('opacity', typeof opacity !== "object" ? opacity as number : DEFAULT_VISUAL_PROPERTIES.opacity);
+                    .attr('stroke-width', (sizeE as ChannelValue).value)
+                    .attr('opacity', IsChannelValue(opacity) ? opacity.value : DEFAULT_VISUAL_PROPERTIES.opacity);
             }
         } else if (markE === "rect") {
-            g.selectAll()
+            gSelection.selectAll()
                 .data(transformed_data)
                 .enter()
                 .append('rect')
                 .attr('fill', "blue")
                 .attr('x', d => xScale(d[glyphChannelsToFields['x']] as number) as number)
                 .attr('width', d => xScale(d[glyphChannelsToFields['x1']] as number) - xScale(d[glyphChannelsToFields['x']] as number))
-                .attr('y', d => yScale(d[glyphChannelsToFields['y']] as string) as number - (sizeE as number) / 2.0)
-                .attr('height', sizeE as number)
+                .attr('y', d => yScale(d[glyphChannelsToFields['y']] as string) as number - ((sizeE as ChannelValue).value as number) / 2.0)
+                .attr('height', (sizeE as ChannelValue).value)
                 .attr('stroke', 'black')
                 .attr('stroke-width', 1)
-                .attr('opacity', typeof opacity !== "object" ? opacity as number : DEFAULT_VISUAL_PROPERTIES.opacity);
+                .attr('opacity', IsChannelValue(opacity) ? opacity.value : DEFAULT_VISUAL_PROPERTIES.opacity);
         } else if (markE === 'text') {
-            g.selectAll()
+            gSelection.selectAll()
                 .data(transformed_data)
                 .enter()
                 .append('text')
                 .text(d => d["gene_name"])
-                .attr('fill', colorE as string)
+                .attr('fill', (colorE as ChannelValue).value)
                 .attr('x', d => xScale(d[glyphChannelsToFields['x']] as number) as number + (xScale(d[glyphChannelsToFields['x1']] as number) - xScale(d[glyphChannelsToFields['x']] as number)) / 2.0)
                 .attr('y', d => yScale(d[glyphChannelsToFields['y']] as string) as number - 20)
                 .attr('alignment-baseline', "top")
                 .attr('text-anchor', "middle")
-                .attr('opacity', typeof opacity !== "object" ? opacity as number : DEFAULT_VISUAL_PROPERTIES.opacity);
+                .attr('opacity', IsChannelValue(opacity) ? opacity.value : DEFAULT_VISUAL_PROPERTIES.opacity);
         } else if (markE === 'rule') {
-            g.selectAll('line')
+            gSelection.selectAll('line')
                 .data(transformed_data)
                 .enter()
                 .append('line')
-                .attr('stroke', colorE as string)
+                .attr('stroke', (colorE as ChannelValue).value)
                 .attr('x1', d => xScale(d[glyphChannelsToFields['x']] as number) as number)
                 .attr('x2', d => xScale(d[glyphChannelsToFields['x']] as number) as number)
-                .attr('y1', d => yScale(d[glyphChannelsToFields['y']] as string) as number - (sizeE as number) / 2.0)
-                .attr('y2', d => yScale(d[glyphChannelsToFields['y']] as string) as number + (sizeE as number) / 2.0)
+                .attr('y1', d => yScale(d[glyphChannelsToFields['y']] as string) as number - ((sizeE as ChannelValue).value as number) / 2.0)
+                .attr('y2', d => yScale(d[glyphChannelsToFields['y']] as string) as number + ((sizeE as ChannelValue).value as number) / 2.0)
                 .attr('stroke-width', 3)
-                .attr('opacity', typeof opacity !== "object" ? opacity as number : DEFAULT_VISUAL_PROPERTIES.opacity);
+                .attr('opacity', IsChannelValue(opacity) ? opacity.value : DEFAULT_VISUAL_PROPERTIES.opacity);
         } else if (markE === 'point') {
-            g.selectAll('circle')
+            gSelection.selectAll('circle')
                 .data(transformed_data)
                 .enter()
                 .append('circle')
-                .attr('fill', colorE as string)
+                .attr('fill', (colorE as ChannelValue).value)
                 .attr('cx', d => xScale(d[glyphChannelsToFields['x']] as number) as number)
                 .attr('cy', d => xScale(d[glyphChannelsToFields['y']] as number) as number)
                 .attr('r', 15)
-                .attr('opacity', typeof opacity !== "object" ? opacity as number : DEFAULT_VISUAL_PROPERTIES.opacity);
+                .attr('opacity', IsChannelValue(opacity) ? opacity.value : DEFAULT_VISUAL_PROPERTIES.opacity);
         }
     });
 }

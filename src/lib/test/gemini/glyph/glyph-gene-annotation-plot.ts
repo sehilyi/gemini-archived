@@ -1,6 +1,6 @@
-import { Mark } from "../../../gemini.schema";
+import { MarkGlyph } from "../../../gemini.schema";
 
-export const GLYPH_GENE_ANNOTATAION: Mark = {
+export const GLYPH_GENE_ANNOTATAION: MarkGlyph = {
     "type": "glyph",
     "name": "gene-annotation",
     "requiredChannels": [
@@ -13,10 +13,10 @@ export const GLYPH_GENE_ANNOTATAION: Mark = {
             // Should render once
             "description": "horizontal line",
             "mark": "line",
-            "color": "black",
+            "color": { "value": "black" },
             "x": { "bind": "x", "aggregate": "min" },
             "x1": { "bind": "x1", "aggregate": "max" },
-            "size": 2
+            "size": { "value": 2 }
         },
         {
             "description": "exon",
@@ -24,7 +24,7 @@ export const GLYPH_GENE_ANNOTATAION: Mark = {
                 { "channel": "geneOrExon", "equal": "exon" },
             ],
             "mark": "rect",
-            "size": 20
+            "size": { "value": 20 }
         },
         {
             "description": "gene left",
@@ -36,9 +36,9 @@ export const GLYPH_GENE_ANNOTATAION: Mark = {
                 "domain": ["+", "-"],
                 "range": ['point', "rule"]
             },
-            "size": 30,
+            "size": { "value": 30 },
             "x1": null,
-            "color": "red"
+            "color": { "value": "red" }
         },
         {
             "description": "gene right",
@@ -50,16 +50,16 @@ export const GLYPH_GENE_ANNOTATAION: Mark = {
                 "domain": ["+", "-"],
                 "range": ["rule", 'point']
             },
-            "size": 30,
+            "size": { "value": 30 },
             "x": { "bind": "x1" },
-            "color": "red"
+            "color": { "value": "red" }
         },
         {
             "mark": "text",
             "select": [
                 { "channel": "geneOrExon", 'equal': "gene" }
             ],
-            "color": "black"
+            "color": { "value": "black" }
             // Offset
         }
     ]
