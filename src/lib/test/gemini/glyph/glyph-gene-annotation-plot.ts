@@ -4,9 +4,11 @@ export const GLYPH_GENE_ANNOTATAION: MarkGlyph = {
     "type": "glyph",
     "name": "gene-annotation",
     "requiredChannels": [
+        // TODO: What about optional channels?
         "x", "x1",
         "y", // + or - strand?
         "geneOrExon", // genes or exons?
+        'color'
     ],
     "elements": [
         {

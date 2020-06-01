@@ -7,7 +7,7 @@ export class TrackModel {
     private track: Track | GenericType<Channel>;
     private channelToField: { [k: string]: string };
     private domains: { [channel: string]: (string | number)[] };
-    private scales: { [channel: string]: d3.ScaleLinear<any, any> | d3.ScaleOrdinal<any, any> };
+    private scales: { [channel: string]: d3.ScaleLinear<any, any> | d3.ScaleOrdinal<any, any> | d3.ScaleSequential<any> };
     private ranges: { [channel: string]: number[] };
     constructor(track: Track | GenericType<Channel>) {
         this.track = track;
@@ -94,6 +94,8 @@ export class TrackModel {
                     this.ranges['x'] = [bb.x, bb.x1];
                 } else if (c === 'y') {
                     this.ranges['y'] = [bb.y, bb.y1];
+                } else if (c === 'color') {
+                    this.ranges['color'] = [-1, -1]
                 } else {
                     // TODO: Support specifying `range` and `domain`.
                     // ...
@@ -109,13 +111,21 @@ export class TrackModel {
             if (IsChannelDeep(channel)) {
                 const { type } = channel;
                 if (this.ranges[c]) {
-                    this.scales[c] = type === "nominal"
+                    // TODO: simplify
+                    this.scales[c] = c === 'color' && type === 'nominal'
                         ? d3.scaleOrdinal()
                             .domain(this.domains[c] as string[])
-                            .range(this.ranges[c])
-                        : d3.scaleLinear()
-                            .domain(this.domains[c] as [number, number])
-                            .range(this.ranges[c]);
+                            .range(d3.schemeTableau10)
+                        : c === 'color' && type === 'quantitative'
+                            ? d3.scaleSequential(d3.interpolateBrBG)
+                                .domain(this.domains[c] as [number, number])
+                            : type === "nominal"
+                                ? d3.scaleOrdinal()
+                                    .domain(this.domains[c] as string[])
+                                    .range(this.ranges[c])
+                                : d3.scaleLinear()
+                                    .domain(this.domains[c] as [number, number])
+                                    .range(this.ranges[c]);
                 }
             }
         });
@@ -135,21 +145,29 @@ export class TrackModel {
         ////
 
         const scaleChannel = c === 'x1' ? 'x' : c === 'y1' ? 'y' : c;
-        if (this.scales[scaleChannel]) {
-            const field = IsChannelBind(element[c])
-                ? this.getFieldByChannel((element[c] as ChannelBind).bind)
-                : this.getFieldByChannel(c);
-            return this.scales[scaleChannel](datum[field] as any);
-        } else {
+
+        if (IsChannelValue(element[c])) {
             switch (c) {
                 case 'size':
                 case 'opacity':
                 case 'color':
-                    return IsChannelValue(element[c])
-                        ? (element[c] as any).value :
-                        IsChannelValue(this.track[c])
-                            ? (this.track[c] as any).value  // TODO: Remove `any`
-                            : DEFAULT_ENCODING[c];
+                    return (element[c] as any).value;
+            }
+        }
+        else if (this.scales[scaleChannel]) {
+            const field = IsChannelBind(element[c])
+                ? this.getFieldByChannel((element[c] as ChannelBind).bind)
+                : this.getFieldByChannel(c);
+            return this.scales[scaleChannel](datum[field] as any);
+        }
+        else {
+            switch (c) {
+                case 'size':
+                case 'opacity':
+                case 'color':
+                    return IsChannelValue(this.track[c])
+                        ? (this.track[c] as any).value  // TODO: Remove `any`
+                        : DEFAULT_ENCODING[c]; // If not specified, use default value.
             }
         }
     }

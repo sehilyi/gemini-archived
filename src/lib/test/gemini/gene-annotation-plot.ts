@@ -8,6 +8,7 @@ export const GENE_ANNOTATION_PLOT: GeminiSpec = {
             x: { field: "start", type: "quantitative" },
             x1: { field: "end", type: "quantitative" },
             y: { field: "strand", type: "nominal" },
+            color: { field: "strand", type: "nominal" },
             geneOrExon: { field: "feature", type: "nominal" },
             opacity: { value: 0.6 }
         }

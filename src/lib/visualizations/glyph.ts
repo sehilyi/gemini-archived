@@ -11,7 +11,6 @@ export function renderGlyph(
     bb: BoundingBox
 ) {
     const tm = new TrackModel(track);
-
     tm.setScales(bb);
 
     // checks
@@ -47,17 +46,16 @@ export function renderGlyph(
         const transformed_data = transformData(data, filters);
         if (markE === "line") {
             const isAggregate = true;
-            if (isAggregate) {
-                // TODO:
+            if (isAggregate) { // TODO:
                 g.selectAll()
                     .data(transformed_data)
                     .enter()
                     .append('line')
-                    .attr('stroke', d => tm.getEncoding(element, 'color', d))
                     .attr('x1', d => tm.getEncoding(element, 'x', d))
                     .attr('x2', d => tm.getEncoding(element, 'x1', d))
                     .attr('y1', d => tm.getEncoding(element, 'y', d))
                     .attr('y2', d => tm.getEncoding(element, 'y', d))
+                    .attr('stroke', d => tm.getEncoding(element, 'color', d))
                     .attr('stroke-width', d => tm.getEncoding(element, 'size', d))
                     .attr('opacity', d => tm.getEncoding(element, 'opacity', d));
             }
@@ -66,13 +64,11 @@ export function renderGlyph(
                 .data(transformed_data)
                 .enter()
                 .append('rect')
-                .attr('fill', "blue")
                 .attr('x', d => tm.getEncoding(element, 'x', d))
-                .attr('width', d => tm.getEncoding(element, 'x1', d) - tm.getEncoding(element, 'x', d))
                 .attr('y', d => tm.getEncoding(element, 'y', d) - tm.getEncoding(element, 'size', d) / 2.0)
+                .attr('width', d => tm.getEncoding(element, 'x1', d) - tm.getEncoding(element, 'x', d))
                 .attr('height', d => tm.getEncoding(element, 'size', d))
-                .attr('stroke', 'black')
-                .attr('stroke-width', 1)
+                .attr('fill', d => tm.getEncoding(element, 'color', d))
                 .attr('opacity', d => tm.getEncoding(element, 'opacity', d));
         } else if (markE === 'text') {
             g.selectAll()
