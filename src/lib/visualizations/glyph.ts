@@ -35,12 +35,6 @@ export function renderGlyph(
     // TODO: Add title using `name`
     // ...
 
-    // Channels
-    const channelsToFields: { [k: string]: string } = {};
-    requiredChannels.forEach(c => {
-        channelsToFields[c] = ((track as GenericType<Channel>)[c] as ChannelDeep)?.field;
-    });
-
     // Render each element
     trackModel.getElements().forEach(element => {
         const {
@@ -59,8 +53,8 @@ export function renderGlyph(
         const filters: FilterSpec[] = [];
         selectE?.forEach(d => {
             const { channel, equal } = d;
-            if (channelsToFields[channel]) {
-                filters.push({ field: channelsToFields[channel], equal });
+            if (trackModel.getFieldByChannel(channel)) {
+                filters.push({ field: trackModel.getFieldByChannel(channel), equal });
             }
         });
 
@@ -69,8 +63,8 @@ export function renderGlyph(
         requiredChannels.forEach(_c => {
             const c = _c as keyof GlyphElement;
             glyphChannelsToFields[c] =
-                channelsToFields[(element[c] as ChannelBind)?.bind] ??
-                channelsToFields[c];
+                trackModel.getFieldByChannel((element[c] as ChannelBind)?.bind) ??
+                trackModel.getFieldByChannel(c);
         });
 
         // Render glyph

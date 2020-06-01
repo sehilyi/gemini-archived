@@ -45,6 +45,10 @@ export class TrackModel {
         return [];
     }
 
+    public getFieldByChannel(field: string) {
+        return this.channelToField[field];
+    }
+
     private setDomains() {
         const data = this.track.data as Datum[];
 
@@ -82,7 +86,6 @@ export class TrackModel {
                         : d3.extent(this.domains[c] as number[]) as [number, number]
                 }
             });
-            console.log(this.domains);
         }
     }
 
