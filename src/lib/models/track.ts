@@ -1,21 +1,38 @@
-import { Track, Channel, GenericType, IsGlyphMark, MarkGlyph, IsChannelDeep } from "../gemini.schema";
+import { Track, Channel, GenericType, IsGlyphMark, MarkGlyph, IsChannelDeep, ChannelDeep, Datum, ChannelType } from "../gemini.schema";
 import { deepToLongElements } from "../utils/spec-preprocess";
+import * as d3 from "d3";
+import { BoundingBox } from "../visualizations/bounding-box";
 
 export class TrackModel {
     private track: Track | GenericType<Channel>;
+    private channelToField: { [k: string]: string };
+    private domains: { [channel: string]: (string | number)[] };
+    private scales: { [channel: string]: d3.ScaleLinear<any, any> | d3.ScaleOrdinal<any, any> };
+    private ranges: { [channel: string]: number[] };
     constructor(track: Track | GenericType<Channel>) {
         this.track = track;
+        this.domains = {};
+        this.channelToField = {};
+        this.scales = {};
+        this.ranges = {};
 
+        /**
+         * Validate
+         */
         // TODO: Check if required channels are specified.
         // ...
 
-        // Add default specs
+        /**
+         * Default
+         */
         if (IsGlyphMark(track.mark)) {
             track.mark.elements = deepToLongElements(track.mark.elements);
         }
 
-        // Prepare rendering
-        this.setScales();
+        /**
+         * Prepare Rendering
+         */
+        this.setDomains();
     }
     public getTrack() {
         return this.track;
@@ -28,44 +45,83 @@ export class TrackModel {
         return [];
     }
 
-    private setScales() {
-        const { mark, x, x1, y, y1, color, opacity } = this.track;
+    private setDomains() {
+        const data = this.track.data as Datum[];
 
         if (IsGlyphMark(this.track.mark)) {
-            const { name, requiredChannels, elements } = this.track.mark;
+            const { requiredChannels: required } = this.track.mark;
 
-            // fields
-            // const xField = IsChannelDeep(x) ? x.field : undefined;
-            // const x1Field = IsChannelDeep(x1) ? x1.field : undefined;
-            // const yField = IsChannelDeep(y) ? y.field : undefined;
-            // const y1Field = IsChannelDeep(y1) ? y1.field : undefined;
+            // Add channel-to-domain mappings when `field` suggested.
+            required.forEach(c => {
+                const channel = (this.track as GenericType<Channel>)[c];
+                if (IsChannelDeep(channel)) {
+                    const { field } = channel;
+                    this.channelToField[c] = field;
 
-            // // channels
-            // const channelsToFields: { [k: string]: string } = {};
-            // requiredChannels.forEach(c => {
-            //     channelsToFields[c] = ((track as GenericType<Channel>)[c] as ChannelDeep)?.field;
-            // });
+                    // Domains for x1 and y1 needs to be added to that of x and y, respectively.
+                    const targetChannel =
+                        c === 'x1' ? 'x'
+                            : c === 'y1' ? 'y'
+                                : c;
 
-            // // scales
-            // let xValues: any[] = [], yValues: any[] = [];
-            // if (xField) {
-            //     xValues = xValues.concat(data.map(d => d[xField]));
-            // }
-            // if (x1Field) {
-            //     xValues = xValues.concat(data.map(d => d[x1Field]));
-            // }
-            // if (yField) {
-            //     yValues = yValues.concat(data.map(d => d[yField]));
-            // }
-            // if (y1Field) {
-            //     yValues = yValues.concat(data.map(d => d[y1Field]));
-            // }
-            // const xDomain = d3.extent(xValues) as number[];
-            // const yDomain = d3.set(yValues).values();
-            // const xRange = [boundingBox.x, boundingBox.x1];
-            // const yRange = [boundingBox.y, boundingBox.y1];
-            // const xScale = d3.scaleLinear().domain(xDomain).range(xRange);
-            // const yScale = d3.scaleOrdinal().domain(yDomain).range(xRange);
+                    if (!this.domains[targetChannel]) {
+                        this.domains[targetChannel] = [];
+                    }
+                    this.domains[targetChannel] = [
+                        ...this.domains[targetChannel],
+                        ...data.map(d => d[field])
+                    ]
+                }
+            });
+            Object.keys(this.domains).forEach(c => {
+                const channel = (this.track as GenericType<Channel>)[c];
+                if (IsChannelDeep(channel)) {
+                    const { type } = channel;
+                    this.domains[c] = type === "nominal"
+                        ? d3.set(this.domains[c]).values()
+                        : d3.extent(this.domains[c] as number[]) as [number, number]
+                }
+            });
+            console.log(this.domains);
         }
+    }
+
+    private setRanges(bb: BoundingBox) {
+        Object.keys(this.domains).forEach(c => {
+            const channel = (this.track as GenericType<Channel>)[c];
+            if (IsChannelDeep(channel)) {
+                if (c === 'x') {
+                    this.ranges['x'] = [bb.x, bb.x1];
+                } else if (c === 'y') {
+                    this.ranges['y'] = [bb.y, bb.y1];
+                } else {
+                    // TODO: Support specifying `range` and `domain`.
+                    // ...
+                }
+            }
+        });
+    }
+
+    public setScales(boundingBox: BoundingBox) {
+        this.setRanges(boundingBox);
+        Object.keys(this.domains).forEach(c => {
+            const channel = (this.track as GenericType<Channel>)[c];
+            if (IsChannelDeep(channel)) {
+                const { type } = channel;
+                if (this.ranges[c]) {
+                    this.scales[c] = type === "nominal"
+                        ? d3.scaleOrdinal()
+                            .domain(this.domains[c] as string[])
+                            .range(this.ranges[c])
+                        : d3.scaleLinear()
+                            .domain(this.domains[c] as [number, number])
+                            .range(this.ranges[c]);
+                }
+            }
+        });
+    }
+
+    public getScale(c: ChannelType | string) {
+        return this.scales[c];
     }
 }

@@ -2,7 +2,6 @@ import * as d3 from "d3";
 import { BoundingBox } from "./bounding-box";
 import { Track, Datum, ChannelDeep, GenericType, GlyphElement, ChannelBind, IsChannelDeep, Channel, MarkGlyph, IsGlyphMark, MarkDeep, ChannelValue, IsChannelValue } from "../gemini.schema";
 import { transformData, FilterSpec } from "../utils/data-process";
-import { deepToLongElements } from "../utils/spec-preprocess";
 import { DEFAULT_VISUAL_PROPERTIES } from "./defaults";
 import { TrackModel } from "../models/track";
 
@@ -11,17 +10,11 @@ export function renderGlyph(
     track: Track | GenericType<Channel>,
     boundingBox: BoundingBox
 ) {
-    const {
-        mark,
-        x,
-        x1,
-        y,
-        y1,
-        color,
-        opacity
-    } = track;
+    const { mark, opacity } = track;
 
     const trackModel = new TrackModel(track);
+
+    trackModel.setScales(boundingBox);
 
     // checks
     const data = track.data as Datum[];
@@ -37,47 +30,16 @@ export function renderGlyph(
     }
     /////////////
 
-    const {
-        name,
-        requiredChannels,
-        elements
-    } = markDeep;
+    const { requiredChannels } = markDeep;
 
     // TODO: Add title using `name`
     // ...
-
-    // Fields
-    const xField = IsChannelDeep(x) ? x.field : undefined;
-    const x1Field = IsChannelDeep(x1) ? x1.field : undefined;
-    const yField = IsChannelDeep(y) ? y.field : undefined;
-    const y1Field = IsChannelDeep(y1) ? y1.field : undefined;
 
     // Channels
     const channelsToFields: { [k: string]: string } = {};
     requiredChannels.forEach(c => {
         channelsToFields[c] = ((track as GenericType<Channel>)[c] as ChannelDeep)?.field;
     });
-
-    // Scales
-    let xValues: any[] = [], yValues: any[] = [];
-    if (xField) {
-        xValues = xValues.concat(data.map(d => d[xField]));
-    }
-    if (x1Field) {
-        xValues = xValues.concat(data.map(d => d[x1Field]));
-    }
-    if (yField) {
-        yValues = yValues.concat(data.map(d => d[yField]));
-    }
-    if (y1Field) {
-        yValues = yValues.concat(data.map(d => d[y1Field]));
-    }
-    const xDomain = d3.extent(xValues) as number[];
-    const yDomain = d3.set(yValues).values();
-    const xRange = [boundingBox.x, boundingBox.x1];
-    const yRange = [boundingBox.y, boundingBox.y1];
-    const xScale = d3.scaleLinear().domain(xDomain).range(xRange);
-    const yScale = d3.scaleOrdinal().domain(yDomain).range(xRange);
 
     // Render each element
     trackModel.getElements().forEach(element => {
@@ -123,11 +85,11 @@ export function renderGlyph(
                     .append('line')
                     .attr('stroke', (colorE as ChannelValue).value)
                     .attr('x1', d => {
-                        return xScale(d[glyphChannelsToFields['x']] as number);
+                        return trackModel.getScale('x')(d[glyphChannelsToFields['x']] as any);
                     })
-                    .attr('x2', d => xScale(d[glyphChannelsToFields['x1']] as number))
-                    .attr('y1', d => yScale(d[glyphChannelsToFields['y']] as string) as number)
-                    .attr('y2', d => yScale(d[glyphChannelsToFields['y']] as string) as number)
+                    .attr('x2', d => trackModel.getScale('x')(d[glyphChannelsToFields['x1']] as any))
+                    .attr('y1', d => trackModel.getScale('y')(d[glyphChannelsToFields['y']] as any) as number)
+                    .attr('y2', d => trackModel.getScale('y')(d[glyphChannelsToFields['y']] as any) as number)
                     .attr('stroke-width', (sizeE as ChannelValue).value)
                     .attr('opacity', IsChannelValue(opacity) ? opacity.value : DEFAULT_VISUAL_PROPERTIES.opacity);
             }
@@ -137,9 +99,9 @@ export function renderGlyph(
                 .enter()
                 .append('rect')
                 .attr('fill', "blue")
-                .attr('x', d => xScale(d[glyphChannelsToFields['x']] as number) as number)
-                .attr('width', d => xScale(d[glyphChannelsToFields['x1']] as number) - xScale(d[glyphChannelsToFields['x']] as number))
-                .attr('y', d => yScale(d[glyphChannelsToFields['y']] as string) as number - ((sizeE as ChannelValue).value as number) / 2.0)
+                .attr('x', d => trackModel.getScale('x')(d[glyphChannelsToFields['x']] as any) as number)
+                .attr('width', d => trackModel.getScale('x')(d[glyphChannelsToFields['x1']] as any) - trackModel.getScale('x')(d[glyphChannelsToFields['x']] as any))
+                .attr('y', d => trackModel.getScale('y')(d[glyphChannelsToFields['y']] as any) as number - ((sizeE as ChannelValue).value as number) / 2.0)
                 .attr('height', (sizeE as ChannelValue).value)
                 .attr('stroke', 'black')
                 .attr('stroke-width', 1)
@@ -151,8 +113,8 @@ export function renderGlyph(
                 .append('text')
                 .text(d => d["gene_name"])
                 .attr('fill', (colorE as ChannelValue).value)
-                .attr('x', d => xScale(d[glyphChannelsToFields['x']] as number) as number + (xScale(d[glyphChannelsToFields['x1']] as number) - xScale(d[glyphChannelsToFields['x']] as number)) / 2.0)
-                .attr('y', d => yScale(d[glyphChannelsToFields['y']] as string) as number - 20)
+                .attr('x', d => trackModel.getScale('x')(d[glyphChannelsToFields['x']] as any) as number + (trackModel.getScale('x')(d[glyphChannelsToFields['x1']] as any) - trackModel.getScale('x')(d[glyphChannelsToFields['x']] as any)) / 2.0)
+                .attr('y', d => trackModel.getScale('y')(d[glyphChannelsToFields['y']] as any) as number - 20)
                 .attr('alignment-baseline', "top")
                 .attr('text-anchor', "middle")
                 .attr('opacity', IsChannelValue(opacity) ? opacity.value : DEFAULT_VISUAL_PROPERTIES.opacity);
@@ -162,10 +124,10 @@ export function renderGlyph(
                 .enter()
                 .append('line')
                 .attr('stroke', (colorE as ChannelValue).value)
-                .attr('x1', d => xScale(d[glyphChannelsToFields['x']] as number) as number)
-                .attr('x2', d => xScale(d[glyphChannelsToFields['x']] as number) as number)
-                .attr('y1', d => yScale(d[glyphChannelsToFields['y']] as string) as number - ((sizeE as ChannelValue).value as number) / 2.0)
-                .attr('y2', d => yScale(d[glyphChannelsToFields['y']] as string) as number + ((sizeE as ChannelValue).value as number) / 2.0)
+                .attr('x1', d => trackModel.getScale('x')(d[glyphChannelsToFields['x']] as any) as number)
+                .attr('x2', d => trackModel.getScale('x')(d[glyphChannelsToFields['x']] as any) as number)
+                .attr('y1', d => trackModel.getScale('y')(d[glyphChannelsToFields['y']] as any) as number - ((sizeE as ChannelValue).value as number) / 2.0)
+                .attr('y2', d => trackModel.getScale('y')(d[glyphChannelsToFields['y']] as any) as number + ((sizeE as ChannelValue).value as number) / 2.0)
                 .attr('stroke-width', 3)
                 .attr('opacity', IsChannelValue(opacity) ? opacity.value : DEFAULT_VISUAL_PROPERTIES.opacity);
         } else if (markE === 'point') {
@@ -174,8 +136,8 @@ export function renderGlyph(
                 .enter()
                 .append('circle')
                 .attr('fill', (colorE as ChannelValue).value)
-                .attr('cx', d => xScale(d[glyphChannelsToFields['x']] as number) as number)
-                .attr('cy', d => xScale(d[glyphChannelsToFields['y']] as number) as number)
+                .attr('cx', d => trackModel.getScale('x')(d[glyphChannelsToFields['x']] as any) as number)
+                .attr('cy', d => trackModel.getScale('y')(d[glyphChannelsToFields['y']] as any) as number)
                 .attr('r', 15)
                 .attr('opacity', IsChannelValue(opacity) ? opacity.value : DEFAULT_VISUAL_PROPERTIES.opacity);
         }
