@@ -6,15 +6,13 @@ import { DEFAULT_VISUAL_PROPERTIES } from "./defaults";
 import { TrackModel } from "../models/track";
 
 export function renderGlyph(
-    gSelection: d3.Selection<SVGGElement, any, any, any>,
+    g: d3.Selection<SVGGElement, any, any, any>,
     track: Track | GenericType<Channel>,
-    boundingBox: BoundingBox
+    bb: BoundingBox
 ) {
-    const { mark, opacity } = track;
+    const tm = new TrackModel(track);
 
-    const trackModel = new TrackModel(track);
-
-    trackModel.setScales(boundingBox);
+    tm.setScales(bb);
 
     // checks
     const data = track.data as Datum[];
@@ -23,48 +21,26 @@ export function renderGlyph(
         return;
     }
 
-    const markDeep = mark as MarkGlyph;
-    if (!IsGlyphMark(markDeep)) {
+    if (!IsGlyphMark(track.mark)) {
         console.warn("Glyph is not defined.");
         return;
     }
     /////////////
 
-    const { requiredChannels } = markDeep;
-
     // TODO: Add title using `name`
     // ...
 
     // Render each element
-    trackModel.getElements().forEach(element => {
-        const {
-            description: descriptionE,
-            select: selectE,
-            mark: markE,
-            x: xE,
-            x1: x1E,
-            y: yE,
-            y1: y1E,
-            color: colorE,
-            size: sizeE
-        } = element;
+    tm.getElements().forEach(element => {
+        const { select, mark: markE, } = element;
 
         // Select
         const filters: FilterSpec[] = [];
-        selectE?.forEach(d => {
+        select?.forEach(d => {
             const { channel, equal } = d;
-            if (trackModel.getFieldByChannel(channel)) {
-                filters.push({ field: trackModel.getFieldByChannel(channel), equal });
+            if (tm.getFieldByChannel(channel)) {
+                filters.push({ field: tm.getFieldByChannel(channel), equal });
             }
-        });
-
-        // Channels
-        const glyphChannelsToFields: { [k: string]: any } = {};
-        requiredChannels.forEach(_c => {
-            const c = _c as keyof GlyphElement;
-            glyphChannelsToFields[c] =
-                trackModel.getFieldByChannel((element[c] as ChannelBind)?.bind) ??
-                trackModel.getFieldByChannel(c);
         });
 
         // Render glyph
@@ -73,67 +49,65 @@ export function renderGlyph(
             const isAggregate = true;
             if (isAggregate) {
                 // TODO:
-                gSelection.selectAll()
+                g.selectAll()
                     .data(transformed_data)
                     .enter()
                     .append('line')
-                    .attr('stroke', (colorE as ChannelValue).value)
-                    .attr('x1', d => {
-                        return trackModel.getScale('x')(d[glyphChannelsToFields['x']] as any);
-                    })
-                    .attr('x2', d => trackModel.getScale('x')(d[glyphChannelsToFields['x1']] as any))
-                    .attr('y1', d => trackModel.getScale('y')(d[glyphChannelsToFields['y']] as any) as number)
-                    .attr('y2', d => trackModel.getScale('y')(d[glyphChannelsToFields['y']] as any) as number)
-                    .attr('stroke-width', (sizeE as ChannelValue).value)
-                    .attr('opacity', IsChannelValue(opacity) ? opacity.value : DEFAULT_VISUAL_PROPERTIES.opacity);
+                    .attr('stroke', d => tm.getEncoding(element, 'color', d))
+                    .attr('x1', d => tm.getEncoding(element, 'x', d))
+                    .attr('x2', d => tm.getEncoding(element, 'x1', d))
+                    .attr('y1', d => tm.getEncoding(element, 'y', d))
+                    .attr('y2', d => tm.getEncoding(element, 'y', d))
+                    .attr('stroke-width', d => tm.getEncoding(element, 'size', d))
+                    .attr('opacity', d => tm.getEncoding(element, 'opacity', d));
             }
         } else if (markE === "rect") {
-            gSelection.selectAll()
+            g.selectAll()
                 .data(transformed_data)
                 .enter()
                 .append('rect')
                 .attr('fill', "blue")
-                .attr('x', d => trackModel.getScale('x')(d[glyphChannelsToFields['x']] as any) as number)
-                .attr('width', d => trackModel.getScale('x')(d[glyphChannelsToFields['x1']] as any) - trackModel.getScale('x')(d[glyphChannelsToFields['x']] as any))
-                .attr('y', d => trackModel.getScale('y')(d[glyphChannelsToFields['y']] as any) as number - ((sizeE as ChannelValue).value as number) / 2.0)
-                .attr('height', (sizeE as ChannelValue).value)
+                .attr('x', d => tm.getEncoding(element, 'x', d))
+                .attr('width', d => tm.getEncoding(element, 'x1', d) - tm.getEncoding(element, 'x', d))
+                .attr('y', d => tm.getEncoding(element, 'y', d) - tm.getEncoding(element, 'size', d) / 2.0)
+                .attr('height', d => tm.getEncoding(element, 'size', d))
                 .attr('stroke', 'black')
                 .attr('stroke-width', 1)
-                .attr('opacity', IsChannelValue(opacity) ? opacity.value : DEFAULT_VISUAL_PROPERTIES.opacity);
+                .attr('opacity', d => tm.getEncoding(element, 'opacity', d));
         } else if (markE === 'text') {
-            gSelection.selectAll()
+            g.selectAll()
                 .data(transformed_data)
                 .enter()
                 .append('text')
                 .text(d => d["gene_name"])
-                .attr('fill', (colorE as ChannelValue).value)
-                .attr('x', d => trackModel.getScale('x')(d[glyphChannelsToFields['x']] as any) as number + (trackModel.getScale('x')(d[glyphChannelsToFields['x1']] as any) - trackModel.getScale('x')(d[glyphChannelsToFields['x']] as any)) / 2.0)
-                .attr('y', d => trackModel.getScale('y')(d[glyphChannelsToFields['y']] as any) as number - 20)
+                .attr('fill', d => tm.getEncoding(element, 'color', d))
+                .attr('x', d => (tm.getEncoding(element, 'x', d) + tm.getEncoding(element, 'x1', d)) / 2.0)
+                .attr('y', d => - 20 + tm.getEncoding(element, 'y', d))
                 .attr('alignment-baseline', "top")
                 .attr('text-anchor', "middle")
-                .attr('opacity', IsChannelValue(opacity) ? opacity.value : DEFAULT_VISUAL_PROPERTIES.opacity);
+                .attr('opacity', d => tm.getEncoding(element, 'opacity', d));
         } else if (markE === 'rule') {
-            gSelection.selectAll('line')
+            g.selectAll('line')
                 .data(transformed_data)
                 .enter()
                 .append('line')
-                .attr('stroke', (colorE as ChannelValue).value)
-                .attr('x1', d => trackModel.getScale('x')(d[glyphChannelsToFields['x']] as any) as number)
-                .attr('x2', d => trackModel.getScale('x')(d[glyphChannelsToFields['x']] as any) as number)
-                .attr('y1', d => trackModel.getScale('y')(d[glyphChannelsToFields['y']] as any) as number - ((sizeE as ChannelValue).value as number) / 2.0)
-                .attr('y2', d => trackModel.getScale('y')(d[glyphChannelsToFields['y']] as any) as number + ((sizeE as ChannelValue).value as number) / 2.0)
+                .attr('stroke', d => tm.getEncoding(element, 'color', d))
+                .attr('x1', d => tm.getEncoding(element, 'x', d))
+                .attr('x2', d => tm.getEncoding(element, 'x', d))
+                .attr('y1', d => tm.getEncoding(element, 'x', d) - tm.getEncoding(element, 'size', d) / 2.0)
+                .attr('y2', d => tm.getEncoding(element, 'x', d) - tm.getEncoding(element, 'size', d) / 2.0)
                 .attr('stroke-width', 3)
-                .attr('opacity', IsChannelValue(opacity) ? opacity.value : DEFAULT_VISUAL_PROPERTIES.opacity);
+                .attr('opacity', d => tm.getEncoding(element, 'opacity', d));
         } else if (markE === 'point') {
-            gSelection.selectAll('circle')
+            g.selectAll('circle')
                 .data(transformed_data)
                 .enter()
                 .append('circle')
-                .attr('fill', (colorE as ChannelValue).value)
-                .attr('cx', d => trackModel.getScale('x')(d[glyphChannelsToFields['x']] as any) as number)
-                .attr('cy', d => trackModel.getScale('y')(d[glyphChannelsToFields['y']] as any) as number)
+                .attr('fill', d => tm.getEncoding(element, 'color', d))
+                .attr('cx', d => tm.getEncoding(element, 'x', d))
+                .attr('cy', d => tm.getEncoding(element, 'x', d))
                 .attr('r', 15)
-                .attr('opacity', IsChannelValue(opacity) ? opacity.value : DEFAULT_VISUAL_PROPERTIES.opacity);
+                .attr('opacity', d => tm.getEncoding(element, 'opacity', d));
         }
     });
 }

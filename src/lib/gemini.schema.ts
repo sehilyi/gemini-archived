@@ -26,6 +26,7 @@ export interface Track {
     opacity?: Channel
     x1?: Channel
     y1?: Channel
+    size?: Channel
     // styles
     width?: number
     height?: number
@@ -41,15 +42,17 @@ export interface Datum {
 /**
  * Channel
  */
-export const ChannelType = {
+export const ChannelTypes = {
     x: 'x',
     y: 'y',
     x1: 'x1',
     y1: 'y1',
-    color: 'color'
+    color: 'color',
+    opacity: 'opacity',
+    size: 'size'
 } as const;
 
-export type ChannelType = keyof typeof ChannelType | string
+export type ChannelType = keyof typeof ChannelTypes | string
 
 export type Channel = ChannelDeep | ChannelValue
 
@@ -155,8 +158,26 @@ export function IsGlyphMark(mark: any): mark is MarkGlyph {
     return typeof mark === "object" && mark.type === "glyph";
 }
 
-export function IsChannelValue(channel: ChannelDeep | ChannelValue | undefined): channel is ChannelValue {
-    return typeof channel === "object" && 'value' in channel;
+export function IsChannelValue(
+    channel:
+        | ChannelDeep
+        | ChannelValue
+        | ChannelBind
+        | undefined
+        | null
+): channel is ChannelValue {
+    return channel !== null && typeof channel === "object" && 'value' in channel;
+}
+
+export function IsChannelBind(
+    channel:
+        | ChannelDeep
+        | ChannelValue
+        | ChannelBind
+        | undefined
+        | null
+): channel is ChannelBind {
+    return channel !== null && typeof channel === "object" && 'bind' in channel;
 }
 
 export function IsChannelDeep(channel: ChannelDeep | ChannelValue | undefined): channel is ChannelDeep {

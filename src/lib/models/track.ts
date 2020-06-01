@@ -1,4 +1,4 @@
-import { Track, Channel, GenericType, IsGlyphMark, MarkGlyph, IsChannelDeep, ChannelDeep, Datum, ChannelType } from "../gemini.schema";
+import { Track, Channel, GenericType, IsGlyphMark, IsChannelValue, ChannelTypes, ChannelBind, MarkGlyph, IsChannelDeep, ChannelDeep, Datum, ChannelType, GlyphElement, IsChannelBind } from "../gemini.schema";
 import { deepToLongElements } from "../utils/spec-preprocess";
 import * as d3 from "d3";
 import { BoundingBox } from "../visualizations/bounding-box";
@@ -63,10 +63,7 @@ export class TrackModel {
                     this.channelToField[c] = field;
 
                     // Domains for x1 and y1 needs to be added to that of x and y, respectively.
-                    const targetChannel =
-                        c === 'x1' ? 'x'
-                            : c === 'y1' ? 'y'
-                                : c;
+                    const targetChannel = c === 'x1' ? 'x' : c === 'y1' ? 'y' : c;
 
                     if (!this.domains[targetChannel]) {
                         this.domains[targetChannel] = [];
@@ -122,6 +119,39 @@ export class TrackModel {
                 }
             }
         });
+    }
+
+    public getEncoding(
+        element: GlyphElement /* Remove this */,
+        c: keyof typeof ChannelTypes,
+        datum: Datum
+    ) {
+        // TODO: Move out
+        const DEFAULT_ENCODING: { [k: string]: number | string } = {
+            'opacity': 1,
+            'size': 10,
+            'color': 'black'
+        }
+        ////
+
+        const scaleChannel = c === 'x1' ? 'x' : c === 'y1' ? 'y' : c;
+        if (this.scales[scaleChannel]) {
+            const field = IsChannelBind(element[c])
+                ? this.getFieldByChannel((element[c] as ChannelBind).bind)
+                : this.getFieldByChannel(c);
+            return this.scales[scaleChannel](datum[field] as any);
+        } else {
+            switch (c) {
+                case 'size':
+                case 'opacity':
+                case 'color':
+                    return IsChannelValue(element[c])
+                        ? (element[c] as any).value :
+                        IsChannelValue(this.track[c])
+                            ? (this.track[c] as any).value  // TODO: Remove `any`
+                            : DEFAULT_ENCODING[c];
+            }
+        }
     }
 
     public getScale(c: ChannelType | string) {
