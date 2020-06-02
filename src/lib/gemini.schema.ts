@@ -97,6 +97,7 @@ export type MarkType =
     | "bar"
     | "point"
     | "line"
+    | "link" // line connedtion
     | "rect"
     | "text"
     | "rule"
