@@ -5,7 +5,8 @@ export function renderBackground(
     w: number,
     h: number,
     px: number,
-    py: number
+    py: number,
+    isGuideline: boolean = true
 ) {
     d3.select(svg)
         .attr("width", w)
@@ -16,6 +17,7 @@ export function renderBackground(
         .attr("height", h)
         .attr("stroke", "lightgray")
         .attr("fill", "white");
+    if (!isGuideline) return;
     g.append("line")
         .attr("x1", 0)
         .attr("x2", w)

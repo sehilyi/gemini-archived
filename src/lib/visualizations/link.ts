@@ -6,7 +6,7 @@ export function renderLink(
     g: d3.Selection<SVGGElement, any, any, any>,
     tracksWithBB: { bb: BoundingBox, track: Track | GenericType<Channel> }[]
 ) {
-    tracksWithBB.filter(d => d.track.mark === 'link').forEach(tb => {
+    tracksWithBB.filter(d => d.track.mark === 'link-between').forEach(tb => {
         const { bb } = tb;
         const xScale = d3.scaleLinear<number, number>()
             .domain([0, 100]) // TODO:
@@ -26,9 +26,11 @@ export function renderLink(
         const lines = g.selectAll('.line')
             .data(tb.track.data as Datum[])
             .enter()
+            // TODO: for demo
             .filter(
                 d => Math.abs((d[f1 as string] as number) - (d[f2 as string] as number)) < 30
             )
+            /////
             .append('line')
 
         // TODO: better way to merge the codes below?

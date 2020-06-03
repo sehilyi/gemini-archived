@@ -4,6 +4,8 @@
 import { PREDEFINED_GLYPHS_TYPE as PREDEFINED_GLYPH_TYPE } from './test/gemini/glyph'
 
 export interface GeminiSpec {
+    references?: string[],
+    description?: string,
     tracks: (Track | GenericType<Channel>)[] // TODO: `Track` does not mean anything here because of `GenericType`
     // ...
 }
@@ -97,7 +99,6 @@ export type MarkType =
     | 'bar'
     | 'point'
     | 'line'
-    | 'link'
     | 'link-between'
     | 'link-within' // uses either x and x1 or y and y1
     | 'rect'

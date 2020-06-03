@@ -4,14 +4,13 @@ import { BoundingBox } from '../utils/bounding-box';
 import { DUMMY_LINK_DATA } from '../test/data/link-data';
 import { DUMMY_BAND_DATA } from '../test/data/band-data';
 import { renderLink } from './link';
+import { VIEW_PADDING } from './defaults';
 
 export function renderLayout(
     g: d3.Selection<SVGGElement, any, any, any>,
     gm: GeminiSpec
 ) {
     g.selectAll('*').remove();
-
-    const PADDING = 10; // TODO: Move this to other proper place.
 
     // Generate layout data
     const tracksWithBB: { bb: BoundingBox, track: Track | GenericType<Channel> }[] = [];
@@ -28,13 +27,13 @@ export function renderLayout(
             },
             track
         });
-        cumY += track.height as number + PADDING;
+        cumY += track.height as number + VIEW_PADDING;
     });
 
     g.selectAll('rect')
         .data(tracksWithBB)
         .enter()
-        // .filter(d => d.track.mark !== 'link')
+        .filter(d => d.track.mark !== 'link-between')
         .append('rect')
         .attr('x', d => d.bb.x)
         .attr('width', d => d.bb.width)

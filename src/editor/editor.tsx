@@ -13,7 +13,7 @@ import { renderLayoutPreview } from '../lib/visualizations/layout-preview';
 import { calculateSize } from '../lib/utils/bounding-box';
 import { generateLinkData, generateBandData } from '../lib/script/link-data';
 
-const DEBUG_INIT_DEMO_INDEX = 3;
+const DEBUG_INIT_DEMO_INDEX = demos.length - 1;
 
 function Editor() {
 

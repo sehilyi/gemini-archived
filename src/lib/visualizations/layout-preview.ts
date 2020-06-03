@@ -17,7 +17,7 @@ export function renderLayoutPreview(
     const WIDTH = width + PADDING_X * 2, HEIGHT = height + PADDING_Y * 2;
 
     // BG and Guidelines
-    renderBackground(svg, WIDTH, HEIGHT, PADDING_X, PADDING_Y);
+    renderBackground(svg, WIDTH, HEIGHT, PADDING_X, PADDING_Y, false);
 
     const innerG = d3.select(svg).append("g")
         .attr("width", WIDTH - PADDING_X * 2)

@@ -1,6 +1,6 @@
 import { GENE_ANNOTATION_PLOT, GENE_ANNOTATION_PLOT_SIMPLE } from "../lib/test/gemini/gene-annotation-plots";
 import { CYTOGENETIC_BAND } from "../lib/test/gemini/cytogenetic-band";
-import { LAYOUT_EXAMPLE_LINK } from "../lib/test/gemini/layout-examples";
+import { LAYOUT_EXAMPLE_LINK, LAYOUT_EXAMPLE_COMBO } from "../lib/test/gemini/layout-examples";
 import { GeminiSpec } from "../lib/gemini.schema";
 
 interface Demo {
@@ -30,9 +30,15 @@ export const demos: ReadonlyArray<Demo> = [
         glyphHeight: 300
     },
     {
-        name: "Layout Example (HiGlass)",
+        name: "Six Different Between-Links",
         spec: LAYOUT_EXAMPLE_LINK,
         glyphWidth: 0,
         glyphHeight: 0
-    }
+    },
+    {
+        name: "Between-Links (Combo)",
+        spec: LAYOUT_EXAMPLE_COMBO,
+        glyphWidth: 0,
+        glyphHeight: 0
+    },
 ] as const;
