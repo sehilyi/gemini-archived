@@ -9,8 +9,10 @@ import { demos } from './examples';
 import './editor.css';
 import { renderGlyphPreview } from '../lib/visualizations/glyph-preview';
 import { replaceGlyphs } from '../lib/utils';
+import { renderLayoutPreview } from '../lib/visualizations/layout-preview';
+import { calculateSize } from '../lib/utils/bounding-box';
 
-const DEBUG_INIT_DEMO_INDEX = 0;
+const DEBUG_INIT_DEMO_INDEX = 3;
 
 function Editor() {
 
@@ -19,8 +21,8 @@ function Editor() {
     const [demo, setDemo] = useState(demos[DEBUG_INIT_DEMO_INDEX]);
     const [editorMode, setEditorMode] = useState<'Full Glyph Definition' | 'Predefined Glyph'>('Full Glyph Definition');
     const [gm, setGm] = useState(stringify(demos[DEBUG_INIT_DEMO_INDEX].spec as GeminiSpec));
-    const [previewWidth, setPreviewWidth] = useState(demos[DEBUG_INIT_DEMO_INDEX].previewWidth);
-    const [previewHeight, setPreviewHeight] = useState(demos[DEBUG_INIT_DEMO_INDEX].previewHeight);
+    const [glyphWidth, setGlyphWidth] = useState(demos[DEBUG_INIT_DEMO_INDEX].glyphWidth);
+    const [glyphHeight, setGlyphHeight] = useState(demos[DEBUG_INIT_DEMO_INDEX].glyphHeight);
 
     useEffect(() => {
         if (editorMode === 'Full Glyph Definition') {
@@ -29,8 +31,8 @@ function Editor() {
         } else {
             setGm(stringify(demo.spec as GeminiSpec));
         }
-        setPreviewWidth(demo.previewWidth);
-        setPreviewHeight(demo.previewHeight);
+        setGlyphWidth(demo.glyphWidth);
+        setGlyphHeight(demo.glyphHeight);
     }, [demo, editorMode]);
 
     useEffect(() => {
@@ -41,6 +43,13 @@ function Editor() {
             console.warn("Cannnot parse the edited code.");
         }
         if (!editedGm) return;
+
+        renderLayoutPreview(
+            layoutSvg.current as SVGSVGElement,
+            editedGm as GeminiSpec,
+            calculateSize(editedGm).width,
+            calculateSize(editedGm).height
+        );
 
         const track = (editedGm as GeminiSpec)?.tracks?.find(
             d => (d.mark as MarkDeep)?.type === "glyph"
@@ -53,11 +62,11 @@ function Editor() {
             renderGlyphPreview(
                 glyphSvg.current as SVGSVGElement,
                 { ...track, data } as Track,
-                previewWidth,
-                previewHeight
+                glyphWidth,
+                glyphHeight
             )
         );
-    }, [gm, previewWidth, previewHeight]);
+    }, [gm, glyphWidth, glyphHeight]);
 
     return (
         <>

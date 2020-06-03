@@ -1,7 +1,7 @@
 // Refer to the following url for dealing with defaults:
 // https://github.com/vega/vega-lite/blob/23fe2b9c6a82551f321ccab751370ca48ae002c9/src/channeldef.ts#L961
 
-import { PREDEFINED_GLYPHS_TYPE as PREDEFINED_GLYPH_TYPE } from "./test/gemini/glyph"
+import { PREDEFINED_GLYPHS_TYPE as PREDEFINED_GLYPH_TYPE } from './test/gemini/glyph'
 
 export interface GeminiSpec {
     tracks: (Track | GenericType<Channel>)[] // TODO: `Track` does not mean anything here because of `GenericType`
@@ -76,7 +76,7 @@ export type Channel = ChannelDeep | ChannelValue
 
 export interface ChannelDeep {
     field: string
-    type: "nominal" | "quantitative"
+    type: 'nominal' | 'quantitative'
     aggregate?: Aggregate
     domain?: string[]
     range?: string[]
@@ -86,7 +86,7 @@ export interface ChannelValue {
     value: number | string
 }
 
-export type Aggregate = "max" | "min" | "mean"
+export type Aggregate = 'max' | 'min' | 'mean'
 
 /**
  * Mark
@@ -94,15 +94,16 @@ export type Aggregate = "max" | "min" | "mean"
 export type Mark = MarkType | MarkDeep
 
 export type MarkType =
-    | "bar"
-    | "point"
-    | "line"
-    | "link" // line connedtion
-    | "rect"
-    | "text"
-    | "rule"
-    | "triangle-l"
-    | "triangle-r"
+    | 'bar'
+    | 'point'
+    | 'line'
+    | 'link'
+    | 'rect'
+    | 'text'
+    | 'rule'
+    | 'triangle-l'
+    | 'triangle-r'
+    | 'dummy'
 
 /**
  * Glyph
@@ -115,7 +116,7 @@ export interface MarkGlyphPredefined {
 }
 
 export interface MarkGlyph {
-    type: "glyph"
+    type: 'glyph'
     name: string
     referenceColumn?: string // reference column for selecting data tuples for each glyph
     requiredChannels: ChannelType[] // channels that must be assigned
@@ -174,17 +175,17 @@ export interface AnyGlyphChannels {
  */
 interface Consistency {
     /**
-     * `true` and `false` correspond to "shared" and "independent", respectively.
+     * `true` and `false` correspond to 'shared' and 'independent', respectively.
      */
     // List of `uniqueName` of `view` or `track` or indexes appear in the specification.
     targets: string[] | number[]
     // Default: The first element of `targets`.
     reference?: string
-    color?: "shared" | "independent" | "distinct" | true | false
-    x?: "shared" | "independent" | true | false
-    y?: "shared" | "independent" | true | false
-    zoomScale?: "shared" | "independent" | true | false
-    zoomCenter?: "shared" | "independent" | true | false
+    color?: 'shared' | 'independent' | 'distinct' | true | false
+    x?: 'shared' | 'independent' | true | false
+    y?: 'shared' | 'independent' | true | false
+    zoomScale?: 'shared' | 'independent' | true | false
+    zoomCenter?: 'shared' | 'independent' | true | false
 }
 
 /**
@@ -192,7 +193,7 @@ interface Consistency {
  */
 export function IsGlyphMark(mark: any): mark is MarkGlyph {
     // TODO: MarkType | MarkDeep
-    return typeof mark === "object" && mark.type === "glyph";
+    return typeof mark === 'object' && mark.type === 'glyph';
 }
 
 export function IsChannelValue(
@@ -203,7 +204,7 @@ export function IsChannelValue(
         | undefined
         | 'none'
 ): channel is ChannelValue {
-    return channel !== null && typeof channel === "object" && 'value' in channel;
+    return channel !== null && typeof channel === 'object' && 'value' in channel;
 }
 
 export function IsChannelBind(
@@ -214,9 +215,9 @@ export function IsChannelBind(
         | undefined
         | 'none'
 ): channel is ChannelBind {
-    return channel !== null && typeof channel === "object" && 'bind' in channel;
+    return channel !== null && typeof channel === 'object' && 'bind' in channel;
 }
 
 export function IsChannelDeep(channel: ChannelDeep | ChannelValue | undefined): channel is ChannelDeep {
-    return typeof channel === "object" && 'field' in channel;
+    return typeof channel === 'object' && 'field' in channel;
 }
