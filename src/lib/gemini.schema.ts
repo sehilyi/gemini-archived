@@ -98,6 +98,8 @@ export type MarkType =
     | 'point'
     | 'line'
     | 'link'
+    | 'link-between'
+    | 'link-within' // uses either x and x1 or y and y1
     | 'rect'
     | 'text'
     | 'rule'

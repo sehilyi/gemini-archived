@@ -1,8 +1,7 @@
 import { GENE_ANNOTATION_PLOT, GENE_ANNOTATION_PLOT_SIMPLE } from "../lib/test/gemini/gene-annotation-plots";
 import { CYTOGENETIC_BAND } from "../lib/test/gemini/cytogenetic-band";
-import { LAYOUT_HIGLASS } from "../lib/test/gemini/layout-higlass";
+import { LAYOUT_EXAMPLE_LINK } from "../lib/test/gemini/layout-examples";
 import { GeminiSpec } from "../lib/gemini.schema";
-import { calculateSize } from "../lib/utils/bounding-box";
 
 interface Demo {
     name: string,
@@ -32,7 +31,7 @@ export const demos: ReadonlyArray<Demo> = [
     },
     {
         name: "Layout Example (HiGlass)",
-        spec: LAYOUT_HIGLASS,
+        spec: LAYOUT_EXAMPLE_LINK,
         glyphWidth: 0,
         glyphHeight: 0
     }
