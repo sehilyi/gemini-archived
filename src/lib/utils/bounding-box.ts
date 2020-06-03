@@ -1,5 +1,12 @@
 import { GeminiSpec } from "../gemini.schema";
 
+export interface BoundingBox {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+}
+
 /**
  * Naive approach to calculate the entire size of visualization.
  * @param gm 

@@ -32,6 +32,6 @@ export function renderGlyphPreview(
     renderGlyph(
         innerG,
         track,
-        { x: 0, x1: WIDTH - PADDING_X * 2, y: 0, y1: HEIGHT - PADDING_Y * 2 }
+        { x: 0, width: WIDTH - PADDING_X * 2, y: 0, height: HEIGHT - PADDING_Y * 2 }
     );
 }

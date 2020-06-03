@@ -50,7 +50,7 @@ function Editor() {
             calculateSize(editedGm).width,
             calculateSize(editedGm).height
         );
-
+        d3.select(glyphSvg.current).selectAll('*').remove(); // TODO:
         const track = (editedGm as GeminiSpec)?.tracks?.find(
             d => (d.mark as MarkDeep)?.type === "glyph"
         );
