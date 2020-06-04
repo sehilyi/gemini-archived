@@ -49,10 +49,13 @@ export const demos: ReadonlyArray<Demo> = [
         glyphWidth: 0,
         glyphHeight: 0
     },
+    /*
+    // TODO: not ready
     {
         name: "Between-Links (Domino)",
         spec: LAYOUT_EXAMPLE_DOMINO,
         glyphWidth: 0,
         glyphHeight: 0
     },
+    */
 ] as const;
