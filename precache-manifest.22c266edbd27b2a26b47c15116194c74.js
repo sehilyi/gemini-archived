@@ -4,7 +4,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/gemini/editor.worker.js"
   },
   {
-    "revision": "c001281daa0fb2b48a4ed387223fd452",
+    "revision": "d9b0a69d8c637ba94ddbf4a7d2a58ef8",
     "url": "/gemini/index.html"
   },
   {
@@ -16,7 +16,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/gemini/static/css/2.659f5c98.chunk.css"
   },
   {
-    "revision": "bdfc6036aeba649ca881",
+    "revision": "b31ad56f4e32c9a9e0c4",
     "url": "/gemini/static/css/main.f9e16ec9.chunk.css"
   },
   {
@@ -32,8 +32,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/gemini/static/js/3.e45380e2.chunk.js"
   },
   {
-    "revision": "bdfc6036aeba649ca881",
-    "url": "/gemini/static/js/main.96b34d28.chunk.js"
+    "revision": "b31ad56f4e32c9a9e0c4",
+    "url": "/gemini/static/js/main.0c6e3c75.chunk.js"
   },
   {
     "revision": "cc454ebecde82e99e4ab",
