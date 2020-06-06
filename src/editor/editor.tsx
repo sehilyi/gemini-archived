@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import * as d3 from "d3"; // TODO: performance
 import EditorPanel from './editor-panel';
 import stringify from 'json-stringify-pretty-compact';
@@ -11,13 +11,17 @@ import { renderGlyphPreview } from '../lib/visualizations/glyph-preview';
 import { replaceGlyphs } from '../lib/utils';
 import { renderLayoutPreview } from '../lib/visualizations/layout-preview';
 import { calculateSize } from '../lib/utils/bounding-box';
+import simpleHiGlassViewConfig from '../lib/test/higlass/only-heatmap.json';
+// @ts-ignore
+import { HiGlassComponent } from 'higlass';
 
-const DEBUG_INIT_DEMO_INDEX = 0; //demos.length - 1;
+const DEBUG_INIT_DEMO_INDEX = demos.length - 1;
 
 function Editor() {
 
     const glyphSvg = useRef<SVGSVGElement>(null);
     const layoutSvg = useRef<SVGSVGElement>(null);
+    const hgRef = useRef<typeof HiGlassComponent>(null);
     const [demo, setDemo] = useState(demos[DEBUG_INIT_DEMO_INDEX]);
     const [editorMode, setEditorMode] = useState<'Full Glyph Definition' | 'Predefined Glyph'>('Full Glyph Definition');
     const [gm, setGm] = useState(stringify(demos[DEBUG_INIT_DEMO_INDEX].spec as GeminiSpec));
@@ -68,6 +72,41 @@ function Editor() {
         );
     }, [gm, glyphWidth, glyphHeight]);
 
+    // Renders HiGlass by compiling the edited HiGlass-Lite code.
+    const hglass = useMemo(() => {
+        const viewConfigs = [simpleHiGlassViewConfig, simpleHiGlassViewConfig];
+        return viewConfigs.map(d =>
+            <div style={{
+
+            }}>
+                <span style={{
+                    height: "300px",
+                    position: 'absolute',
+                    display: 'block',
+                    width: "100%",
+                    textAlign: 'left'
+                }}>
+                    <HiGlassComponent
+                        ref={hgRef}
+                        options={{
+                            bounded: true,
+                            containerPaddingX: 0,
+                            containerPaddingY: 0,
+                            viewMarginTop: 0,
+                            viewMarginLeft: 0,
+                            viewMarginBottom: 0,
+                            viewPaddingTop: 0,
+                            viewPaddingLeft: 0,
+                            viewPaddingBottom: 0,
+                            sizeMode: "bounded"
+                        }}
+                        viewConfig={d}
+                    />
+                </span>
+            </div>
+        );
+    }, [simpleHiGlassViewConfig]);
+
     return (
         <>
             <div className="demo-navbar">
@@ -113,6 +152,7 @@ function Editor() {
                         </div>
                         <div className="preview-container">
                             <b>Layout Preview</b>
+                            {hglass}
                             <div><svg ref={layoutSvg} /></div>
                         </div>
                     </SplitPane>
