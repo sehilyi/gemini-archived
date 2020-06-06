@@ -5,6 +5,7 @@ import { DUMMY_LINK_DATA } from '../test/data/link-data';
 import { DUMMY_BAND_DATA } from '../test/data/band-data';
 import { renderLink } from './link';
 import { VIEW_PADDING } from './defaults';
+import { renderHiGlass } from './higlass';
 
 export function renderLayout(
     g: d3.Selection<SVGGElement, any, any, any>,
@@ -56,5 +57,8 @@ export function renderLayout(
         .attr('stroke-width', 1)
 
     // Render links and bands
-    renderLink(g, tracksWithBB);
+    renderLink(g, tracksWithBB.filter(d => d.track.mark === 'link-between'));
+
+    // Render HiGlass tracks
+    renderHiGlass(g, tracksWithBB);
 }
