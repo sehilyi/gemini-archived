@@ -12,7 +12,8 @@ import './editor.css';
 import { renderGlyphPreview } from '../lib/visualizations/glyph-preview';
 import { replaceGlyphs } from '../lib/utils';
 import { renderLayoutPreview } from '../lib/visualizations/layout-preview';
-import { calculateSize, BoundingBox } from '../lib/utils/bounding-box';
+import { calculateSize } from '../lib/utils/bounding-box';
+import { HiGlassTrack } from '../lib/visualizations/higlass';
 import testViewConfig from '../lib/test/higlass/only-heatmap.json';
 
 const DEBUG_INIT_DEMO_INDEX = demos.length - 1;
@@ -21,9 +22,9 @@ function Editor() {
 
     const glyphSvg = useRef<SVGSVGElement>(null);
     const layoutSvg = useRef<SVGSVGElement>(null);
-    const [higlassOptions, setHiglassOptions] = useState<{ viewConfig: Object, boundingBox: BoundingBox }[]>([
+    const [higlassTrackOptions, setHiGlassTrackOptions] = useState<HiGlassTrack[]>([
         // Debug
-        { viewConfig: testViewConfig, boundingBox: { x: 60, y: 60, width: 60, height: 500 } }
+        // { viewConfig: testViewConfig, boundingBox: { x: 60, y: 60, width: 60, height: 500 } }
     ]);
     const [demo, setDemo] = useState(demos[DEBUG_INIT_DEMO_INDEX]);
     const [editorMode, setEditorMode] = useState<'Full Glyph Definition' | 'Predefined Glyph'>('Full Glyph Definition');
@@ -58,6 +59,9 @@ function Editor() {
                 x: 60, y: 60,
                 width: calculateSize(editedGm).width,
                 height: calculateSize(editedGm).height
+            },
+            (higlassInfo: HiGlassTrack[]) => {
+                setHiGlassTrackOptions(higlassInfo);
             }
         );
         d3.select(glyphSvg.current).selectAll('*').remove(); // TODO:
@@ -79,7 +83,7 @@ function Editor() {
     }, [gm, glyphWidth, glyphHeight]);
 
     const hglass = useMemo(() => {
-        return higlassOptions.map(op =>
+        return higlassTrackOptions.map(op =>
             <div style={{
                 position: 'absolute',
                 display: 'block',
@@ -107,7 +111,7 @@ function Editor() {
                 />
             </div>
         );
-    }, [higlassOptions]);
+    }, [higlassTrackOptions]);
 
     return (
         <>
