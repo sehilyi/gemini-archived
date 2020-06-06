@@ -87,6 +87,34 @@ export const LAYOUT_EXAMPLE_COMBO_HORIZONTAL: GeminiSpec = {
     ]
 }
 
+export const LAYOUT_EXAMPLE_COMBO_BAND: GeminiSpec = {
+    references: [
+        "http://genocat.tools/tools/combo.html",
+        "http://genocat.tools/tools/gbrowse_syn.html",
+        "http://genocat.tools/tools/ggbio.html",
+        "http://genocat.tools/tools/give.html",
+        "http://genocat.tools/tools/variant_view.html"
+    ],
+    tracks: [
+        {
+            data: 'dummy', mark: 'dummy',
+            width: 600, height: 150
+        },
+        {
+            data: 'dummy-band', mark: 'link-between',
+            x1: { field: 'from', type: "nominal" },
+            x1e: { field: 'from1', type: "nominal" },
+            x: { field: 'to', type: "nominal" },
+            xe: { field: 'to1', type: "nominal" },
+            width: 600, height: 150
+        },
+        {
+            data: 'dummy', mark: 'dummy',
+            width: 600, height: 150
+        }
+    ]
+}
+
 export const LAYOUT_EXAMPLE_DOMINO: GeminiSpec = {
     layout: { type: 'linear', direction: 'horizontal', wrap: 3 },
     tracks: [

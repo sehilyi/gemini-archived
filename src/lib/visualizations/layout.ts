@@ -3,7 +3,7 @@ import { GeminiSpec, Track, GenericType, Channel, Datum, IsChannelDeep } from '.
 import { BoundingBox } from '../utils/bounding-box';
 import { DUMMY_LINK_DATA } from '../test/data/link-data';
 import { DUMMY_BAND_DATA } from '../test/data/band-data';
-import { renderLink } from './link';
+import { renderBetweenLink } from './link';
 import { VIEW_PADDING } from './defaults';
 import { renderHiGlass, HiGlassTrack } from './higlass';
 
@@ -45,9 +45,10 @@ export function renderLayout(
     });
 
     g.selectAll('rect')
-        .data(tracksWithBB)
+        .data(tracksWithBB.filter(
+            d => d.track.mark !== "link-between" && d.track.mark !== 'link-within' && d.track.mark !== 'empty'
+        ))
         .enter()
-        .filter(d => d.track.mark !== 'link-between' && d.track.mark !== 'empty')
         .append('rect')
         .attr('x', d => d.bb.x)
         .attr('width', d => d.bb.width)
@@ -58,7 +59,7 @@ export function renderLayout(
         .attr('stroke-width', 1)
 
     // Render links and bands
-    renderLink(g, tracksWithBB.filter(d => d.track.mark === 'link-between'));
+    renderBetweenLink(g, tracksWithBB.filter(d => d.track.mark === 'link-between'));
 
     // Render HiGlass tracks
     renderHiGlass(g, tracksWithBB, setHiGlassInfo);

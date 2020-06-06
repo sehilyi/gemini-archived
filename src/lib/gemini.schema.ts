@@ -12,7 +12,6 @@ export interface GeminiSpec {
         wrap: number // TODO: does not work now
     }
     tracks: (Track | GenericType<Channel>)[] // TODO: `Track` does not mean anything here because of `GenericType`
-    // ...
 }
 
 export interface GenericType<T> {
@@ -227,6 +226,11 @@ export function IsChannelBind(
     return channel !== null && typeof channel === 'object' && 'bind' in channel;
 }
 
-export function IsChannelDeep(channel: ChannelDeep | ChannelValue | undefined): channel is ChannelDeep {
+export function IsChannelDeep(
+    channel:
+        | ChannelDeep
+        | ChannelValue
+        | undefined
+): channel is ChannelDeep {
     return typeof channel === 'object' && 'field' in channel;
 }
