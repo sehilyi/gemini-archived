@@ -21,9 +21,10 @@ export interface GenericType<T> {
 /**
  * Tracks
  */
+export interface DataDeep { url: string, type: 'tileset' | 'csv' }
 export interface Track {
     // primitives
-    data: string | Datum[]
+    data: DataDeep | Datum[]
     mark: Mark
     // coordinates
     x?: Channel
@@ -204,6 +205,16 @@ interface Consistency {
 /**
  * Type Checks
  */
+export function IsDataDeep(data:
+    | DataDeep
+    | Datum[]
+    /* remove the two types below */
+    | ChannelDeep
+    | ChannelValue
+): data is DataDeep {
+    return typeof data === 'object';
+}
+
 export function IsGlyphMark(mark: any): mark is MarkGlyph {
     // TODO: MarkType | MarkDeep
     return typeof mark === 'object' && mark.type === 'groupMark';
