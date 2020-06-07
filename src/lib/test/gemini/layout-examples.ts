@@ -105,8 +105,12 @@ export const LAYOUT_EXAMPLE_COMBO_BAND: GeminiSpec = {
     ],
     tracks: [
         {
-            data: 'dummy', mark: 'dummy',
-            width: 600, height: 150
+            data: 'dummy',
+            mark: {
+                type: 'higlass-gene-annotation',
+                server: 'gemini-v1'
+            },
+            width: 600, height: 155
         },
         {
             data: 'https://raw.githubusercontent.com/sehilyi/gemini-datasets/master/data/range-to-range-relation.csv',
@@ -122,8 +126,12 @@ export const LAYOUT_EXAMPLE_COMBO_BAND: GeminiSpec = {
             strokeWidth: { value: 1 }
         },
         {
-            data: 'dummy', mark: 'dummy',
-            width: 600, height: 150
+            data: 'dummy',
+            mark: {
+                type: 'higlass-gene-annotation',
+                server: 'gemini-v1'
+            },
+            width: 600, height: 155
         }
     ]
 }

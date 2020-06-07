@@ -18,10 +18,10 @@ export function renderBetweenLineLink(
     const [f1, f2] = [xField, x1Field, yField, y1Field].filter(d => d);
 
     const xScale = d3.scaleLinear<number, number>()
-        .domain([0, 100]) // TODO: Support data-driven domain.
+        .domain([0, 99]) // TODO: Support data-driven domain.
         .range([bb.x, bb.x + bb.width])
     const yScale = d3.scaleLinear<number, number>()
-        .domain([0, 100])
+        .domain([0, 99])
         .range([bb.y, bb.y + bb.height])
 
     // calculate position of points

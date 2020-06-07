@@ -25,12 +25,13 @@ export function renderLayoutPreview(
     const innerG = d3.select(svg).append("g")
         .attr("width", WIDTH - PADDING_X * 2)
         .attr("height", HEIGHT - PADDING_Y * 2)
-        .attr("transform", `translate(${PADDING_X},${PADDING_Y})`);
 
     renderLayout(
         innerG,
         gm,
-        setHiGlassInfo
+        setHiGlassInfo,
+        PADDING_X,
+        PADDING_Y
     );
 
 }

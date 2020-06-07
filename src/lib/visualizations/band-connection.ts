@@ -20,10 +20,10 @@ export function renderBetweenBandLink(
     const y1eField = IsChannelDeep(track.y1e) ? track.y1e.field : undefined;
 
     const xScale = d3.scaleLinear<number, number>()
-        .domain([0, 100]) // TODO:
+        .domain([0, 99]) // TODO:
         .range([bb.x, bb.x + bb.width])
     const yScale = d3.scaleLinear<number, number>()
-        .domain([0, 100])
+        .domain([0, 99])
         .range([bb.y, bb.y + bb.height])
 
     // calculate position of points

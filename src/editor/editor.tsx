@@ -66,7 +66,7 @@ function Editor() {
         );
         d3.select(glyphSvg.current).selectAll('*').remove(); // TODO:
         const track = (editedGm as GeminiSpec)?.tracks?.find(
-            d => (d.mark as MarkDeep)?.type === "glyph"
+            d => (d.mark as MarkDeep)?.type === 'groupMark'
         );
         if (!track) return;
 
