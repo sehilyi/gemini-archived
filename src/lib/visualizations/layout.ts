@@ -1,8 +1,6 @@
 import * as d3 from 'd3'
-import { GeminiSpec, Track, GenericType, Channel, Datum, IsChannelDeep } from '../gemini.schema';
+import { GeminiSpec, Track, GenericType, Channel } from '../gemini.schema';
 import { BoundingBox } from '../utils/bounding-box';
-import { DUMMY_LINK_DATA } from '../test/data/link-data';
-import { DUMMY_BAND_DATA } from '../test/data/band-data';
 import { renderBetweenLink } from './link';
 import { VIEW_PADDING } from './defaults';
 import { renderHiGlass, HiGlassTrack } from './higlass';
@@ -18,10 +16,6 @@ export function renderLayout(
     const tracksWithBB: { bb: BoundingBox, track: Track | GenericType<Channel> }[] = [];
     let cumY = 0, cumX = 0;
     gm.tracks.forEach(track => {
-        // TODO: for demo
-        if (track.data === "dummy-link") track.data = DUMMY_LINK_DATA;
-        else if (track.data === "dummy-band") track.data = DUMMY_BAND_DATA;
-        ///
         if (gm.layout?.direction !== "horizontal") {
             tracksWithBB.push({
                 bb: {

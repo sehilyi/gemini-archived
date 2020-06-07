@@ -70,8 +70,6 @@ function Editor() {
         );
         if (!track) return;
 
-        // TODO: Faster way of this?
-        // TODO: Move this inside of a model
         d3.csv(track.data as string).then(data =>
             renderGlyphPreview(
                 glyphSvg.current as SVGSVGElement,
