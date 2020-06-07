@@ -83,7 +83,7 @@ export type Channel = ChannelDeep | ChannelValue
 
 export interface ChannelDeep {
     field?: string
-    type?: 'nominal' | 'quantitative'
+    type?: 'genomic' | 'nominal' | 'quantitative'
     aggregate?: Aggregate
     domain?: string[]
     range?: string[]

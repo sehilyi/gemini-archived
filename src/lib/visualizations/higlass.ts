@@ -1,7 +1,7 @@
 import { BoundingBox } from '../utils/bounding-box';
 import { Track, GenericType, Channel } from '../gemini.schema';
-import testViewConfig from '../test/higlass/hg-only-heatmap.json';
 import { compiler } from '../higlass/gemini-to-higlass';
+import testViewConfig from '../test/higlass/hg-only-heatmap.json';
 
 export interface HiGlassTrack {
     viewConfig: Object

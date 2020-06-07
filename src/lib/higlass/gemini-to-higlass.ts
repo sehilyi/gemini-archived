@@ -13,10 +13,17 @@ export function compiler(track: Track | GenericType<Channel>, bb: BoundingBox): 
     if (IsHiGlassTrack(track.mark) && IsDataDeep(track.data) && validTilesetUrl(track.data.url)) {
         const { server, tilesetUid } = parseServerAndTilesetUidFromUrl(track.data.url);
 
+        // Is this track horizontal or vertical?
+        const isXGenomic = IsChannelDeep(track.x) && track.x.type === "genomic"
+        const isYGenomic = IsChannelDeep(track.y) && track.y.type === "genomic"
+        const trackDirection = isXGenomic && isYGenomic ? 'both' : isXGenomic ? 'horizontal' : 'vertical'
+
         const typeMap: { [k: string]: EnumTrackType } = {
             // TODO: Add horizontal vs. vertical
-            'gene-annotation-higlass': 'horizontal-gene-annotations'
-        }
+            'gene-annotation-higlass': `${trackDirection}-gene-annotations`
+            // ...
+        } as { [k: string]: EnumTrackType }
+
         const higlassTrackType = typeMap[track.mark.type];
         if (!higlassTrackType) return {};
 
@@ -35,13 +42,14 @@ export function compiler(track: Track | GenericType<Channel>, bb: BoundingBox): 
             y1: 'right'
         }
         Object.keys(chanToPos).forEach(c => {
-            if (IsChannelDeep((track as GenericType<Channel>)[c])) {
+            const channelDef = (track as GenericType<Channel>)[c];
+            if (IsChannelDeep(channelDef) && channelDef.axis) {
                 higlass.setAxisTrack(chanToPos[c]);
             }
         })
 
         higlass.validateSpec();
-        console.log(higlass.spec());
+
         return higlass.spec();
     }
     return {};

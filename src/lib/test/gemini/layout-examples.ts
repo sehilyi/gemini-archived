@@ -110,16 +110,16 @@ export const LAYOUT_EXAMPLE_COMBO_BAND: GeminiSpec = {
                 type: 'gene-annotation-higlass',
                 server: 'gemini-v1'
             },
-            x: { axis: true },
+            x: { type: 'genomic', axis: true },
             width: 600, height: 120
         },
         {
             data: { url: 'https://raw.githubusercontent.com/sehilyi/gemini-datasets/master/data/range-to-range-relation.csv', type: 'csv' },
             mark: 'link-between',
-            x1: { field: 'from', type: "nominal" },
-            x1e: { field: 'from1', type: "nominal" },
-            x: { field: 'to', type: "nominal" },
-            xe: { field: 'to1', type: "nominal" },
+            x1: { field: 'from' },
+            x1e: { field: 'from1' },
+            x: { field: 'to' },
+            xe: { field: 'to1' },
             width: 600, height: 150,
             stroke: { value: 'none' }
         },
@@ -129,6 +129,7 @@ export const LAYOUT_EXAMPLE_COMBO_BAND: GeminiSpec = {
                 type: 'gene-annotation-higlass',
                 server: 'gemini-v1'
             },
+            x: { type: 'genomic' },
             x1: { axis: true },
             width: 600, height: 120
         }
