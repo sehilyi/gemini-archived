@@ -3,28 +3,36 @@ import HiGlassSchema from "./higlass.schema.json";
 import { HiGlassSpec, EnumTrackType } from "./higlass.schema";
 import { HiGlassModel } from './higlass-model';
 import { parseServerAndTilesetUidFromUrl, validTilesetUrl } from '../utils';
-import { GenericType, Track, Channel, IsDataDeep, IsHiGlassTrack, IsChannelDeep } from '../gemini.schema';
+import { GenericType, Track, Channel, IsDataDeep, IsHiGlassTrack, IsChannelDeep, IsShallowMark, IsMarkDeep } from '../gemini.schema';
 import { BoundingBox } from '../utils/bounding-box';
 
 export function compiler(track: Track | GenericType<Channel>, bb: BoundingBox): HiGlassSpec {
 
     const higlass = new HiGlassModel();
 
-    if (IsHiGlassTrack(track.mark) && IsDataDeep(track.data) && validTilesetUrl(track.data.url)) {
+    if (IsHiGlassTrack(track) && IsDataDeep(track.data)) {
         const { server, tilesetUid } = parseServerAndTilesetUidFromUrl(track.data.url);
 
         // Is this track horizontal or vertical?
         const isXGenomic = IsChannelDeep(track.x) && track.x.type === "genomic"
         const isYGenomic = IsChannelDeep(track.y) && track.y.type === "genomic"
         const trackDirection = isXGenomic && isYGenomic ? 'both' : isXGenomic ? 'horizontal' : 'vertical'
+        const trackType = IsShallowMark(track.mark) ? track.mark : IsMarkDeep(track.mark) ? track.mark.type : 'unknown'
 
         const typeMap: { [k: string]: EnumTrackType } = {
             // TODO: Add horizontal vs. vertical
-            'gene-annotation-higlass': `${trackDirection}-gene-annotations`
+            'gene-annotation-higlass': `${trackDirection}-gene-annotations`,
+            'point': `${trackDirection}-point`
             // ...
         } as { [k: string]: EnumTrackType }
 
-        const higlassTrackType = typeMap[track.mark.type];
+        const defaultOptions: { [k: string]: Object } = {
+            'point': {
+                pointColor: '#0072B2',
+                labelPosition: 'hidden'
+            }
+        }
+        const higlassTrackType = typeMap[trackType];
         if (!higlassTrackType) return {};
 
         higlass.setMainTrack({
@@ -32,7 +40,8 @@ export function compiler(track: Track | GenericType<Channel>, bb: BoundingBox): 
             server: server,
             tilesetUid: tilesetUid,
             width: bb.width,
-            height: bb.height // TODO: consider the height of axes
+            height: bb.height, // TODO: consider the height of axes
+            options: defaultOptions[trackType]
         }).addTrackSourceServers(server);
 
         const chanToPos: { [k: string]: 'left' | 'right' | 'top' | 'bottom' } = {
@@ -49,6 +58,8 @@ export function compiler(track: Track | GenericType<Channel>, bb: BoundingBox): 
         })
 
         higlass.validateSpec();
+
+        console.log('HiGlass viewConfig:', higlass.spec());
 
         return higlass.spec();
     }

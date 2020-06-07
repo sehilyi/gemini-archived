@@ -48,7 +48,7 @@ export function parseServerAndTilesetUidFromUrl(url: string) {
 
     const pre = url.includes("https:") ? "https:" : "http:";
 
-    const server = url.split("tileset_info/?d=")[0].split(pre)[1];
+    const server = url.split("tileset_info/?d=")[0]
     const tilesetUid = url.split("tileset_info/?d=")[1]
     return { server, tilesetUid };
 }

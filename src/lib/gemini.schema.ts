@@ -2,6 +2,7 @@
 // https://github.com/vega/vega-lite/blob/23fe2b9c6a82551f321ccab751370ca48ae002c9/src/channeldef.ts#L961
 
 import { GLYPH_LOCAL_PRESET_TYPE, GLYPH_HIGLASS_PRESET_TYPE } from './test/gemini/glyph'
+import { validTilesetUrl } from './utils';
 
 export interface GeminiSpec {
     references?: string[]
@@ -213,17 +214,32 @@ export function IsDataDeep(data:
     | ChannelDeep
     | ChannelValue
 ): data is DataDeep {
-    return typeof data === 'object';
+    return typeof data === 'object'
+}
+
+export function IsShallowMark(mark: any): mark is MarkType {
+    // TODO: MarkType | MarkDeep
+    return typeof mark !== 'object'
+}
+
+export function IsMarkDeep(mark: any): mark is MarkDeep {
+    // TODO: MarkType | MarkDeep
+    return typeof mark === 'object'
 }
 
 export function IsGlyphMark(mark: any): mark is MarkGlyph {
     // TODO: MarkType | MarkDeep
-    return typeof mark === 'object' && mark.type === 'groupMark';
+    return typeof mark === 'object' && mark.type === 'groupMark'
 }
 
-export function IsHiGlassTrack(mark: any): mark is MarkGlyphPreset {
-    // TODO: MarkType | MarkDeep
-    return typeof mark === 'object' && mark.type !== 'groupMark';
+export function IsHiGlassTrack(track: Track | GenericType<Channel>) {
+    return (
+        (
+            typeof track.mark === 'object' &&
+            IsGlyphMark(track.mark) &&
+            track.mark.type !== 'groupMark'
+        ) || (IsDataDeep(track.data) && validTilesetUrl(track.data.url))
+    );
 }
 
 export function IsChannelValue(

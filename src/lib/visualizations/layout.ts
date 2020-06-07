@@ -58,5 +58,5 @@ export function renderLayout(
     renderBetweenLink(g, tracksWithBB.filter(d => d.track.mark === 'link-between'));
 
     // Render HiGlass tracks
-    renderHiGlass(g, tracksWithBB.filter(d => IsHiGlassTrack(d.track.mark)), setHiGlassInfo);
+    renderHiGlass(g, tracksWithBB.filter(d => IsHiGlassTrack(d.track)), setHiGlassInfo);
 }
