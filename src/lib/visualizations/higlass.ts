@@ -1,6 +1,7 @@
 import { BoundingBox } from '../utils/bounding-box';
 import { Track, GenericType, Channel } from '../gemini.schema';
 import testViewConfig from '../test/higlass/hg-only-heatmap.json';
+import { compiler } from '../higlass/gemini-to-higlass';
 
 export interface HiGlassTrack {
     viewConfig: Object
@@ -12,14 +13,22 @@ export function renderHiGlass(
     tracksWithBB: { bb: BoundingBox, track: Track | GenericType<Channel> }[],
     setHiGlassInfo: (higlassInfo: HiGlassTrack[]) => void
 ) {
+    const hiGlassInfo: HiGlassTrack[] = [];
     tracksWithBB.forEach(tb => {
         const { track, bb } = tb;
-        // ...
+
+        // add a HiGlass view config
+        hiGlassInfo.push({ boundingBox: bb, viewConfig: compiler(track, bb) });
     })
-    const testHGInfo = tracksWithBB.map(tb => ({ boundingBox: tb.bb, viewConfig: testViewConfig }));
-    console.log(testHGInfo);
-    setHiGlassInfo(tracksWithBB.map(tb => ({
-        boundingBox: tb.bb,
-        viewConfig: testViewConfig
-    })));
+    setHiGlassInfo(hiGlassInfo);
+    console.log(hiGlassInfo);
+
+    /////// DEBUG
+    // const testHGInfo = tracksWithBB.map(tb => ({ boundingBox: tb.bb, viewConfig: testViewConfig }));
+    // console.log(testHGInfo);
+    // setHiGlassInfo(tracksWithBB.map(tb => ({
+    //     boundingBox: tb.bb,
+    //     viewConfig: testViewConfig
+    // })));
+    ///////
 }

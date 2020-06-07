@@ -24,12 +24,25 @@ export function generateReadableTrackUid(pre: string | undefined, n: number) {
     else return `track-${n}-${id}`;
 }
 
+export function validTilesetUrl(url: string) {
+    if (
+        !url.includes("tileset_info/?d=")
+        ||
+        (!url.includes("https:") && !url.includes("http:"))
+    ) {
+        return false;
+    }
+    return true;
+}
+
 export function parseServerAndTilesetUidFromUrl(url: string) {
-    if (!url.includes("tileset_info/?d=") || (
-        !url.includes("https:") && !url.includes("http:")
-    )) {
+    if (
+        !url.includes("tileset_info/?d=")
+        ||
+        (!url.includes("https:") && !url.includes("http:"))
+    ) {
         // TODO: Add RE to validate the format.
-        console.warn("Data url format is incorrect.");
+        console.warn("Data url format is incorrect:" + url);
         return { server: undefined, tilesetUid: undefined };
     }
 

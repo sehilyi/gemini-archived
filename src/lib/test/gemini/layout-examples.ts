@@ -105,12 +105,13 @@ export const LAYOUT_EXAMPLE_COMBO_BAND: GeminiSpec = {
     ],
     tracks: [
         {
-            data: { url: '', type: 'csv' },
+            data: { url: 'http://higlass.io/api/v1/tileset_info/?d=OHJakQICQD6gTD7skx4EWA', type: 'tileset' },
             mark: {
-                type: 'higlass-gene-annotation',
+                type: 'gene-annotation-higlass',
                 server: 'gemini-v1'
             },
-            width: 600, height: 155
+            x: { axis: true },
+            width: 600, height: 120
         },
         {
             data: { url: 'https://raw.githubusercontent.com/sehilyi/gemini-datasets/master/data/range-to-range-relation.csv', type: 'csv' },
@@ -120,18 +121,16 @@ export const LAYOUT_EXAMPLE_COMBO_BAND: GeminiSpec = {
             x: { field: 'to', type: "nominal" },
             xe: { field: 'to1', type: "nominal" },
             width: 600, height: 150,
-            color: { value: '#302E82' },
-            stroke: { value: 'none' },
-            opacity: { value: 0.6 },
-            strokeWidth: { value: 1 }
+            stroke: { value: 'none' }
         },
         {
-            data: { url: '', type: 'csv' },
+            data: { url: 'http://higlass.io/api/v1/tileset_info/?d=OHJakQICQD6gTD7skx4EWA', type: 'tileset' },
             mark: {
-                type: 'higlass-gene-annotation',
+                type: 'gene-annotation-higlass',
                 server: 'gemini-v1'
             },
-            width: 600, height: 155
+            x1: { axis: true },
+            width: 600, height: 120
         }
     ]
 }

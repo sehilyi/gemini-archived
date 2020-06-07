@@ -82,11 +82,12 @@ export type ChannelType = keyof typeof ChannelTypes | string
 export type Channel = ChannelDeep | ChannelValue
 
 export interface ChannelDeep {
-    field: string
-    type: 'nominal' | 'quantitative'
+    field?: string
+    type?: 'nominal' | 'quantitative'
     aggregate?: Aggregate
     domain?: string[]
     range?: string[]
+    axis?: boolean
 }
 
 export interface ChannelValue {
@@ -253,5 +254,5 @@ export function IsChannelDeep(
         | ChannelValue
         | undefined
 ): channel is ChannelDeep {
-    return typeof channel === 'object' && 'field' in channel;
+    return typeof channel === 'object' && !('value' in channel);
 }

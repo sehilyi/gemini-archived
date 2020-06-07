@@ -1,27 +1,50 @@
 import Ajv from 'ajv';
 import HiGlassSchema from "./higlass.schema.json";
-import { HiGlassSpec, Track as HGTrack } from "./higlass.schema";
+import { HiGlassSpec, EnumTrackType } from "./higlass.schema";
 import { HiGlassModel } from './higlass-model';
-import mapper from '../compile-mapper';
-import { generateReadableTrackUid, parseServerAndTilesetUidFromUrl } from '../utils';
+import { parseServerAndTilesetUidFromUrl, validTilesetUrl } from '../utils';
+import { GenericType, Track, Channel, IsDataDeep, IsHiGlassTrack, IsChannelDeep } from '../gemini.schema';
+import { BoundingBox } from '../utils/bounding-box';
 
-export function compile(): HiGlassSpec {
+export function compiler(track: Track | GenericType<Channel>, bb: BoundingBox): HiGlassSpec {
 
     const higlass = new HiGlassModel();
 
-    // const { server, tilesetUid } = parseServerAndTilesetUidFromUrl(track.data);
-    // hg.addTrack(track.position, {
-    //     uid: track.uniqueName ? track.uniqueName : generateReadableTrackUid(hg.getLastView()?.uid, numTracks++),
-    //     type: hgToHlTrackType(track.type, track.position),
-    //     server: server,
-    //     tilesetUid: tilesetUid,
-    //     width: mapper.sizeToWidthOrHeight(track).width,
-    //     height: mapper.sizeToWidthOrHeight(track).height
-    // }).addTrackSourceServers(server);
+    if (IsHiGlassTrack(track.mark) && IsDataDeep(track.data) && validTilesetUrl(track.data.url)) {
+        const { server, tilesetUid } = parseServerAndTilesetUidFromUrl(track.data.url);
 
-    higlass.validateSpec();
+        const typeMap: { [k: string]: EnumTrackType } = {
+            // TODO: Add horizontal vs. vertical
+            'gene-annotation-higlass': 'horizontal-gene-annotations'
+        }
+        const higlassTrackType = typeMap[track.mark.type];
+        if (!higlassTrackType) return {};
 
-    return higlass.spec();
+        higlass.setMainTrack({
+            type: higlassTrackType,
+            server: server,
+            tilesetUid: tilesetUid,
+            width: bb.width,
+            height: bb.height // TODO: consider the height of axes
+        }).addTrackSourceServers(server);
+
+        const chanToPos: { [k: string]: 'left' | 'right' | 'top' | 'bottom' } = {
+            x: 'bottom',
+            x1: 'top',
+            y: 'left',
+            y1: 'right'
+        }
+        Object.keys(chanToPos).forEach(c => {
+            if (IsChannelDeep((track as GenericType<Channel>)[c])) {
+                higlass.setAxisTrack(chanToPos[c]);
+            }
+        })
+
+        higlass.validateSpec();
+        console.log(higlass.spec());
+        return higlass.spec();
+    }
+    return {};
 }
 
 export function validateHG(hg: HiGlassSpec): boolean {

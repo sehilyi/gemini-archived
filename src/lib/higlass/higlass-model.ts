@@ -58,9 +58,9 @@ export class HiGlassModel {
         return this;
     }
 
-    public addMainTrack(track: Track) {
+    public setMainTrack(track: Track) {
         if (!this.hg.views) return this;
-        this.hg.views[this.hg.views.length - 1].tracks.center?.push(track);
+        this.hg.views[0].tracks.center = [track];
         return this;
     }
 
@@ -69,12 +69,12 @@ export class HiGlassModel {
         const baseTrackType = '-chromosome-labels';
         const direction = position === 'left' || position === 'right' ? 'vertical' : 'horizontal';
         const widthOrHeight = direction === 'vertical' ? 'width' : 'height'
-        this.hg.views[0].tracks[position] = []; // Should be only one axis.
-        this.getView()?.tracks[position]?.push({
+        this.hg.views[0].tracks[position] = [{
             uid: uuid.v1(),
             type: (direction + baseTrackType) as any /* TODO */,
-            [widthOrHeight]: 30
-        });
+            [widthOrHeight]: 20,
+            chromInfoPath: this.hg.chromInfoPath
+        }]
         return this;
     }
 
