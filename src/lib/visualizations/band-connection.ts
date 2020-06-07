@@ -75,9 +75,9 @@ export function renderBetweenBandLink(
         .append('polygon')
         .attr('points', d => {
             const primaryPointStart = `${point[0].x(d)},${point[0].y(d)}`;
-            const primaryPointEnd = `${point[0].xe(d)},${point[0].y(d)}`;
+            const primaryPointEnd = `${point[0].xe(d)},${point[0].ye(d)}`;
             const secondaryPointStart = `${point[1].xe(d)},${point[1].ye(d)}`;
-            const secondaryPointEnd = `${point[1].x(d)},${point[1].ye(d)}`;
+            const secondaryPointEnd = `${point[1].x(d)},${point[1].y(d)}`;
             return `${primaryPointStart} ${primaryPointEnd} ${secondaryPointStart} ${secondaryPointEnd}`;
         })
         .attr('fill', styles.getStyle().fill)
