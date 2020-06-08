@@ -1,5 +1,5 @@
 import * as d3 from 'd3'
-import { GeminiSpec, Track, GenericType, Channel, IsHiGlassTrack } from '../gemini.schema';
+import { GeminiSpec, Track, GenericType, Channel, IsHiGlassTrack, IsNotEmptyTrack } from '../gemini.schema';
 import { BoundingBox } from '../utils/bounding-box';
 import { renderBetweenLink } from './link';
 import { VIEW_PADDING } from './defaults';
@@ -18,6 +18,9 @@ export function renderLayout(
     const tracksWithBB: { bb: BoundingBox, track: Track | GenericType<Channel> }[] = [];
     let cumY = top, cumX = left;
     gm.tracks.forEach(track => {
+        if (!IsNotEmptyTrack(track)) {
+            return;
+        }
         if (gm.layout?.direction !== "horizontal") {
             tracksWithBB.push({
                 bb: {

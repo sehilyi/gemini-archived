@@ -10,9 +10,9 @@ export interface GeminiSpec {
     layout?: {
         type: "linear" | "circular"
         direction: "vertical" | "horizontal"
-        wrap: number // TODO: does not work now
+        wrap?: number // TODO: does not work now
     }
-    tracks: (Track | GenericType<Channel>)[] // TODO: `Track` does not mean anything here because of `GenericType`
+    tracks: (Track | GenericType<Channel> | EmptyTrack)[] // TODO: `Track` does not mean anything here because of `GenericType`
 }
 
 export interface GenericType<T> {
@@ -23,6 +23,7 @@ export interface GenericType<T> {
  * Tracks
  */
 export interface DataDeep { url: string, type: 'tileset' | 'csv' }
+export interface EmptyTrack { }
 export interface Track {
     // primitives
     data: DataDeep | Datum[]
@@ -114,7 +115,6 @@ export type MarkType =
     | 'triangle-l'
     | 'triangle-r'
     | 'dummy'
-    | 'empty'
 
 /**
  * Glyph
@@ -215,6 +215,14 @@ export function IsDataDeep(data:
     | ChannelValue
 ): data is DataDeep {
     return typeof data === 'object'
+}
+
+export function IsNotEmptyTrack(track:
+    | Track
+    | GenericType<Channel>
+    | EmptyTrack
+): track is Track | GenericType<Channel> {
+    return track !== {}
 }
 
 export function IsShallowMark(mark: any): mark is MarkType {
