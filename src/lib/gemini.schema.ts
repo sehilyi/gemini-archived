@@ -11,6 +11,9 @@ export interface GeminiSpec {
         type: "linear" | "circular"
         direction: "vertical" | "horizontal"
         wrap?: number // TODO: does not work now
+        // TODO: Currently, these two are used only for circular layout.
+        width?: number
+        height?: number
     }
     tracks: (Track | GenericType<Channel> | EmptyTrack)[] // TODO: `Track` does not mean anything here because of `GenericType`
 }
@@ -48,6 +51,11 @@ export interface Track {
     // styles
     width?: number
     height?: number
+    style?: TrackStyle
+}
+
+export interface TrackStyle {
+    background?: string
 }
 
 /**
@@ -160,14 +168,15 @@ export interface GlyphElement {
     w?: ChannelBind | ChannelValue | 'none'
     opacity?: ChannelBind | ChannelValue | 'none'
     text?: ChannelBind | ChannelValue | 'none'
-    styles?: Style
+    style?: MarkStyle
 }
 
-export interface Style {
+export interface MarkStyle {
     dashed?: string
     dy?: number
     stroke?: string
     strokeWidth?: number
+    background?: string
 }
 
 export interface MarkBind {
@@ -217,26 +226,28 @@ export function IsDataDeep(data:
     return typeof data === 'object'
 }
 
-export function IsNotEmptyTrack(track:
-    | Track
-    | GenericType<Channel>
-    | EmptyTrack
+export function IsNotEmptyTrack(
+    track:
+        | Track
+        | GenericType<Channel>
+        | EmptyTrack
 ): track is Track | GenericType<Channel> {
     return track !== {}
 }
 
-export function IsShallowMark(mark: any): mark is MarkType {
-    // TODO: MarkType | MarkDeep
+export function IsTrackStyle(track: TrackStyle | undefined): track is TrackStyle {
+    return track !== undefined
+}
+
+export function IsShallowMark(mark: any /* TODO */): mark is MarkType {
     return typeof mark !== 'object'
 }
 
-export function IsMarkDeep(mark: any): mark is MarkDeep {
-    // TODO: MarkType | MarkDeep
+export function IsMarkDeep(mark: any /* TODO */): mark is MarkDeep {
     return typeof mark === 'object'
 }
 
-export function IsGlyphMark(mark: any): mark is MarkGlyph {
-    // TODO: MarkType | MarkDeep
+export function IsGlyphMark(mark: any /* TODO */): mark is MarkGlyph {
     return typeof mark === 'object' && mark.type === 'groupMark'
 }
 
@@ -246,7 +257,8 @@ export function IsHiGlassTrack(track: Track | GenericType<Channel>) {
             typeof track.mark === 'object' &&
             IsGlyphMark(track.mark) &&
             track.mark.type !== 'groupMark'
-        ) || (IsDataDeep(track.data) && validTilesetUrl(track.data.url))
+        ) ||
+        (IsDataDeep(track.data) && validTilesetUrl(track.data.url))
     );
 }
 

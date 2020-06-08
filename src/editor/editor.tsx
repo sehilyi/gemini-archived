@@ -51,6 +51,7 @@ function Editor() {
         }
         if (!editedGm) return;
 
+        // Render layout preview
         renderLayoutPreview(
             layoutSvg.current as SVGSVGElement,
             editedGm as GeminiSpec,
@@ -69,6 +70,7 @@ function Editor() {
         )
         if (!track) return;
 
+        // Render glyph preview
         if (IsNotEmptyTrack(track) && IsDataDeep(track.data)) {
             d3.csv(track.data.url).then(data =>
                 renderGlyphPreview(

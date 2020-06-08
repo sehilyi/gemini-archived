@@ -1,15 +1,16 @@
 import { GeminiSpec } from "../lib/gemini.schema";
-import { CYTOGENETIC_BAND } from "../lib/test/gemini/cytogenetic-band";
 import {
     GENE_ANNOTATION_PLOT,
-    GENE_ANNOTATION_PLOT_SIMPLE
-} from "../lib/test/gemini/gene-annotation-plots";
+    GENE_ANNOTATION_PLOT_SIMPLE,
+    CYTOGENETIC_BAND
+} from "../lib/test/gemini/glyph-examples";
 import {
     LAYOUT_EXAMPLE_COMBO_HORIZONTAL,
     LAYOUT_EXAMPLE_LINK,
     LAYOUT_EXAMPLE_COMBO,
     LAYOUT_EXAMPLE_COMBO_BAND,
-    LAYOUT_EXAMPLE_STACKED_MULTI_TRACKS
+    LAYOUT_EXAMPLE_STACKED_MULTI_TRACKS,
+    LAYOUT_EXAMPLE_STACKED_MULTI_TRACKS_CIRCULAR
 } from "../lib/test/gemini/layout-examples";
 
 interface Demo {
@@ -65,6 +66,12 @@ export const demos: ReadonlyArray<Demo> = [
     {
         name: "Stacked Multiple Tracks",
         spec: LAYOUT_EXAMPLE_STACKED_MULTI_TRACKS,
+        glyphWidth: 0,
+        glyphHeight: 0
+    },
+    {
+        name: "Stacked Multiple Tracks (Circular)",
+        spec: LAYOUT_EXAMPLE_STACKED_MULTI_TRACKS_CIRCULAR,
         glyphWidth: 0,
         glyphHeight: 0
     },

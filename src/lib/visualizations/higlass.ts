@@ -21,7 +21,6 @@ export function renderHiGlass(
         hiGlassInfo.push({ boundingBox: bb, viewConfig: compiler(track, bb) });
     })
     setHiGlassInfo(hiGlassInfo);
-    console.log(hiGlassInfo);
 
     /////// DEBUG
     // const testHGInfo = tracksWithBB.map(tb => ({ boundingBox: tb.bb, viewConfig: testViewConfig }));

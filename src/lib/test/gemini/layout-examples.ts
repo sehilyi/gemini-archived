@@ -163,8 +163,23 @@ export const LAYOUT_EXAMPLE_COMBO_BAND: GeminiSpec = {
 export const LAYOUT_EXAMPLE_STACKED_MULTI_TRACKS: GeminiSpec = {
     layout: { type: 'linear', direction: 'vertical' },
     tracks: [
-        { data: { url: 'dummy', type: 'csv' }, mark: 'dummy', width: 60, height: 500 },
-        { data: { url: 'dummy', type: 'csv' }, mark: 'dummy', width: 60, height: 500 },
-        { data: { url: 'dummy', type: 'csv' }, mark: 'dummy', width: 60, height: 500 },
+        { data: { url: 'dummy', type: 'csv' }, mark: 'dummy', width: 500, height: 30, style: { background: '#FAF9F7' } },
+        { data: { url: 'dummy', type: 'csv' }, mark: 'dummy', width: 500, height: 30 },
+        { data: { url: 'dummy', type: 'csv' }, mark: 'dummy', width: 500, height: 30, style: { background: '#FAF9F7' } },
+        { data: { url: 'dummy', type: 'csv' }, mark: 'dummy', width: 500, height: 30 },
+        { data: { url: 'dummy', type: 'csv' }, mark: 'dummy', width: 500, height: 30, style: { background: '#FAF9F7' } },
+        { data: { url: 'dummy', type: 'csv' }, mark: 'dummy', width: 500, height: 30 },
+    ]
+}
+
+export const LAYOUT_EXAMPLE_STACKED_MULTI_TRACKS_CIRCULAR: GeminiSpec = {
+    layout: { type: 'circular', direction: 'horizontal' },
+    tracks: [
+        { data: { url: 'dummy', type: 'csv' }, mark: 'dummy', width: 500, height: 30, style: { background: '#FAF9F7' } },
+        { data: { url: 'dummy', type: 'csv' }, mark: 'dummy', width: 500, height: 30 },
+        { data: { url: 'dummy', type: 'csv' }, mark: 'dummy', width: 500, height: 30, style: { background: '#FAF9F7' } },
+        { data: { url: 'dummy', type: 'csv' }, mark: 'dummy', width: 500, height: 30 },
+        { data: { url: 'dummy', type: 'csv' }, mark: 'dummy', width: 500, height: 30, style: { background: '#FAF9F7' } },
+        { data: { url: 'dummy', type: 'csv' }, mark: 'dummy', width: 500, height: 30 },
     ]
 }

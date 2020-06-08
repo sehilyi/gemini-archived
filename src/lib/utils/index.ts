@@ -1,6 +1,6 @@
 import Ajv from 'ajv';
 import uuid from "uuid";
-import { GeminiSpec, Mark, MarkGlyphPreset, IsNotEmptyTrack, IsGlyphMark, IsMarkDeep } from '../gemini.schema';
+import { GeminiSpec, Mark, IsNotEmptyTrack, IsMarkDeep } from '../gemini.schema';
 import { GLYPH_LOCAL_PRESET_TYPES, GLYPH_PRESETS } from "../test/gemini/glyph";
 
 export function replaceGlyphs(spec: GeminiSpec): GeminiSpec {
@@ -48,7 +48,6 @@ export function parseServerAndTilesetUidFromUrl(url: string) {
         return { server: undefined, tilesetUid: undefined };
     }
 
-    const pre = url.includes("https:") ? "https:" : "http:";
 
     const server = url.split("tileset_info/?d=")[0]
     const tilesetUid = url.split("tileset_info/?d=")[1]
