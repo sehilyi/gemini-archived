@@ -106,9 +106,15 @@ export const LAYOUT_EXAMPLE_COMBO_BAND: GeminiSpec = {
     tracks: [
         {
             data: { url: 'https://resgen.io/api/v1/tileset_info/?d=a-iBpdh3Q_uO2FLCWKpOOw', type: 'tileset' },
-            mark: 'point',
+            mark: 'rect',
             x: { type: 'genomic' },
-            width: 600, height: 120
+            width: 600, height: 60
+        },
+        {
+            data: { url: 'https://resgen.io/api/v1/tileset_info/?d=a-iBpdh3Q_uO2FLCWKpOOw', type: 'tileset' },
+            mark: 'line',
+            x: { type: 'genomic' },
+            width: 600, height: 60
         },
         {
             data: { url: 'http://higlass.io/api/v1/tileset_info/?d=OHJakQICQD6gTD7skx4EWA', type: 'tileset' },
@@ -138,7 +144,19 @@ export const LAYOUT_EXAMPLE_COMBO_BAND: GeminiSpec = {
             x: { type: 'genomic' },
             x1: { axis: true },
             width: 600, height: 120
-        }
+        },
+        {
+            data: { url: 'https://resgen.io/api/v1/tileset_info/?d=a-iBpdh3Q_uO2FLCWKpOOw', type: 'tileset' },
+            mark: 'bar',
+            x: { type: 'genomic' },
+            width: 600, height: 60
+        },
+        {
+            data: { url: 'https://resgen.io/api/v1/tileset_info/?d=a-iBpdh3Q_uO2FLCWKpOOw', type: 'tileset' },
+            mark: 'point',
+            x: { type: 'genomic' },
+            width: 600, height: 60
+        },
     ]
 }
 
