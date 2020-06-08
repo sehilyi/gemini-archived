@@ -151,7 +151,7 @@ function Editor() {
                         }, 1000)}
                     />
                     {/* D3 Visualizations */}
-                    <SplitPane split="horizontal" defaultSize="35%" onChange={() => { }}>
+                    <SplitPane split="horizontal" defaultSize="20%" onChange={() => { }}>
                         <div className="preview-container">
                             <b>Glyph Preview</b>
                             <div><svg ref={glyphSvg} /></div>

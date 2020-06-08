@@ -17,8 +17,12 @@ export function compiler(track: Track | GenericType<Channel>, bb: BoundingBox): 
         // Is this track horizontal or vertical?
         const isXGenomic = IsChannelDeep(track.x) && track.x.type === "genomic"
         const isYGenomic = IsChannelDeep(track.y) && track.y.type === "genomic"
+        const xDomain = isXGenomic && IsChannelDeep(track.x) ? track.x.domain as [number, number] : undefined
+        const yDomain = isYGenomic && IsChannelDeep(track.y) ? track.y.domain as [number, number] : undefined
         const trackDirection = isXGenomic && isYGenomic ? 'both' : isXGenomic ? 'horizontal' : 'vertical'
         const trackType = IsShallowMark(track.mark) ? track.mark : IsMarkDeep(track.mark) ? track.mark.type : 'unknown'
+
+        higlass.setDomain(xDomain, yDomain);
 
         const typeMap: { [k: string]: EnumTrackType } = {
             // TODO: Add horizontal vs. vertical

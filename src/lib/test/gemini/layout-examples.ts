@@ -122,7 +122,7 @@ export const LAYOUT_EXAMPLE_COMBO_BAND: GeminiSpec = {
                 type: 'gene-annotation-higlass',
                 server: 'gemini-v1'
             },
-            x: { type: 'genomic', axis: true },
+            x: { type: 'genomic', axis: true, domain: [1519086324.7628496, 1519471836.3240566] },
             width: 600, height: 120
         },
         {

@@ -86,7 +86,7 @@ export interface ChannelDeep {
     field?: string
     type?: 'genomic' | 'nominal' | 'quantitative'
     aggregate?: Aggregate
-    domain?: string[]
+    domain?: string[] | number[]
     range?: string[]
     axis?: boolean
 }

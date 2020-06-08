@@ -17,19 +17,19 @@ export const demos: ReadonlyArray<Demo> = [
         name: "Gene Annotation Plot (Simple)",
         spec: GENE_ANNOTATION_PLOT_SIMPLE,
         glyphWidth: 300,
-        glyphHeight: 300
+        glyphHeight: 150
     },
     {
         name: "Gene Annotation Plot",
         spec: GENE_ANNOTATION_PLOT,
         glyphWidth: 600,
-        glyphHeight: 300
+        glyphHeight: 150
     },
     {
         name: "Cytogenetic Band",
         spec: CYTOGENETIC_BAND,
         glyphWidth: 900,
-        glyphHeight: 300
+        glyphHeight: 150
     },
     {
         name: "Six Different Between-Links",
