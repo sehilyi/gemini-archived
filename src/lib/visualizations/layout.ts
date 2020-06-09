@@ -1,9 +1,9 @@
 import * as d3 from 'd3'
 import { GeminiSpec, Track } from '../gemini.schema';
 import { HiGlassTrack } from './higlass';
+import { BoundingBox } from '../utils/bounding-box';
 import { renderCircularLayout } from './layout-circular';
 import { renderLinearLayout } from './layout-linear';
-import { BoundingBox } from '../utils/bounding-box';
 
 export function renderLayout(
     g: d3.Selection<SVGGElement, any, any, any>,
@@ -22,6 +22,6 @@ export function renderLayout(
 
 export const trackStyle = {
     background: (track: Track) => track.style?.background ?? 'white',
-    stroke: () => 'lightgray',
-    strokeWidth: () => 1
+    stroke: (track: Track) => track.style?.stroke ?? '#E2575A',   // TODO: for demo
+    strokeWidth: (track: Track) => track.style?.strokeWidth ?? 1
 }

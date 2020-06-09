@@ -56,6 +56,8 @@ export interface Track {
 
 export interface TrackStyle {
     background?: string
+    stroke?: string
+    strokeWidth?: number
 }
 
 /**
