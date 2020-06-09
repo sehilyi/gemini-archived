@@ -23,14 +23,13 @@ export function renderLayoutPreview(
     renderBackground(svg, WIDTH, HEIGHT, PADDING_X, PADDING_Y, false);
 
     const innerG = d3.select(svg).append("g")
-        .attr("width", WIDTH - PADDING_X * 2)
-        .attr("height", HEIGHT - PADDING_Y * 2)
+        .attr("width", boundingBox.width)
+        .attr("height", boundingBox.height)
 
     renderLayout(
         innerG,
         gm,
         setHiGlassInfo,
-        PADDING_X,
-        PADDING_Y
+        boundingBox
     );
 }
