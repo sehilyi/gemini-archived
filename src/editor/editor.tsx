@@ -119,7 +119,7 @@ function Editor() {
     return (
         <>
             <div className="demo-navbar">
-                🧬Gemini <code>Editor</code>
+                🧬 Gemini <code>Editor</code>
                 <select
                     onChange={e => {
                         setDemo(demos.find(d => d.name === e.target.value) as any);
