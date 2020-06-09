@@ -26,10 +26,5 @@ export function renderLayoutPreview(
         .attr("width", boundingBox.width)
         .attr("height", boundingBox.height)
 
-    renderLayout(
-        innerG,
-        gm,
-        setHiGlassInfo,
-        boundingBox
-    );
+    renderLayout(innerG, gm, setHiGlassInfo, boundingBox);
 }

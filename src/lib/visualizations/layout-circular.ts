@@ -23,47 +23,46 @@ export function renderCircularLayout(
     const angleGap = Math.PI * 2 / 160.0;
 
     // Generate layout data
+    // TODO: support `wrap`
     const trackInfo: { arc: ArcInfo, track: Track | GenericType<Channel> }[] = []
-    let cumLength = 0
-    let cumDonutBandWidth = 0
-    // TODO: Better organize this!
-    gm.tracks.forEach(track => {
-        if (!IsNotEmptyTrack(track)) {
-            return;
-        }
-        // TODO: support `wrap`
-        if (gm.layout?.direction === "horizontal") {
-            // adjacently place first
-            const donutBandWidth = track.height as number // Height is used for the width of donut band.
-            const length = track.width as number
-            const startAngle = (Math.PI * 2) * cumLength / totalLength + angleGap
-            const endAngle = startAngle + (Math.PI * 2) * length / totalLength - angleGap
-            trackInfo.push({
-                track,
-                arc: {
-                    innerRadius: totalRadius - donutBandWidth,
-                    outerRadius: totalRadius,
-                    startAngle,
-                    endAngle
-                }
-            })
-            cumLength += length
-        }
-        else {
-            // stack first
-            const donutBandWidth = track.height as number // Height is used for the width of donut band.
-            trackInfo.push({
-                track,
-                arc: {
-                    innerRadius: totalRadius - cumDonutBandWidth - donutBandWidth,
-                    outerRadius: totalRadius - cumDonutBandWidth,
-                    startAngle: Math.PI + angleGap,
-                    endAngle: Math.PI * 3 - angleGap
-                }
-            })
-            cumDonutBandWidth += donutBandWidth + TRACK_GAP
-        }
-    });
+    if (gm.layout?.direction === "horizontal") {
+        // adjacently place first
+        let cumLength = 0
+        gm.tracks.forEach(track => {
+            if (IsNotEmptyTrack(track)) {
+                const donutBandWidth = track.height as number // Height is used for the width of donut band.
+                const length = track.width as number // Width is used for calculating the proportion of the circumference.
+                const startAngle = (Math.PI * 2) * cumLength / totalLength + angleGap
+                const endAngle = startAngle + (Math.PI * 2) * length / totalLength - angleGap
+                trackInfo.push({
+                    track, arc: {
+                        innerRadius: totalRadius - donutBandWidth,
+                        outerRadius: totalRadius,
+                        startAngle, endAngle
+                    }
+                })
+                cumLength += length
+            }
+        })
+    }
+    else {
+        // stack first
+        let cumDonutBandWidth = 0
+        gm.tracks.forEach(track => {
+            if (IsNotEmptyTrack(track)) {
+                const donutBandWidth = track.height as number // Height is used for the width of donut band.
+                trackInfo.push({
+                    track, arc: {
+                        innerRadius: totalRadius - cumDonutBandWidth - donutBandWidth,
+                        outerRadius: totalRadius - cumDonutBandWidth,
+                        startAngle: Math.PI + angleGap,
+                        endAngle: Math.PI * 3 - angleGap
+                    }
+                })
+                cumDonutBandWidth += donutBandWidth + TRACK_GAP
+            }
+        })
+    }
 
     const trackStyle = {
         background: (track: Track) => track.style?.background ?? 'white',

@@ -20,8 +20,7 @@ export function renderLinearLayout(
         gm.tracks.forEach(track => {
             if (IsNotEmptyTrack(track)) {
                 trackInfo.push({
-                    track,
-                    boundingBox: {
+                    track, boundingBox: {
                         x: cumX, width: track.width as number,
                         y: boundingBox.y, height: track.height as number
                     }
@@ -34,8 +33,7 @@ export function renderLinearLayout(
         gm.tracks.forEach(track => {
             if (IsNotEmptyTrack(track)) {
                 trackInfo.push({
-                    track,
-                    boundingBox: {
+                    track, boundingBox: {
                         x: boundingBox.x, width: track.width as number,
                         y: cumY, height: track.height as number
                     }
