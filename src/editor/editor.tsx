@@ -8,14 +8,14 @@ import SplitPane from 'react-split-pane';
 import { GeminiSpec, Track, IsDataDeep, IsMarkDeep, IsNotEmptyTrack } from '../lib/gemini.schema';
 import { debounce } from "lodash";
 import { demos } from './examples';
-import './editor.css';
 import { renderGlyphPreview } from '../lib/visualizations/glyph-preview';
 import { replaceGlyphs } from '../lib/utils';
 import { renderLayoutPreview } from '../lib/visualizations/layout-preview';
 import { calculateSize } from '../lib/utils/bounding-box';
 import { HiGlassTrack } from '../lib/visualizations/higlass';
+import './editor.css';
 
-const DEBUG_INIT_DEMO_INDEX = demos.length - 1;
+const DEBUG_INIT_DEMO_INDEX = 0; //demos.length - 1;
 
 function Editor() {
 
@@ -40,6 +40,7 @@ function Editor() {
         }
         setGlyphWidth(demo.glyphWidth);
         setGlyphHeight(demo.glyphHeight);
+        setHiGlassTrackOptions([]);
     }, [demo, editorMode]);
 
     useEffect(() => {
@@ -85,14 +86,15 @@ function Editor() {
 
     const hglass = useMemo(() => {
         return higlassTrackOptions.map(op =>
-            <div style={{
-                position: 'absolute',
-                display: 'block',
-                left: op.boundingBox.x,
-                top: op.boundingBox.y,
-                width: op.boundingBox.width,
-                height: op.boundingBox.height,
-            }}>
+            <div key={stringify(op.viewConfig)}
+                style={{
+                    position: 'absolute',
+                    display: 'block',
+                    left: op.boundingBox.x,
+                    top: op.boundingBox.y,
+                    width: op.boundingBox.width,
+                    height: op.boundingBox.height,
+                }}>
                 <HiGlassComponent
                     options={{
                         bounded: true,

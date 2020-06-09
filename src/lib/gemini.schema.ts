@@ -7,15 +7,17 @@ import { validTilesetUrl } from './utils';
 export interface GeminiSpec {
     references?: string[]
     description?: string
-    layout?: {
-        type: "linear" | "circular"
-        direction: "vertical" | "horizontal"
-        wrap?: number // TODO: does not work now
-        // TODO: Currently, these two are used only for circular layout.
-        width?: number
-        height?: number
-    }
+    layout?: Layout
     tracks: (Track | GenericType<Channel> | EmptyTrack)[] // TODO: `Track` does not mean anything here because of `GenericType`
+}
+
+export interface Layout {
+    type: "linear" | "circular"
+    direction: "vertical" | "horizontal"
+    wrap?: number // TODO: does not work now
+    // TODO: Currently, these two are used only for circular layout.
+    width?: number
+    height?: number
 }
 
 export interface GenericType<T> {
