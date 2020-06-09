@@ -64,14 +64,14 @@ export const demos: ReadonlyArray<Demo> = [
         glyphHeight: 0
     },
     {
-        name: "Stacked Multiple Tracks (Circular)",
-        spec: LAYOUT_EXAMPLE_STACKED_MULTI_TRACKS_CIRCULAR,
+        name: "Stacked Multiple Tracks",
+        spec: LAYOUT_EXAMPLE_STACKED_MULTI_TRACKS,
         glyphWidth: 0,
         glyphHeight: 0
     },
     {
-        name: "Stacked Multiple Tracks",
-        spec: LAYOUT_EXAMPLE_STACKED_MULTI_TRACKS,
+        name: "Stacked Multiple Tracks (Circular)",
+        spec: LAYOUT_EXAMPLE_STACKED_MULTI_TRACKS_CIRCULAR,
         glyphWidth: 0,
         glyphHeight: 0
     }

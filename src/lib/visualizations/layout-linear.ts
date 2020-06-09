@@ -15,7 +15,6 @@ export function renderLinearLayout(
     const wrap: number = gm.layout?.wrap ?? 999;
 
     // Generate layout data
-    // TODO: support `wrap`
     const trackInfo: { boundingBox: BoundingBox, track: Track | GenericType<Channel> }[] = [];
     let cumX = boundingBox.x
     let cumY = boundingBox.y

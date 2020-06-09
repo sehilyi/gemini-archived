@@ -173,7 +173,7 @@ export const LAYOUT_EXAMPLE_STACKED_MULTI_TRACKS: GeminiSpec = {
 }
 
 export const LAYOUT_EXAMPLE_STACKED_MULTI_TRACKS_CIRCULAR: GeminiSpec = {
-    layout: { type: 'circular', direction: 'vertical' },
+    layout: { type: 'circular', direction: 'horizontal', wrap: 2 },
     tracks: [
         { data: { url: 'dummy', type: 'csv' }, mark: 'dummy', width: 500, height: 30, style: { background: '#FAF9F7' } },
         { data: { url: 'dummy', type: 'csv' }, mark: 'dummy', width: 500, height: 30 },
