@@ -67,7 +67,7 @@ function Editor() {
         );
         d3.select(glyphSvg.current).selectAll('*').remove(); // TODO:
         const track = (editedGm as GeminiSpec)?.tracks?.find(
-            d => IsNotEmptyTrack(d) && IsMarkDeep(d.mark) ? d.mark.type === 'groupMark' : false
+            d => IsNotEmptyTrack(d) && IsMarkDeep(d.mark) ? d.mark.type === 'compositeMark' : false
         )
         if (!track) return;
 
@@ -156,7 +156,7 @@ function Editor() {
                     {/* D3 Visualizations */}
                     <SplitPane split="horizontal" defaultSize="20%" onChange={() => { }}>
                         <div className="preview-container">
-                            <b>Glyph Preview</b>
+                            <b>Composite Mark Preview</b>
                             <div><svg ref={glyphSvg} /></div>
                         </div>
                         <div className="preview-container">

@@ -144,7 +144,7 @@ export interface MarkGlyphPreset {
 }
 
 export interface MarkGlyph {
-    type: 'groupMark'
+    type: 'compositeMark'
     name: string
     referenceColumn?: string // reference column for selecting data tuples for each glyph
     requiredChannels: ChannelType[] // channels that must be assigned
@@ -252,7 +252,7 @@ export function IsMarkDeep(mark: any /* TODO */): mark is MarkDeep {
 }
 
 export function IsGlyphMark(mark: any /* TODO */): mark is MarkGlyph {
-    return typeof mark === 'object' && mark.type === 'groupMark'
+    return typeof mark === 'object' && mark.type === 'compositeMark'
 }
 
 export function IsHiGlassTrack(track: Track | GenericType<Channel>) {
@@ -260,7 +260,7 @@ export function IsHiGlassTrack(track: Track | GenericType<Channel>) {
         (
             typeof track.mark === 'object' &&
             IsGlyphMark(track.mark) &&
-            track.mark.type !== 'groupMark'
+            track.mark.type !== 'compositeMark'
         ) ||
         (IsDataDeep(track.data) && validTilesetUrl(track.data.url))
     );
