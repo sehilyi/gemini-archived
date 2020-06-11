@@ -107,7 +107,7 @@ export const LAYOUT_EXAMPLE_COMBO_BAND: GeminiSpec = {
         {
             data: { url: 'https://resgen.io/api/v1/tileset_info/?d=a-iBpdh3Q_uO2FLCWKpOOw', type: 'tileset' },
             mark: 'rect',
-            x: { type: 'genomic' },
+            x: { type: 'genomic', domain: { chromosome: '9' } },
             width: 600, height: 60
         },
         {

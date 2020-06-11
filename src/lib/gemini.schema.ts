@@ -14,10 +14,7 @@ export interface GeminiSpec {
 export interface Layout {
     type: "linear" | "circular"
     direction: "vertical" | "horizontal"
-    wrap?: number // TODO: does not work now
-    // TODO: Currently, these two are used only for circular layout.
-    width?: number
-    height?: number
+    wrap?: number
 }
 
 export interface GenericType<T> {

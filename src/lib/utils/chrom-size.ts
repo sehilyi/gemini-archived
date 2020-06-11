@@ -34,6 +34,4 @@ Object.keys(CHROM_SIZE_HG19).reduce((sum, k) => {
     return sum + CHROM_SIZE_HG19[k]
 }, 0)
 
-console.log(CHROM_RANGE_HG19);
-
 export const TOTAL_CHROM_SIZE_HG19 = Object.values(CHROM_SIZE_HG19).reduce((sum, current) => sum + current, 0);
