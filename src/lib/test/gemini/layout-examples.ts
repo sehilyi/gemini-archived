@@ -117,12 +117,12 @@ export const LAYOUT_EXAMPLE_COMBO_BAND: GeminiSpec = {
             width: 600, height: 60
         },
         {
-            data: { url: 'http://higlass.io/api/v1/tileset_info/?d=OHJakQICQD6gTD7skx4EWA', type: 'tileset' },
+            data: { url: 'https://higlass.io/api/v1/tileset_info/?d=OHJakQICQD6gTD7skx4EWA', type: 'tileset' },
             mark: {
                 type: 'gene-annotation-higlass',
                 server: 'gemini-v1'
             },
-            x: { type: 'genomic', axis: true, domain: [1519086324.7628496, 1519471836.3240566] },
+            x: { type: 'genomic', axis: true, domain: { chromosome: '12' } },
             width: 600, height: 120
         },
         {
@@ -136,7 +136,7 @@ export const LAYOUT_EXAMPLE_COMBO_BAND: GeminiSpec = {
             stroke: { value: 'none' }
         },
         {
-            data: { url: 'http://higlass.io/api/v1/tileset_info/?d=OHJakQICQD6gTD7skx4EWA', type: 'tileset' },
+            data: { url: 'https://higlass.io/api/v1/tileset_info/?d=OHJakQICQD6gTD7skx4EWA', type: 'tileset' },
             mark: {
                 type: 'gene-annotation-higlass',
                 server: 'gemini-v1'

@@ -15,7 +15,7 @@ import { calculateSize } from '../lib/utils/bounding-box';
 import { HiGlassTrack } from '../lib/visualizations/higlass';
 import './editor.css';
 
-const DEBUG_INIT_DEMO_INDEX = 0; //demos.length - 1;
+const DEBUG_INIT_DEMO_INDEX = demos.length - 1;
 
 function Editor() {
 

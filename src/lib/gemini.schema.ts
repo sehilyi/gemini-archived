@@ -99,9 +99,29 @@ export interface ChannelDeep {
     field?: string
     type?: 'genomic' | 'nominal' | 'quantitative'
     aggregate?: Aggregate
-    domain?: string[] | number[]
+    domain?: Domain
     range?: string[]
     axis?: boolean
+}
+
+export type Domain = string[] | number[] | DomainInterval | DomainChrInterval | DomainChr | DomainGene
+export interface DomainChr {
+    // For showing a certain chromosome
+    chromosome: string
+}
+export interface DomainChrInterval {
+    // For showing a certain interval in a chromosome
+    chromosome: string
+    interval: [number, number]
+}
+export interface DomainInterval {
+    // For showing a certain interval in intire chromosomes
+    interval: [number, number] // This is consistent to HiGlass's initXDomain and initYDomain.
+}
+export interface DomainGene {
+    // For showing genes
+    // TODO: not supported yet
+    gene: string | [string, string]
 }
 
 export interface ChannelValue {
@@ -228,6 +248,26 @@ export function IsDataDeep(data:
     | ChannelValue
 ): data is DataDeep {
     return typeof data === 'object'
+}
+
+export function IsDomainFlat(domain: Domain): domain is string[] | number[] {
+    return Array.isArray(domain)
+}
+
+export function IsDomainChr(domain: Domain): domain is DomainChr {
+    return 'chromosome' in domain && !('interval' in domain)
+}
+
+export function IsDomainInterval(domain: Domain): domain is DomainInterval {
+    return !('chromosome' in domain) && 'interval' in domain
+}
+
+export function IsDomainChrInterval(domain: Domain): domain is DomainChrInterval {
+    return 'chromosome' in domain && 'interval' in domain
+}
+
+export function IsDomainGene(domain: Domain): domain is DomainGene {
+    return 'gene' in domain
 }
 
 export function IsNotEmptyTrack(
