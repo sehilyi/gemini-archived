@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/gemini/static/css/main.f9e16ec9.chunk.css",
-    "main.js": "/gemini/static/js/main.9c695fdf.chunk.js",
-    "main.js.map": "/gemini/static/js/main.9c695fdf.chunk.js.map",
+    "main.js": "/gemini/static/js/main.df2ff00a.chunk.js",
+    "main.js.map": "/gemini/static/js/main.df2ff00a.chunk.js.map",
     "runtime-main.js": "/gemini/static/js/runtime-main.17d9f8c6.js",
     "runtime-main.js.map": "/gemini/static/js/runtime-main.17d9f8c6.js.map",
     "static/css/2.659f5c98.chunk.css": "/gemini/static/css/2.659f5c98.chunk.css",
-    "static/js/2.b0cc9fdf.chunk.js": "/gemini/static/js/2.b0cc9fdf.chunk.js",
-    "static/js/2.b0cc9fdf.chunk.js.map": "/gemini/static/js/2.b0cc9fdf.chunk.js.map",
+    "static/js/2.b6d38193.chunk.js": "/gemini/static/js/2.b6d38193.chunk.js",
+    "static/js/2.b6d38193.chunk.js.map": "/gemini/static/js/2.b6d38193.chunk.js.map",
     "static/js/3.f86ac769.chunk.js": "/gemini/static/js/3.f86ac769.chunk.js",
     "static/js/3.f86ac769.chunk.js.map": "/gemini/static/js/3.f86ac769.chunk.js.map",
     "editor.worker.js": "/gemini/editor.worker.js",
@@ -15,18 +15,18 @@
     "index.html": "/gemini/index.html",
     "json.worker.js": "/gemini/json.worker.js",
     "json.worker.js.map": "/gemini/json.worker.js.map",
-    "precache-manifest.5b04ae12e0a9e27902ac96b4dea98998.js": "/gemini/precache-manifest.5b04ae12e0a9e27902ac96b4dea98998.js",
+    "precache-manifest.80b79e6ce787aa49c4904b28d5003164.js": "/gemini/precache-manifest.80b79e6ce787aa49c4904b28d5003164.js",
     "service-worker.js": "/gemini/service-worker.js",
     "static/css/2.659f5c98.chunk.css.map": "/gemini/static/css/2.659f5c98.chunk.css.map",
     "static/css/main.f9e16ec9.chunk.css.map": "/gemini/static/css/main.f9e16ec9.chunk.css.map",
-    "static/js/2.b0cc9fdf.chunk.js.LICENSE.txt": "/gemini/static/js/2.b0cc9fdf.chunk.js.LICENSE.txt",
+    "static/js/2.b6d38193.chunk.js.LICENSE.txt": "/gemini/static/js/2.b6d38193.chunk.js.LICENSE.txt",
     "static/media/codicon.css": "/gemini/static/media/codicon.a609dc0f.ttf"
   },
   "entrypoints": [
     "static/js/runtime-main.17d9f8c6.js",
     "static/css/2.659f5c98.chunk.css",
-    "static/js/2.b0cc9fdf.chunk.js",
+    "static/js/2.b6d38193.chunk.js",
     "static/css/main.f9e16ec9.chunk.css",
-    "static/js/main.9c695fdf.chunk.js"
+    "static/js/main.df2ff00a.chunk.js"
   ]
 }
