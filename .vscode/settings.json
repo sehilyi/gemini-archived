@@ -1,5 +1,5 @@
 {
-  "editor.formatOnSave": true,
   "editor.wordWrapColumn": 100,
-  "html.format.wrapLineLength": 0
+  "html.format.wrapLineLength": 0,
+  "editor.formatOnSave": true
 }
