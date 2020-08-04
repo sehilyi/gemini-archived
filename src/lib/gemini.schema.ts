@@ -97,11 +97,12 @@ export interface ChannelDeep {
     type?: 'genomic' | 'nominal' | 'quantitative'
     aggregate?: Aggregate
     domain?: Domain
-    range?: string[]
+    range?: Range
     axis?: boolean
 }
 
 export type Domain = string[] | number[] | DomainInterval | DomainChrInterval | DomainChr | DomainGene
+export type Range = string[] | number[]
 export interface DomainChr {
     // For showing a certain chromosome
     chromosome: string

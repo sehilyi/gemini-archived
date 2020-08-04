@@ -3,7 +3,7 @@ import HiGlassSchema from "./higlass.schema.json"
 import { HiGlassSpec, EnumTrackType } from "./higlass.schema"
 import { HiGlassModel } from './higlass-model'
 import { parseServerAndTilesetUidFromUrl, validTilesetUrl } from '../utils'
-import { GenericType, Track, Channel, IsDataDeep, IsHiGlassTrack, IsChannelDeep, IsShallowMark, IsMarkDeep, Domain } from '../gemini.schema'
+import { GenericType, Track, Channel, IsDataDeep, IsHiGlassTrack, IsChannelDeep, IsShallowMark, IsMarkDeep, Domain, Range } from '../gemini.schema'
 import { BoundingBox } from '../utils/bounding-box'
 import { COLOR_SCHEME_VIRIDIS } from '../utils/contants'
 
@@ -19,6 +19,7 @@ export function compiler(track: Track | GenericType<Channel>, bb: BoundingBox): 
         const isYGenomic = IsChannelDeep(track.y) && track.y.type === "genomic"
         const xDomain = isXGenomic && IsChannelDeep(track.x) ? track.x.domain as Domain : undefined
         const yDomain = isYGenomic && IsChannelDeep(track.y) ? track.y.domain as Domain : undefined
+        const colorRange = IsChannelDeep(track.color) ? track.color.range as Range : undefined
         const trackDirection = isXGenomic && isYGenomic ? 'both' : isXGenomic ? 'horizontal' : 'vertical'
         const trackType = IsShallowMark(track.mark) ? track.mark : IsMarkDeep(track.mark) ? track.mark.type : 'unknown'
 
@@ -65,8 +66,13 @@ export function compiler(track: Track | GenericType<Channel>, bb: BoundingBox): 
             tilesetUid: tilesetUid,
             width: bb.width,
             height: bb.height, // TODO: consider the height of axes
-            options: defaultOptions[trackType]
+            options: {
+                ...defaultOptions[trackType],
+                colorScale: colorRange
+            }
         }).addTrackSourceServers(server)
+
+        console.log(colorRange)
 
         const chanToPos: { [k: string]: 'left' | 'right' | 'top' | 'bottom' } = {
             x: 'bottom',

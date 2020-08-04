@@ -9,6 +9,16 @@ export const GEMINI_TRACK_EXAMPLE: GeminiSpec = {
     },
     x: { type: 'genomic', domain: { chromosome: '1', interval: [1, 10000] } },
     x1: { axis: true },
+    color: {
+      range: [
+        "#007FFF",
+        "#e8e500",
+        "#008000",
+        "#FF0038",
+        "#800080",
+        "#DCDCDC",
+      ]
+    },
     width: 800,
     height: 120,
   }]

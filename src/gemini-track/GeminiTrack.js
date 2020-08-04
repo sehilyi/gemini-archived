@@ -1,3 +1,6 @@
+/**
+ * This file is based on the https://github.com/higlass/higlass-multivec
+ */
 import { scaleLinear, scaleOrdinal, schemeCategory10 } from 'd3';
 
 function GeminiTrack(HGC, ...args) {
@@ -134,8 +137,11 @@ function GeminiTrack(HGC, ...args) {
             tile.drawnAtScale = this._xScale.copy();
 
             // we're setting the start of the tile to the current zoom level
-            const { tileX, tileWidth } = this.getTilePosAndDimensions(tile.tileData.zoomLevel,
-                tile.tileData.tilePos, this.tilesetInfo.tile_size);
+            const { tileX, tileWidth } = this.getTilePosAndDimensions(
+                tile.tileData.zoomLevel,
+                tile.tileData.tilePos,
+                this.tilesetInfo.tile_size
+            );
 
             const matrix = this.unFlatten(tile);
 
@@ -334,7 +340,7 @@ function GeminiTrack(HGC, ...args) {
                     }
                 }
                 if (this.options.sortLargestOnTop) {
-                    positive.sort((a, b) => a.value - b.value);
+                    positive.sort((a, b) => a.color - b.color);
                     negative.sort((a, b) => b.value - a.value);
                 }
                 else {
@@ -371,7 +377,6 @@ function GeminiTrack(HGC, ...args) {
             // fraction of the track devoted to negative values
             const negativeTrackHeight = (Math.abs(negativeMax) * trackHeight) / unscaledHeight;
 
-            let start = null;
             let lowestY = this.dimensions[1];
 
             const width = 10;
@@ -384,12 +389,8 @@ function GeminiTrack(HGC, ...args) {
                 graphics.lineStyle(1, 0x000000, 1);
             }
 
-
-            for (let j = 0; j < matrix.length; j++) { // jth vertical bar in the graph
+            for (let j = 0; j < matrix.length / 2.0; j++) { // jth vertical bar in the graph
                 const x = (j * width);
-                if (j === 0) {
-                    start = x
-                }
 
                 // draw positive values
                 const positive = matrix[j][0];
@@ -731,7 +732,7 @@ GeminiTrack.config = {
         trackBorderWidth: 0,
         trackBorderColor: 'black',
         backgroundColor: 'white',
-        barBorder: true,
+        barBorder: false,
         sortLargestOnTop: true,
     },
     otherOptions: {
