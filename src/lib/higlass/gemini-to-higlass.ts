@@ -26,6 +26,7 @@ export function compiler(track: Track | GenericType<Channel>, bb: BoundingBox): 
 
         const typeMap: { [k: string]: EnumTrackType } = {
             'gene-annotation-higlass': `${trackDirection}-gene-annotations`,
+            'gemini-track-higlass': 'gemini-track',
             'point': `${trackDirection}-point`,
             'bar': `${trackDirection}-bar`,
             'line': `${trackDirection}-line`,

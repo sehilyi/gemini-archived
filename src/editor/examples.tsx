@@ -1,17 +1,18 @@
-import { GeminiSpec } from "../lib/gemini.schema";
+import { GeminiSpec } from "../lib/gemini.schema"
 import {
     GENE_ANNOTATION_PLOT,
     GENE_ANNOTATION_PLOT_SIMPLE,
     CYTOGENETIC_BAND
-} from "../lib/test/gemini/glyph-examples";
+} from "../lib/test/gemini/glyph-examples"
 import {
     LAYOUT_EXAMPLE_COMBO_HORIZONTAL,
     LAYOUT_EXAMPLE_LINK,
     LAYOUT_EXAMPLE_COMBO,
     LAYOUT_EXAMPLE_COMBO_BAND,
     LAYOUT_EXAMPLE_STACKED_MULTI_TRACKS,
-    LAYOUT_EXAMPLE_STACKED_MULTI_TRACKS_CIRCULAR
-} from "../lib/test/gemini/layout-examples";
+    LAYOUT_EXAMPLE_STACKED_MULTI_TRACKS_CIRCULAR,
+    GEMINI_TRACK_EXAMPLE
+} from "../lib/test/gemini/layout-examples"
 
 interface Demo {
     name: string,
@@ -75,4 +76,10 @@ export const demos: ReadonlyArray<Demo> = [
         glyphWidth: 0,
         glyphHeight: 0
     },
-] as const;
+    {
+        name: 'HiGlass Gemini Track',
+        spec: GEMINI_TRACK_EXAMPLE,
+        glyphWidth: 0,
+        glyphHeight: 0
+    }
+] as const
