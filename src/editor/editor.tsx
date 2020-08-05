@@ -169,12 +169,23 @@ function Editor() {
       </div>
       <div className='editor'>
         <SplitPane split='vertical' defaultSize='50%' onChange={() => { }}>
-          {/* Gemini Editor */}
-          <EditorPanel
-            code={gm}
-            readOnly={false}
-            onChange={debounce((code) => { setGm(code) }, 1000)}
-          />
+          <SplitPane split='horizontal' defaultSize='50%' onChange={() => { }}>
+            {/* Gemini Editor */}
+            <EditorPanel
+              code={gm}
+              readOnly={false}
+              onChange={debounce((code) => { setGm(code) }, 1000)}
+            />
+            {/* HiGlass View Config */}
+            <>
+              <div className='editor-header'><b>Compiled HiGlass ViewConfigs</b></div>
+              <EditorPanel
+                code={stringify(higlassTrackOptions.map(d => d.viewConfig))}
+                readOnly={true}
+                onChange={() => { }}
+              />
+            </>
+          </SplitPane>
           {/* D3 Visualizations */}
           <SplitPane split='horizontal' defaultSize='0%' onChange={() => { }}>
             <div className='preview-container' hidden>
