@@ -17,7 +17,7 @@ function GeminiTrack(HGC, ...args) {
     // Utils
     const { colorToHex } = HGC.utils;
 
-    class GeminiTrackClass extends HGC.tracks.BarTrack { //mix(HGC.tracks.BarTrack).with(HGC.tracks.OneDimensionalMixin) {
+    class GeminiTrackClass extends HGC.tracks.BarTrack {
         constructor(context, options) {
             super(context, options);
             this.initializeStackedBarTrack();
@@ -77,6 +77,7 @@ function GeminiTrack(HGC, ...args) {
         }
 
         initTile(tile) {
+            console.log(tile)
             this.createColorScale();
             this.initializeStackedBarTrack();
 
@@ -191,7 +192,12 @@ function GeminiTrack(HGC, ...args) {
                 else if (this.options?.zoomOutTechnique?.type === 'alt-representation') {
                     this.distroyZoomInstruction()
 
-                    this.drawMultipleBarCharts(tile);
+                    if (this.options?.zoomOutTechnique?.spec?.mark) {
+                        this.drawLineCharts(tile);
+                    }
+                    else if (this.options?.zoomOutTechnique?.spec?.row) {
+                        this.drawMultipleBarCharts(tile);
+                    }
                 } else if (this.options?.zoomOutTechnique?.type === 'auto') {
                     this.distroyZoomInstruction()
 
@@ -251,6 +257,42 @@ function GeminiTrack(HGC, ...args) {
             const graphics = this.pBorder;
             graphics.clear();
             graphics.removeChildren();
+        }
+
+        drawLineCharts(tile) {
+            const graphics = tile.graphics;
+            graphics.clear();
+            tile.drawnAtScale = this._xScale.copy();
+
+            // we're setting the start of the tile to the current zoom level
+            const { tileX, tileWidth } = this.getTilePosAndDimensions(tile.tileData.zoomLevel,
+                tile.tileData.tilePos, this.tilesetInfo.tile_size);
+
+            const matrix = tile.matrix;
+            const trackHeight = this.dimensions[1];
+            const matrixDimensions = tile.tileData.shape;
+            const colorScale = this.options.colorScale || scaleOrdinal(schemeCategory10);
+            const valueToPixels = scaleLinear()
+                .domain([0, this.maxAndMin.max])
+                .range([0, trackHeight/* / matrixDimensions[0]*/]);
+
+            for (let i = 0; i < matrix[0].length; i++) {
+                const intervals = trackHeight / matrixDimensions[0];
+                // calculates placement for a line in each interval; we subtract 1 so we can see the last line clearly
+                const linePlacement = trackHeight
+                // (i === matrix[0].length - 1) ?
+                //     (intervals * i) + ((intervals * (i + 1) - (intervals * i))) - 1 :
+                //     (intervals * i) + ((intervals * (i + 1) - (intervals * i)));
+                graphics.lineStyle(1, this.colorHexMap[colorScale[i]], 1);
+
+                for (let j = 0; j < matrix.length; j++) { // 3070 or something
+                    const x = this._xScale(tileX + (j * tileWidth / this.tilesetInfo.tile_size));
+                    const y = linePlacement - valueToPixels(matrix[j][i]);
+                    this.addSVGInfo(tile, x, y, colorScale[i]);
+                    // move draw position back to the start at beginning of each line
+                    (j === 0) ? graphics.moveTo(x, y) : graphics.lineTo(x, y);
+                }
+            }
         }
 
         drawMultipleBarCharts(tile) {

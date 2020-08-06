@@ -5,11 +5,12 @@ export const GEMINI_TRACK_EXAMPLE: GeminiSpec = {
     data: { url: 'https://resgen.io/api/v1/tileset_info/?d=RTGsPv37TB2aKk9ujTIu6Q', type: 'tileset' },
     zoomOutTechnique: { type: 'auto' },
     mark: 'bar',
-    x: { type: 'genomic', domain: { chromosome: '1', interval: [5000, 5500] } },
+    x: { field: '__G__', type: 'genomic', domain: { chromosome: '1', interval: [5000, 5500] } },
     x1: { axis: true },
-    y: { field: 'frequency', type: 'quantitative' },
+    y: { field: '__Q__', type: 'quantitative' },
     color: {
-      field: 'letter',
+      field: '__N__',
+      type: 'nominal',
       domain: [
         'A', 'T', 'G', 'C', 'N', 'other'
       ],
@@ -33,15 +34,82 @@ export const GEMINI_TRACK_EXAMPLE2: GeminiSpec = {
     zoomOutTechnique: {
       type: 'alt-representation',
       spec: {
-        row: { field: 'letter', type: 'nominal' }
+        row: { field: '__N__', type: 'nominal' }
       }
     },
     mark: 'bar',
-    x: { type: 'genomic', domain: { chromosome: '1', interval: [5000, 5500] } },
+    x: { field: '__G__', type: 'genomic', domain: { chromosome: '1', interval: [5000, 5500] } },
     x1: { axis: true },
-    y: { field: 'frequency', type: 'quantitative' },
+    y: { field: '__Q__', type: 'quantitative' },
     color: {
-      field: 'letter',
+      field: '__N__',
+      type: 'nominal',
+      domain: [
+        'A', 'T', 'G', 'C', 'N', 'other'
+      ],
+      range: [
+        "#007FFF",
+        "#e8e500",
+        "#008000",
+        "#FF0038",
+        "#800080",
+        "#DCDCDC",
+      ]
+    },
+    width: 1000,
+    height: 180,
+  }]
+}
+
+export const GEMINI_TRACK_EXAMPLE3: GeminiSpec = {
+  tracks: [{
+    data: { url: 'https://resgen.io/api/v1/tileset_info/?d=RTGsPv37TB2aKk9ujTIu6Q', type: 'tileset' },
+    zoomOutTechnique: {
+      type: 'alt-representation',
+      spec: {
+        mark: 'line'
+      }
+    },
+    mark: 'bar',
+    x: { field: '__G__', type: 'genomic', domain: { chromosome: '1', interval: [5000, 5500] } },
+    x1: { axis: true },
+    y: { field: '__Q__', type: 'quantitative' },
+    color: {
+      field: '__N__',
+      type: 'nominal',
+      domain: [
+        'A', 'T', 'G', 'C', 'N', 'other'
+      ],
+      range: [
+        "#007FFF",
+        "#e8e500",
+        "#008000",
+        "#FF0038",
+        "#800080",
+        "#DCDCDC",
+      ]
+    },
+    width: 1000,
+    height: 180,
+  }]
+}
+
+export const GEMINI_TRACK_EXAMPLE4: GeminiSpec = {
+  tracks: [{
+    data: { url: 'https://resgen.io/api/v1/tileset_info/?d=RTGsPv37TB2aKk9ujTIu6Q', type: 'tileset' },
+    zoomOutTechnique: {
+      type: 'alt-representation',
+      spec: {
+        mark: 'line'
+      }
+    },
+    mark: 'bar',
+    x: { field: '__G__', type: 'genomic', domain: { chromosome: '1', interval: [5000, 5500] } },
+    x1: { axis: true },
+    y: { field: '__Q__', type: 'quantitative' },
+    color: {
+      field: '__N__',
+      type: 'nominal',
       domain: [
         'A', 'T', 'G', 'C', 'N', 'other'
       ],

@@ -12,7 +12,8 @@ import {
     LAYOUT_EXAMPLE_STACKED_MULTI_TRACKS,
     LAYOUT_EXAMPLE_STACKED_MULTI_TRACKS_CIRCULAR,
     GEMINI_TRACK_EXAMPLE,
-    GEMINI_TRACK_EXAMPLE2
+    GEMINI_TRACK_EXAMPLE2,
+    GEMINI_TRACK_EXAMPLE3
 } from "../lib/test/gemini/layout-examples"
 
 interface Demo {
@@ -86,6 +87,12 @@ export const demos: ReadonlyArray<Demo> = [
     {
         name: 'HiGlass Gemini Track (zoom out example 2)',
         spec: GEMINI_TRACK_EXAMPLE2,
+        glyphWidth: 0,
+        glyphHeight: 0
+    },
+    {
+        name: 'HiGlass Gemini Track (zoom out example 3)',
+        spec: GEMINI_TRACK_EXAMPLE3,
         glyphWidth: 0,
         glyphHeight: 0
     }

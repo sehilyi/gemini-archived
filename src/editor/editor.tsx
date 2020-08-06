@@ -31,7 +31,7 @@ higlassRegister({
   config: GeminiTrack.config,
 })
 
-const DEBUG_INIT_DEMO_INDEX = demos.length - 1
+const DEBUG_INIT_DEMO_INDEX = demos.length - 3
 
 function Editor() {
 
