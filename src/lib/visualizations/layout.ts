@@ -7,7 +7,7 @@ import { renderLinearLayout } from './layout-linear'
 
 export const trackStyle = {
     background: (track: Track) => track.style?.background ?? 'white',
-    stroke: (track: Track) => track.style?.stroke ?? 'lightgray',
+    stroke: (track: Track) => track.style?.stroke ?? 'none',
     strokeWidth: (track: Track) => track.style?.strokeWidth ?? 1
 }
 

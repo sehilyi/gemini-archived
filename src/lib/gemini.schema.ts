@@ -30,6 +30,8 @@ export interface Track {
     // primitives
     data: DataDeep | Datum[]
     mark: Mark
+    // zoom technique
+    zoomOutTechnique?: ZoomOutTechnique
     // coordinates
     x?: Channel
     y?: Channel
@@ -40,6 +42,8 @@ export interface Track {
     y1?: Channel
     x1e?: Channel
     y1e?: Channel
+    // separation
+    row?: Channel
     // others
     color?: Channel
     opacity?: Channel
@@ -65,6 +69,19 @@ export interface TrackStyle {
 export interface Datum {
     [k: string]: number | string
 }
+
+/**
+ * Zoom technique (How should we show visualization based on different zoom level?)
+ */
+export interface ZoomOutTechnique {
+    // TODO: separate this interface by type, e.g., { type: 'aggregate', aggFunction: 'max' | ... }
+    type: 'auto' | 'none' | 'aggregate' | 'filter' | 'alt-representation'
+    // zoomLevel?: number // TODO: what meaning to contain?
+    aggFunction?: 'max' | 'min' | 'mean' | 'count' | 'sum'
+    importance?: string // field name
+    spec?: Partial<Track>
+}
+
 
 /**
  * Channel

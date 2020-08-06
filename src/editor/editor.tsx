@@ -168,7 +168,7 @@ function Editor() {
         </select>
       </div>
       <div className='editor'>
-        <SplitPane split='vertical' defaultSize='50%' onChange={() => { }}>
+        <SplitPane className='split-pane-root' split='vertical' defaultSize='50%' onChange={() => { }}>
           <SplitPane split='horizontal' defaultSize='50%' onChange={() => { }}>
             {/* Gemini Editor */}
             <EditorPanel
@@ -177,14 +177,22 @@ function Editor() {
               onChange={debounce((code) => { setGm(code) }, 1000)}
             />
             {/* HiGlass View Config */}
-            <>
-              <div className='editor-header'><b>Compiled HiGlass ViewConfigs</b></div>
-              <EditorPanel
-                code={stringify(higlassTrackOptions.map(d => d.viewConfig))}
-                readOnly={true}
-                onChange={() => { }}
-              />
-            </>
+            <SplitPane split='vertical' defaultSize='100%' onChange={() => { }}>
+              <>
+                <div className='editor-header'><b>Compiled HiGlass ViewConfigs</b></div>
+                <EditorPanel
+                  code={stringify(higlassTrackOptions.map(d => d.viewConfig))}
+                  readOnly={true}
+                  onChange={() => { }}
+                />
+              </>
+              {/* 
+                TODO: This is only for showing a scroll view for the higlass view config editor 
+                Remove the below line and the nearest SplitPane after figuring out a better way 
+                of showing the scroll view.
+              */}
+              <></>
+            </SplitPane>
           </SplitPane>
           {/* D3 Visualizations */}
           <SplitPane split='horizontal' defaultSize='0%' onChange={() => { }}>

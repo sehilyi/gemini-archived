@@ -21,6 +21,7 @@
         "higlass-register": "^0.1.0",
         "json-stringify-pretty-compact": "^2.0.0",
         "lodash": "^4.17.15",
+        "mixwith": "^0.1.1",
         "monaco-editor-webpack-plugin": "^1.9.0",
         "pixi.js": "^5.2.4",
         "react": "^16.13.1",

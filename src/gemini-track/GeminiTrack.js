@@ -1,6 +1,7 @@
 /**
  * This file is based on the https://github.com/higlass/higlass-multivec
  */
+// import { mix } from 'mixwith';
 import { scaleLinear, scaleOrdinal, schemeCategory10 } from 'd3';
 
 function GeminiTrack(HGC, ...args) {
@@ -16,7 +17,7 @@ function GeminiTrack(HGC, ...args) {
     // Utils
     const { colorToHex } = HGC.utils;
 
-    class GeminiTrackClass extends HGC.tracks.BarTrack {
+    class GeminiTrackClass extends HGC.tracks.BarTrack { //mix(HGC.tracks.BarTrack).with(HGC.tracks.OneDimensionalMixin) {
         constructor(context, options) {
             super(context, options);
             this.initializeStackedBarTrack();
@@ -35,6 +36,17 @@ function GeminiTrack(HGC, ...args) {
             };
 
             this.stackedBarTrackInitialized = true
+
+            this.zoomInstruction = new HGC.libraries.PIXI.Text(
+                'Zoom in to see information',
+                {
+                    fontSize: "13px",
+                    fontFamily: "Arial",
+                    fill: 0x333333,
+                }
+            )
+            this.zoomInstruction.anchor.x = 0.5
+            this.zoomInstruction.anchor.y = 0.5
         }
 
         createColorScale() {
@@ -89,6 +101,7 @@ function GeminiTrack(HGC, ...args) {
 
 
         rerender(newOptions) {
+            // TODO: this is being called only when the options are changed?
             super.rerender(newOptions);
 
             this.options = newOptions;
@@ -131,6 +144,14 @@ function GeminiTrack(HGC, ...args) {
             tile.svgData = null;
             tile.mouseOverData = null;
 
+            // TODO: How to calculate maxZoomLevel?
+            const TILE_SIZE = 256;
+            const totalLength = 10000;
+            const maxZoomLevel = Math.ceil(
+                Math.log(totalLength / TILE_SIZE) / Math.log(2)
+            )
+            //
+
             const graphics = tile.graphics;
             graphics.clear();
             graphics.children.map(child => { graphics.removeChild(child) });
@@ -147,12 +168,135 @@ function GeminiTrack(HGC, ...args) {
 
             this.oldDimensions = this.dimensions; // for mouseover
 
-            // creates a sprite containing all of the rectangles in this tile
-            this.drawVerticalBars(this.mapOriginalColors(matrix), tileX, tileWidth,
-                this.maxAndMin.max, this.maxAndMin.min, tile);
+            if (tile?.tileData?.zoomLevel !== maxZoomLevel) {
+                // we are in the highest level
+                if (this.options?.zoomOutTechnique?.type === 'none') {
+                    this.drawZoomInstruction()
+                }
+                else if (this.options?.zoomOutTechnique?.type === 'aggregate') {
+                    this.distroyZoomInstruction()
 
-            graphics.addChild(tile.sprite);
-            this.makeMouseOverData(tile);
+                    // creates a sprite containing all of the rectangles in this tile
+                    this.drawVerticalBars(
+                        this.mapOriginalColors(matrix),
+                        tileX,
+                        tileWidth,
+                        this.maxAndMin.max,
+                        this.maxAndMin.min,
+                        tile
+                    );
+
+                    graphics.addChild(tile.sprite);
+                }
+                else if (this.options?.zoomOutTechnique?.type === 'alt-representation') {
+                    this.distroyZoomInstruction()
+
+                    this.drawMultipleBarCharts(tile);
+                } else if (this.options?.zoomOutTechnique?.type === 'auto') {
+                    this.distroyZoomInstruction()
+
+                    // creates a sprite containing all of the rectangles in this tile
+                    this.drawVerticalBars(
+                        this.mapOriginalColors(matrix),
+                        tileX,
+                        tileWidth,
+                        this.maxAndMin.max,
+                        this.maxAndMin.min,
+                        tile
+                    );
+
+                    graphics.addChild(tile.sprite);
+                }
+            }
+            else {
+                this.distroyZoomInstruction()
+
+                // creates a sprite containing all of the rectangles in this tile
+                this.drawVerticalBars(
+                    this.mapOriginalColors(matrix),
+                    tileX,
+                    tileWidth,
+                    this.maxAndMin.max,
+                    this.maxAndMin.min,
+                    tile
+                );
+
+                graphics.addChild(tile.sprite);
+            }
+        }
+
+        drawZoomInstruction() {
+            this.zoomInstruction.x = this.position[0] + this.dimensions[0] / 2;
+            this.zoomInstruction.y = this.position[1] + this.dimensions[1] / 2;
+
+            // Draw the notification on the pBorder level. This is in the foreground
+            const graphics = this.pBorder;
+
+            graphics.clear();
+            graphics.removeChildren();
+
+            graphics.beginFill(0xEAEAEA);
+
+            graphics.drawRect(
+                this.position[0],
+                this.position[1],
+                this.dimensions[0],
+                this.dimensions[1]
+            );
+            graphics.addChild(this.zoomInstruction);
+        }
+
+        distroyZoomInstruction() {
+            // instruction is on the pBorder level
+            const graphics = this.pBorder;
+            graphics.clear();
+            graphics.removeChildren();
+        }
+
+        drawMultipleBarCharts(tile) {
+            const graphics = tile.graphics;
+            graphics.clear();
+            graphics.children.map(child => { graphics.removeChild(child) });
+            tile.drawnAtScale = this._xScale.copy();
+
+            let localGraphics = new HGC.libraries.PIXI.Graphics();
+
+            // we're setting the start of the tile to the current zoom level
+            const { tileX, tileWidth } = this.getTilePosAndDimensions(tile.tileData.zoomLevel,
+                tile.tileData.tilePos, this.tilesetInfo.tile_size);
+
+            if (this.options.barBorder || true) {
+                localGraphics.lineStyle(0.1, 0x000000, 1);
+                tile.barBorders = true;
+            }
+
+            const matrix = tile.matrix;
+            const trackHeight = this.dimensions[1];
+            const matrixDimensions = tile.tileData.shape;
+            const colorScale = this.options.colorScale || scaleOrdinal(schemeCategory10);
+            const width = this._xScale(tileX + (tileWidth / this.tilesetInfo.tile_size)) - this._xScale(tileX);
+            const valueToPixels = scaleLinear()
+                .domain([0, this.maxAndMin.max])
+                .range([0, trackHeight / matrixDimensions[0]]);
+
+            for (let i = 0; i < matrix[0].length; i++) { // 15
+                localGraphics.beginFill(this.colorHexMap[colorScale[i]]);
+
+                for (let j = 0; j < matrix.length; j++) { // 3000
+                    const x = this._xScale(tileX + (j * tileWidth / this.tilesetInfo.tile_size));
+                    const height = valueToPixels(matrix[j][i]);
+                    const y = ((trackHeight / matrixDimensions[0]) * (i + 1) - height);
+                    this.addSVGInfo(tile, x, y, width, height, colorScale[i]);
+                    localGraphics.drawRect(x, y, width, height);
+                }
+
+            }
+
+            const texture = pixiRenderer.generateTexture(localGraphics, HGC.libraries.PIXI.SCALE_MODES.NEAREST);
+            const sprite = new HGC.libraries.PIXI.Sprite(texture);
+            sprite.width = this._xScale(tileX + tileWidth) - this._xScale(tileX);
+            sprite.x = this._xScale(tileX);
+            graphics.addChild(sprite);
         }
 
         syncMaxAndMin() {
@@ -385,7 +529,7 @@ function GeminiTrack(HGC, ...args) {
             this.drawBackground(matrix, graphics);
 
             // borders around each bar
-            if (this.options.barBorder) {
+            if (this.options.barBorder || true) {
                 graphics.lineStyle(1, 0x000000, 1);
             }
 
@@ -720,11 +864,26 @@ GeminiTrack.config = {
     local: false,
     orientation: '1d-horizontal',
     thumbnail: new DOMParser().parseFromString(icon, 'text/xml').documentElement,
-    availableOptions: ['labelPosition', 'labelColor', 'valueScaling',
-        'labelTextOpacity', 'labelBackgroundOpacity', 'trackBorderWidth',
-        'trackBorderColor', 'trackType', 'scaledHeight', 'backgroundColor',
-        'colorScale', 'barBorder', 'sortLargestOnTop'],
+    availableOptions: [
+        'zoomOutTechnique',
+        'colorScale',
+        'labelPosition',
+        'labelColor',
+        'valueScaling',
+        'labelTextOpacity',
+        'labelBackgroundOpacity',
+        'trackBorderWidth',
+        'trackBorderColor',
+        'trackType',
+        'scaledHeight',
+        'backgroundColor',
+        'barBorder',
+        'sortLargestOnTop'
+    ],
     defaultOptions: {
+        zoomOutTechnique: {
+            type: 'none'
+        },
         labelPosition: 'none',
         labelColor: 'black',
         labelTextOpacity: 0.4,

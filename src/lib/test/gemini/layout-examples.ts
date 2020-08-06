@@ -3,13 +3,16 @@ import { GeminiSpec } from '../../gemini.schema'
 export const GEMINI_TRACK_EXAMPLE: GeminiSpec = {
   tracks: [{
     data: { url: 'https://resgen.io/api/v1/tileset_info/?d=RTGsPv37TB2aKk9ujTIu6Q', type: 'tileset' },
-    mark: {
-      type: 'gemini-track-higlass',
-      server: 'gemini-v1',
-    },
-    x: { type: 'genomic', domain: { chromosome: '1', interval: [1, 10000] } },
+    zoomOutTechnique: { type: 'auto' },
+    mark: 'bar',
+    x: { type: 'genomic', domain: { chromosome: '1', interval: [5000, 5500] } },
     x1: { axis: true },
+    y: { field: 'frequency', type: 'quantitative' },
     color: {
+      field: 'letter',
+      domain: [
+        'A', 'T', 'G', 'C', 'N', 'other'
+      ],
       range: [
         "#007FFF",
         "#e8e500",
@@ -19,8 +22,40 @@ export const GEMINI_TRACK_EXAMPLE: GeminiSpec = {
         "#DCDCDC",
       ]
     },
-    width: 800,
-    height: 120,
+    width: 1000,
+    height: 180,
+  }]
+}
+
+export const GEMINI_TRACK_EXAMPLE2: GeminiSpec = {
+  tracks: [{
+    data: { url: 'https://resgen.io/api/v1/tileset_info/?d=RTGsPv37TB2aKk9ujTIu6Q', type: 'tileset' },
+    zoomOutTechnique: {
+      type: 'alt-representation',
+      spec: {
+        row: { field: 'letter', type: 'nominal' }
+      }
+    },
+    mark: 'bar',
+    x: { type: 'genomic', domain: { chromosome: '1', interval: [5000, 5500] } },
+    x1: { axis: true },
+    y: { field: 'frequency', type: 'quantitative' },
+    color: {
+      field: 'letter',
+      domain: [
+        'A', 'T', 'G', 'C', 'N', 'other'
+      ],
+      range: [
+        "#007FFF",
+        "#e8e500",
+        "#008000",
+        "#FF0038",
+        "#800080",
+        "#DCDCDC",
+      ]
+    },
+    width: 1000,
+    height: 180,
   }]
 }
 
@@ -173,7 +208,7 @@ export const LAYOUT_EXAMPLE_COMBO_BAND: GeminiSpec = {
         url: 'https://resgen.io/api/v1/tileset_info/?d=a-iBpdh3Q_uO2FLCWKpOOw',
         type: 'tileset',
       },
-      mark: 'rect',
+      mark: { type: '1d-heatmap-higlass', server: 'gemini-v1' },
       x: { type: 'genomic', domain: { chromosome: '2' } },
       width: 800,
       height: 60,
@@ -183,7 +218,7 @@ export const LAYOUT_EXAMPLE_COMBO_BAND: GeminiSpec = {
         url: 'https://resgen.io/api/v1/tileset_info/?d=a-iBpdh3Q_uO2FLCWKpOOw',
         type: 'tileset',
       },
-      mark: 'line',
+      mark: { type: 'line-higlass', server: 'gemini-v1' },
       x: { type: 'genomic', domain: { chromosome: '2' } },
       width: 800,
       height: 90,
@@ -235,7 +270,7 @@ export const LAYOUT_EXAMPLE_COMBO_BAND: GeminiSpec = {
         url: 'https://resgen.io/api/v1/tileset_info/?d=a-iBpdh3Q_uO2FLCWKpOOw',
         type: 'tileset',
       },
-      mark: 'bar',
+      mark: { type: 'bar-higlass', server: 'gemini-v1' },
       x: { type: 'genomic', domain: { chromosome: '4' } },
       width: 800,
       height: 80,
@@ -245,7 +280,7 @@ export const LAYOUT_EXAMPLE_COMBO_BAND: GeminiSpec = {
         url: 'https://resgen.io/api/v1/tileset_info/?d=a-iBpdh3Q_uO2FLCWKpOOw',
         type: 'tileset',
       },
-      mark: 'point',
+      mark: { type: 'point-higlass', server: 'gemini-v1' },
       x: { type: 'genomic' },
       width: 800,
       height: 80,

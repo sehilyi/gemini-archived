@@ -14,6 +14,11 @@ export function compiler(track: Track | GenericType<Channel>, bb: BoundingBox): 
     if (IsHiGlassTrack(track) && IsDataDeep(track.data)) {
         const { server, tilesetUid } = parseServerAndTilesetUidFromUrl(track.data.url)
 
+        // Mose this to an independent file
+        const defaultZoomTech = {
+            type: 'none'
+        }
+
         // Is this track horizontal or vertical?
         const isXGenomic = IsChannelDeep(track.x) && track.x.type === "genomic"
         const isYGenomic = IsChannelDeep(track.y) && track.y.type === "genomic"
@@ -22,40 +27,48 @@ export function compiler(track: Track | GenericType<Channel>, bb: BoundingBox): 
         const colorRange = IsChannelDeep(track.color) ? track.color.range as Range : undefined
         const trackDirection = isXGenomic && isYGenomic ? 'both' : isXGenomic ? 'horizontal' : 'vertical'
         const trackType = IsShallowMark(track.mark) ? track.mark : IsMarkDeep(track.mark) ? track.mark.type : 'unknown'
+        const zoomOutTechnique = track.zoomOutTechnique ?? defaultZoomTech
 
         higlass.setDomain(xDomain, yDomain)
 
+        // TODO: remove below
         const typeMap: { [k: string]: EnumTrackType } = {
-            'gene-annotation-higlass': `${trackDirection}-gene-annotations`,
+            // gemini track types
             'gemini-track-higlass': 'gemini-track',
-            'point': `${trackDirection}-point`,
-            'bar': `${trackDirection}-bar`,
-            'line': `${trackDirection}-line`,
-            'rect': `${trackDirection}-1d-heatmap`,
+            'point': 'gemini-track',
+            'bar': 'gemini-track',
+            'line': 'gemini-track',
+            'rect': 'gemini-track',
+
+            // higlass track types
+            'gene-annotation-higlass': `${trackDirection}-gene-annotations`,
+            'point-higlass': `${trackDirection}-point`,
+            'bar-higlass': `${trackDirection}-bar`,
+            'line-higlass': `${trackDirection}-line`,
+            '1d-heatmap-higlass': `${trackDirection}-1d-heatmap`,
             // ...
         } as { [k: string]: EnumTrackType }
 
         const defaultOptions: { [k: string]: Object } = {
-            'point': {
+            'point-higlass': {
                 pointColor: '#0072B2',
                 labelPosition: 'hidden',
                 axisPositionHorizontal: 'left'
             },
-            'bar': {
+            'bar-higlass': {
                 barFillColor: '#0072B2',
                 labelPosition: 'hidden',
                 axisPositionHorizontal: 'left'
             },
-            'line': {
+            'line-higlass': {
                 lineStrokeColor: '#0072B2',
                 labelPosition: 'hidden',
                 axisPositionHorizontal: 'left'
             },
-            'rect': {
+            '1d-heatmap-higlass': {
                 colorRange: COLOR_SCHEME_VIRIDIS,
                 labelPosition: 'hidden'
-            }
-
+            },
         }
         const higlassTrackType = typeMap[trackType]
         if (!higlassTrackType) return {}
@@ -68,11 +81,16 @@ export function compiler(track: Track | GenericType<Channel>, bb: BoundingBox): 
             height: bb.height, // TODO: consider the height of axes
             options: {
                 ...defaultOptions[trackType],
-                colorScale: colorRange
+                colorScale: colorRange,
+                zoomOutTechnique
             }
         }).addTrackSourceServers(server)
 
-        console.log(colorRange)
+        console.log({
+            ...(defaultOptions[trackType] ?? defaultOptions.default),
+            colorScale: colorRange,
+            zoomOutTechnique
+        })
 
         const chanToPos: { [k: string]: 'left' | 'right' | 'top' | 'bottom' } = {
             x: 'bottom',

@@ -20,9 +20,14 @@
   height: calc(100% - 34px);
 }
 
+.split-pane-root {
+  height: calc(100% - 34px) !important;
+}
+
 .editor-header {
   width: 100%;
   padding: 4px;
+  padding-left: 10px;
   background: #F6F6F6;
   border-top: 1px solid lightgray;
   border-bottom: 1px solid lightgray;
