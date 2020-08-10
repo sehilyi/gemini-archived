@@ -1,8 +1,5 @@
-/**
- * This file is based on the https://github.com/higlass/higlass-multivec
- */
-// import { mix } from 'mixwith';
-import { scaleLinear, scaleOrdinal, schemeCategory10 } from 'd3';
+import { scaleLinear, scaleOrdinal, schemeCategory10, min, max } from 'd3';
+import { findExtent, getMaxZoomLevel } from './utils';
 
 function GeminiTrack(HGC, ...args) {
     if (!new.target) {
@@ -12,7 +9,7 @@ function GeminiTrack(HGC, ...args) {
     }
 
     // Services
-    const { tileProxy, pixiRenderer } = HGC.services;
+    const { pixiRenderer } = HGC.services;
 
     // Utils
     const { colorToHex } = HGC.utils;
@@ -20,66 +17,30 @@ function GeminiTrack(HGC, ...args) {
     class GeminiTrackClass extends HGC.tracks.BarTrack {
         constructor(context, options) {
             super(context, options);
-            this.initializeStackedBarTrack();
+            this.initGeminiTrack();
         }
 
-        /** Factor out some initialization code for the track. This is
-        necessary because we can now load tiles synchronously and so
-        we have to check if the track is initialized in initTiles
-        and not in the constructor */
-        initializeStackedBarTrack() {
-            if (this.stackedBarTrackInitialized) return;
+        initGeminiTrack() {
+            if (this.isGeminiTrackInit) return;
 
             this.maxAndMin = {
                 max: null,
                 min: null
             };
 
-            this.stackedBarTrackInitialized = true
+            this.zoomMask = new HGC.libraries.PIXI.Text('Zoom in to see information', {
+                fontSize: "13px",
+                fontFamily: "Arial",
+                fill: 'black',
+            });
+            this.zoomMask.anchor.x = 0.5;
+            this.zoomMask.anchor.y = 0.5;
 
-            this.zoomInstruction = new HGC.libraries.PIXI.Text(
-                'Zoom in to see information',
-                {
-                    fontSize: "13px",
-                    fontFamily: "Arial",
-                    fill: 0x333333,
-                }
-            )
-            this.zoomInstruction.anchor.x = 0.5
-            this.zoomInstruction.anchor.y = 0.5
-        }
-
-        createColorScale() {
-            if (this.options.colorScale) return;
-
-            if (this.tilesetInfo.row_infos && this.tilesetInfo.row_infos[0].color) {
-                this.options.colorScale = this.tilesetInfo.row_infos.map(x => x.color);
-            } else {
-                const DEFAULT_HUMAN_EPILOGOS_COLORS = [
-                    "#FF0000",
-                    "#FF4500",
-                    "#32CD32",
-                    "#008000",
-                    "#006400",
-                    "#C2E105",
-                    "#FFFF00",
-                    "#66CDAA",
-                    "#8A91D0",
-                    "#CD5C5C",
-                    "#E9967A",
-                    "#BDB76B",
-                    "#808080",
-                    "#C0C0C0",
-                    "#FFFFFF"
-                ]
-                this.options.colorScale = DEFAULT_HUMAN_EPILOGOS_COLORS
-            }
+            this.isGeminiTrackInit = true;
         }
 
         initTile(tile) {
-            console.log(tile)
-            this.createColorScale();
-            this.initializeStackedBarTrack();
+            this.initGeminiTrack();
 
             // create the tile
             // should be overwritten by child classes
@@ -89,8 +50,8 @@ function GeminiTrack(HGC, ...args) {
             this.scale.minValue = this.scale.minRawValue;
             this.scale.maxValue = this.scale.maxRawValue;
 
-            this.maxAndMin.min = this.minValueInArray(tile.tileData.dense);
-            this.maxAndMin.max = this.maxValueInArray(tile.tileData.dense);
+            this.maxAndMin.min = min(tile.tileData.dense);
+            this.maxAndMin.max = max(tile.tileData.dense);
 
             this.localColorToHexScale();
 
@@ -98,42 +59,6 @@ function GeminiTrack(HGC, ...args) {
 
             this.renderTile(tile);
             this.rescaleTiles();
-        }
-
-
-        rerender(newOptions) {
-            // TODO: this is being called only when the options are changed?
-            super.rerender(newOptions);
-
-            this.options = newOptions;
-            const visibleAndFetched = this.visibleAndFetchedTiles();
-
-            for (let i = 0; i < visibleAndFetched.length; i++) {
-                this.updateTile(visibleAndFetched[i]);
-            }
-
-            this.rescaleTiles();
-            this.draw();
-        }
-
-        updateTile() {
-            const visibleAndFetched = this.visibleAndFetchedTiles();
-
-            for (let i = 0; i < visibleAndFetched.length; i++) {
-                const tile = visibleAndFetched[i];
-                this.unFlatten(tile);
-            }
-
-            this.rescaleTiles();
-        }
-
-        /**
-         * Prevent BarTracks draw method from having an effect
-         *
-         * @param tile
-         */
-        drawTile(tile) {
-
         }
 
         /**
@@ -145,17 +70,13 @@ function GeminiTrack(HGC, ...args) {
             tile.svgData = null;
             tile.mouseOverData = null;
 
-            // TODO: How to calculate maxZoomLevel?
-            const TILE_SIZE = 256;
-            const totalLength = 10000;
-            const maxZoomLevel = Math.ceil(
-                Math.log(totalLength / TILE_SIZE) / Math.log(2)
-            )
-            //
+            const maxZoomLevel = getMaxZoomLevel();
 
             const graphics = tile.graphics;
+
             graphics.clear();
-            graphics.children.map(child => { graphics.removeChild(child) });
+            graphics.removeChildren();
+
             tile.drawnAtScale = this._xScale.copy();
 
             // we're setting the start of the tile to the current zoom level
@@ -232,8 +153,8 @@ function GeminiTrack(HGC, ...args) {
         }
 
         drawZoomInstruction() {
-            this.zoomInstruction.x = this.position[0] + this.dimensions[0] / 2;
-            this.zoomInstruction.y = this.position[1] + this.dimensions[1] / 2;
+            this.zoomMask.x = this.position[0] + this.dimensions[0] / 2;
+            this.zoomMask.y = this.position[1] + this.dimensions[1] / 2;
 
             // Draw the notification on the pBorder level. This is in the foreground
             const graphics = this.pBorder;
@@ -249,12 +170,12 @@ function GeminiTrack(HGC, ...args) {
                 this.dimensions[0],
                 this.dimensions[1]
             );
-            graphics.addChild(this.zoomInstruction);
+            graphics.addChild(this.zoomMask);
         }
 
         distroyZoomInstruction() {
-            // instruction is on the pBorder level
             const graphics = this.pBorder;
+
             graphics.clear();
             graphics.removeChildren();
         }
@@ -271,7 +192,7 @@ function GeminiTrack(HGC, ...args) {
             const matrix = tile.matrix;
             const trackHeight = this.dimensions[1];
             const matrixDimensions = tile.tileData.shape;
-            const colorScale = this.options.colorScale || scaleOrdinal(schemeCategory10);
+
             const valueToPixels = scaleLinear()
                 .domain([0, this.maxAndMin.max])
                 .range([0, trackHeight/* / matrixDimensions[0]*/]);
@@ -283,12 +204,12 @@ function GeminiTrack(HGC, ...args) {
                 // (i === matrix[0].length - 1) ?
                 //     (intervals * i) + ((intervals * (i + 1) - (intervals * i))) - 1 :
                 //     (intervals * i) + ((intervals * (i + 1) - (intervals * i)));
-                graphics.lineStyle(1, this.colorHexMap[colorScale[i]], 1);
+                graphics.lineStyle(1, this.colorHexMap[this.options.colorScale[i]], 1);
 
                 for (let j = 0; j < matrix.length; j++) { // 3070 or something
                     const x = this._xScale(tileX + (j * tileWidth / this.tilesetInfo.tile_size));
                     const y = linePlacement - valueToPixels(matrix[j][i]);
-                    this.addSVGInfo(tile, x, y, colorScale[i]);
+                    this.addSVGInfo(tile, x, y, this.options.colorScale[i]);
                     // move draw position back to the start at beginning of each line
                     (j === 0) ? graphics.moveTo(x, y) : graphics.lineTo(x, y);
                 }
@@ -297,8 +218,10 @@ function GeminiTrack(HGC, ...args) {
 
         drawMultipleBarCharts(tile) {
             const graphics = tile.graphics;
+
             graphics.clear();
-            graphics.children.map(child => { graphics.removeChild(child) });
+            graphics.removeChildren();
+
             tile.drawnAtScale = this._xScale.copy();
 
             let localGraphics = new HGC.libraries.PIXI.Graphics();
@@ -392,45 +315,6 @@ function GeminiTrack(HGC, ...args) {
         }
 
         /**
-         * Find max and min heights for the given tile
-         *
-         * @param matrix 2d array of numbers representing one tile
-         */
-        findMaxAndMin(matrix) {
-            // find max height of bars for scaling in the track
-            const maxAndMin = {
-                max: null,
-                min: null
-            };
-
-            for (let i = 0; i < matrix.length; i++) {
-                const temp = matrix[i];
-
-                // find total heights of each positive column and each negative column
-                // and compare to highest value so far for the tile
-                const localPositiveMax = temp.filter(a => a >= 0).reduce((a, b) => a + b, 0);
-                if (localPositiveMax > maxAndMin.max) {
-                    maxAndMin.max = localPositiveMax;
-                }
-
-                // When dealing with states data we have positive values including 0
-                // maxAndMin.min should be 0 in this case
-                let negativeValues = temp.filter(a => a <= 0);
-
-                if (negativeValues.length > 0) {
-                    negativeValues = negativeValues.map(a => Math.abs(a));
-                    const localNegativeMax = negativeValues.reduce((a, b) => a + b, 0); // check
-                    if (maxAndMin.min === null || localNegativeMax > maxAndMin.min) {
-                        maxAndMin.min = localNegativeMax;
-                    }
-                }
-            }
-
-            return maxAndMin;
-        }
-
-
-        /**
          * un-flatten data into matrix of tile.tileData.shape[0] x tile.tileData.shape[1]
          *
          * @param tile
@@ -451,7 +335,7 @@ function GeminiTrack(HGC, ...args) {
 
             const matrix = this.simpleUnFlatten(tile, flattenedArray);
 
-            const maxAndMin = this.findMaxAndMin(matrix);
+            const maxAndMin = findExtent(matrix);
 
             tile.matrix = matrix;
             tile.maxValue = maxAndMin.max;
@@ -639,22 +523,7 @@ function GeminiTrack(HGC, ...args) {
          * @param color color of bar (not converted to hex)
          */
         addSVGInfo(tile, x, y, width, height, color) {
-            if (tile.hasOwnProperty('svgData') && tile.svgData !== null) {
-                tile.svgData.barXValues.push(x);
-                tile.svgData.barYValues.push(y);
-                tile.svgData.barWidths.push(width);
-                tile.svgData.barHeights.push(height);
-                tile.svgData.barColors.push(color);
-            }
-            else {
-                tile.svgData = {
-                    barXValues: [x],
-                    barYValues: [y],
-                    barWidths: [width],
-                    barHeights: [height],
-                    barColors: [color]
-                };
-            }
+
         }
 
         /**
@@ -670,38 +539,43 @@ function GeminiTrack(HGC, ...args) {
             visibleAndFetched.map(a => this.initTile(a));
         }
 
-        /**
-         * Get the minimum of an array
-         *
-         * @param {array} arr
-         */
-        minValueInArray(arr) {
+        rerender(newOptions) {
+            // TODO: this is being called only when the options are changed?
+            super.rerender(newOptions);
 
-            let min = arr[0];
+            this.options = newOptions;
+            const visibleAndFetched = this.visibleAndFetchedTiles();
 
-            for (let i = 1; i < arr.length; i++) {
-                let value = arr[i];
-                min = (value < min) ? value : min;
+            for (let i = 0; i < visibleAndFetched.length; i++) {
+                this.updateTile(visibleAndFetched[i]);
             }
 
-            return min
+            this.rescaleTiles();
+            this.draw();
+        }
+
+        updateTile() {
+            const visibleAndFetched = this.visibleAndFetchedTiles();
+
+            for (let i = 0; i < visibleAndFetched.length; i++) {
+                const tile = visibleAndFetched[i];
+                this.unFlatten(tile);
+            }
+
+            this.rescaleTiles();
         }
 
         /**
-         * Get the maximum of an array
+         * Prevent BarTracks draw method from having an effect
          *
-         * @param {array} arr
+         * @param tile
          */
-        maxValueInArray(arr) {
+        drawTile(tile) {
 
-            let max = arr[0];
+        }
 
-            for (let i = 1; i < arr.length; i++) {
-                let value = arr[i];
-                max = (value > max) ? value : max;
-            }
-
-            return max
+        exportSVG() {
+            return null;
         }
 
         /**
@@ -710,183 +584,11 @@ function GeminiTrack(HGC, ...args) {
          * @param tile
          */
         makeMouseOverData(tile) {
-            return; // TODO:
-            const shapeX = tile.tileData.shape[0]; // 15 number of different nucleotides in each bar
-            const shapeY = tile.tileData.shape[1]; // 3840 number of bars
-            const barYValues = tile.svgData.barYValues;
-            const barHeights = tile.svgData.barHeights;
-            const barColors = tile.svgData.barColors;
-            let mouseOverData = [];
-
-            for (let i = 0; i < shapeX; i++) {
-                for (let j = 0; j < shapeY; j++) {
-                    const index = (j * shapeX) + i;
-                    let dataPoint = {
-                        y: barYValues[index],
-                        height: barHeights[index],
-                        color: barColors[index]
-                    };
-                    (mouseOverData[j] === undefined) ? mouseOverData[j] = [dataPoint]
-                        : mouseOverData[j].push(dataPoint);
-                }
-            }
-            for (let i = 0; i < mouseOverData.length; i++) {
-                mouseOverData[i] = mouseOverData[i].sort((a, b) => {
-                    return a.y - b.y
-                });
-            }
-
-            tile.mouseOverData = mouseOverData;
-
+            return;
         }
 
-        /**
-         * Realigns tiles when exporting to SVG
-         */
-        /*
-       realignSVG() {
-         const visibleAndFetched = this.visibleAndFetchedTiles();
-   
-         visibleAndFetched.map(tile => {
-           const valueToPixels = scaleLinear()
-             .domain([0, this.maxAndMin.max + Math.abs(this.maxAndMin.min)])
-             .range([0, this.dimensions[1]]);
-           const newZero = this.dimensions[1] - valueToPixels(Math.abs(this.maxAndMin.min));
-           const realignment = newZero - valueToPixels(tile.maxValue);
-           tile.svgData.barYValues = tile.svgData.barYValues.map(yVal => { return yVal - realignment});
-         });
-       }
-       */
-
-        exportSVG() {
-
-            const visibleAndFetched = this.visibleAndFetchedTiles();
-            visibleAndFetched.map((tile) => {
-                this.initTile(tile);
-                this.draw();
-            });
-
-            let track = null;
-            let base = null;
-
-            base = document.createElement('g');
-            track = base;
-
-            [base, track] = super.superSVG();
-
-            const output = document.createElement('g');
-            track.appendChild(output);
-
-            output.setAttribute(
-                'transform',
-                `translate(${this.pMain.position.x},${this.pMain.position.y}) scale(${this.pMain.scale.x},${this.pMain.scale.y})`,
-            );
-
-            // this.realignSVG();
-
-            for (const tile of this.visibleAndFetchedTiles()) {
-                const rotation = 0;
-                const g = document.createElement('g');
-
-
-
-                // place each sprite
-                g.setAttribute(
-                    'transform',
-                    ` translate(${tile.sprite.x},${tile.sprite.y}) rotate(${rotation}) scale(${tile.sprite.scale.x},${tile.sprite.scale.y}) `,
-                );
-
-                const data = tile.svgData;
-
-                // add each bar
-                for (let i = 0; i < data.barXValues.length; i++) {
-                    const rect = document.createElement('rect');
-                    rect.setAttribute('fill', data.barColors[i]);
-                    rect.setAttribute('stroke', data.barColors[i]);
-
-                    rect.setAttribute('x', data.barXValues[i]);
-                    rect.setAttribute('y', data.barYValues[i] - tile.lowestY);
-                    rect.setAttribute('height', data.barHeights[i]);
-                    rect.setAttribute('width', data.barWidths[i]);
-                    if (this.options.barBorder) {
-                        rect.setAttribute('stroke-width', '0.1');
-                        rect.setAttribute('stroke', 'black');
-                    }
-
-                    g.appendChild(rect);
-                }
-
-                output.appendChild(g);
-            }
-
-            return [base, base];
-        }
-
-        /**
-         * Shows value and type for each bar
-         *
-         * @param trackX x coordinate of mouse
-         * @param trackY y coordinate of mouse
-         * @returns string with embedded values and svg square for color
-         */
         getMouseOverHtml(trackX, trackY) {
-            return ''; // TODO:
-            if (!this.tilesetInfo)
-                return '';
-
-            const colorScale = this.options.colorScale || scaleOrdinal(schemeCategory10);
-
-            const zoomLevel = this.calculateZoomLevel();
-            const tileWidth = tileProxy.calculateTileWidth(this.tilesetInfo,
-                zoomLevel,
-                this.tilesetInfo.tile_size);
-
-            // the position of the tile containing the query position
-            const tilePos = this._xScale.invert(trackX) / tileWidth;
-
-            const posInTileX = Math.floor(this.tilesetInfo.tile_size * (tilePos - Math.floor(tilePos)));
-
-            const tileId = this.tileToLocalId([zoomLevel, Math.floor(tilePos)]);
-            const fetchedTile = this.fetchedTiles[tileId];
-
-            if (!fetchedTile)
-                return '';
-
-            const matrixRow = fetchedTile.matrix[posInTileX];
-            let row = fetchedTile.mouseOverData[posInTileX];
-
-            const dataY = ((trackY - fetchedTile.sprite.y)
-                / fetchedTile.sprite.scale.y) + fetchedTile.lowestY;
-
-            //use color to map back to the array index for correct data
-            const colorScaleMap = {};
-            for (let i = 0; i < colorScale.length; i++) {
-                colorScaleMap[colorScale[i]] = i;
-            }
-
-            // // if mousing over a blank area
-            if (dataY < row[0].y || dataY
-                >= (row[row.length - 1].y + row[row.length - 1].height)) {
-                return '';
-            }
-            else {
-                for (let i = 0; i < row.length; i++) {
-                    const y = row[i].y;
-                    const height = row[i].height;
-                    if (dataY > y && dataY <= (y + height)) {
-                        const color = row[i].color;
-                        const value = Number.parseFloat(matrixRow[colorScaleMap[color]]).toPrecision(4).toString();
-                        const rowInfo = this.tilesetInfo.row_infos[colorScaleMap[color]];
-                        const type = rowInfo.name || rowInfo;
-
-                        return `<svg width="10" height="10"><rect width="10" height="10" rx="2" ry="2"
-            style="fill:${color};stroke:black;stroke-width:2;"></svg>`
-                            + ` ${type}` + `<br>` + `${value}`;
-
-                    }
-                }
-            }
-
+            return '';
         }
 
         draw() {
@@ -935,11 +637,7 @@ GeminiTrack.config = {
         backgroundColor: 'white',
         barBorder: false,
         sortLargestOnTop: true,
-    },
-    otherOptions: {
-        'epilogos': {
-            scaledHeight: false,
-        }
+        colorScale: scaleOrdinal(schemeCategory10)
     }
 };
 
