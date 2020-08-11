@@ -1,9 +1,9 @@
-import { scaleLinear, scaleOrdinal, schemeCategory10, min, max } from 'd3';
+import { scaleLinear, scaleOrdinal, schemeCategory10, min, max, set } from 'd3';
 
 export function drawMultipleBarCharts(HGC, obj, tile) {
 
-    // Services
     const { pixiRenderer } = HGC.services;
+    const { colorToHex } = HGC.utils;
 
     const graphics = tile.graphics;
 
@@ -18,41 +18,55 @@ export function drawMultipleBarCharts(HGC, obj, tile) {
     const { tileX, tileWidth } = obj.getTilePosAndDimensions(tile.tileData.zoomLevel,
         tile.tileData.tilePos, obj.tilesetInfo.tile_size);
 
-    if (obj.options.barBorder || true) {
+    if (obj.options.barBorder) {
         localGraphics.lineStyle(1, 0x333333, 0.5, 0);
         tile.barBorders = true;
     }
 
-    const matrix = tile.matrix;
-    const trackHeight = obj.dimensions[1];
+    const data = tile.tabularData; // alternative data that will replace the `matrix`
+
     const matrixDimensions = tile.tileData.shape;
     const colorScale = obj.options.colorScale || scaleOrdinal(schemeCategory10);
-    const width = obj._xScale(tileX + (tileWidth / obj.tilesetInfo.tile_size)) - obj._xScale(tileX);
-    const valueToPixels = scaleLinear()
-        .domain([0, obj.maxAndMin.max])
-        .range([0, trackHeight / matrixDimensions[0]]);
 
-    for (let i = 0; i < matrix[0].length; i++) { // 15
-        localGraphics.beginFill(obj.colorHexMap[colorScale[i]]);
+    const trackHeight = obj.dimensions[1];
+    const barWidth = obj._xScale(tileX + (tileWidth / obj.tilesetInfo.tile_size)) - obj._xScale(tileX);
+    const tileSize = obj.tilesetInfo.tile_size;
+    const uniqueCategories = Array.from(new Set(data.map(d => d['__N__'])));
+    const rowHeight = trackHeight / uniqueCategories.length;
 
-        for (let j = 0; j < matrix.length; j++) { // 3000
-            const x = obj._xScale(tileX + (j * tileWidth / obj.tilesetInfo.tile_size));
-            const height = valueToPixels(matrix[j][i]);
-            const y = ((trackHeight / matrixDimensions[0]) * (i + 1) - height);
-            obj.addSVGInfo(tile, x, y, width, height, colorScale[i]);
-            localGraphics.drawRect(x, y, width, height);
-        }
+    const xScale = obj._xScale;
+    const yScale = scaleLinear()
+        .domain([0, max(data.map(d => d['__Q__']))])
+        .range([0, rowHeight]);
+    const cScale = scaleOrdinal(colorScale)
+        .domain(uniqueCategories);
 
-    }
+    data.forEach(d => {
+        const category = d['__N__'];
+        const value = d['__Q__'];
+        const gposition = d['__G__'];
+
+        const color = cScale(category);
+        const x = xScale(tileX + (gposition * tileWidth / tileSize));
+        const height = yScale(value);
+        const y = (rowHeight) * (uniqueCategories.indexOf(category) + 1) - height;
+
+        // pixi
+        localGraphics.beginFill(colorToHex(color));
+        localGraphics.drawRect(x, y, barWidth, height);
+
+        // svg
+        obj.addSVGInfo(tile, x, y, barWidth, height, color);
+    });
 
     const texture = pixiRenderer.generateTexture(localGraphics, HGC.libraries.PIXI.SCALE_MODES.NEAREST);
     const sprite = new HGC.libraries.PIXI.Sprite(texture);
-    sprite.width = obj._xScale(tileX + tileWidth) - obj._xScale(tileX);
-    sprite.x = obj._xScale(tileX);
+    sprite.width = xScale(tileX + tileWidth) - xScale(tileX);
+    sprite.x = xScale(tileX);
     graphics.addChild(sprite);
 }
 
-export function drawVerticalBars(HGC, obj, tile) {
+export function drawStackedBarChart(HGC, obj, tile) {
 
     // Services
     const { pixiRenderer } = HGC.services;
@@ -89,34 +103,38 @@ export function drawVerticalBars(HGC, obj, tile) {
     obj.drawBackground(matrix, graphics);
 
     // borders around each bar
-    if (obj.options.barBorder || true) {
+    if (obj.options.barBorder) {
         graphics.lineStyle(1, 0x333333, 1, 0);
     }
 
-    for (let j = 0; j < matrix.length / 2.0; j++) { // jth vertical bar in the graph
+    for (let j = 0; j < matrix.length; j++) {
         const x = (j * width);
 
         // draw positive values
-        const positive = matrix[j][0];
-        const valueToPixelsPositive = scaleLinear()
+        const posBars = matrix[j][0];
+        const posScale = scaleLinear()
             .domain([0, positiveMax])
             .range([0, positiveTrackHeight]);
-        let positiveStackedHeight = 0;
 
-        for (let i = 0; i < positive.length; i++) {
-            const height = valueToPixelsPositive(positive[i].value);
-            const y = positiveTrackHeight - (positiveStackedHeight + height);
-            obj.addSVGInfo(tile, x, y, width, height, positive[i].color);
-            graphics.beginFill(obj.colorHexMap[positive[i].color]);
+        let posStackedHeight = 0;
+        for (let i = 0; i < posBars.length; i++) {
+            const height = posScale(posBars[i].value);
+
+            if (height === 0) continue;
+
+            const y = positiveTrackHeight - (posStackedHeight + height);
+
+            obj.addSVGInfo(tile, x, y, width, height, posBars[i].color);
+            graphics.beginFill(obj.colorHexMap[posBars[i].color]);
             graphics.drawRect(x, y, width, height);
 
-            positiveStackedHeight = positiveStackedHeight + height;
-            if (lowestY > y)
+            posStackedHeight += height;
+
+            if (lowestY > y) // TODO: when do we use this?
                 lowestY = y;
         }
 
         // draw negative values, if there are any
-
         if (Math.abs(negativeMax) > 0) {
             const negative = matrix[j][1];
             const valueToPixelsNegative = scaleLinear()

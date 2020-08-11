@@ -1,3 +1,5 @@
+import { min, max, sum } from 'd3';
+
 export function getMaxZoomLevel() {
     // TODO: How to calculate maxZoomLevel?
     const TILE_SIZE = 256;
@@ -43,4 +45,25 @@ export function findExtent(matrix) {
     }
 
     return maxAndMin;
+}
+
+export function findExtentByTrackType(data, isStacked) {
+    // TODO: do not consider negative values here yet
+    if (isStacked) {
+        const extent = {
+            min: 0, max: null
+        };
+
+        const positions = Array.from(new Set(data.map(d => d['__G__'])));
+        positions.forEach(pos => {
+            const curMax = sum(data.filter(d => d['__G__'] === pos).map(d => d['__Q__']));
+            if (extent.max < curMax) {
+                extent.max = curMax;
+            }
+        });
+
+        return extent;
+    } else {
+        return { min: 0, max: max(data.map(d => d['__Q__'])) };
+    }
 }

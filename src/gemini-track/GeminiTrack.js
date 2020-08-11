@@ -1,5 +1,5 @@
 import { scaleLinear, scaleOrdinal, schemeCategory10, min, max } from 'd3';
-import { findExtent, getMaxZoomLevel } from './utils/zoom';
+import { findExtent, getMaxZoomLevel, findExtentByTrackType } from './utils/zoom';
 import vis from './visualizations';
 
 function GeminiTrack(HGC, ...args) {
@@ -27,6 +27,13 @@ function GeminiTrack(HGC, ...args) {
             };
 
             this.isGeminiTrackInit = true;
+
+            // TODO: this should be determined considering the zoom level and zoom tech
+            this.isStackedBarChart = (
+                this.options?.spec?.color &&
+                !this.options?.spec?.row &&
+                this.options?.spec?.mark === 'bar'
+            );
         }
 
         initTile(tile) {
@@ -46,6 +53,10 @@ function GeminiTrack(HGC, ...args) {
             this.localColorToHexScale();
 
             this.unFlatten(tile);
+
+            // TODO: Metadata, such as field names, should be come from the server
+            // This should replace the `unFlatten()`
+            this.tabularizeTile(tile);
 
             this.renderTile(tile);
             this.rescaleTiles();
@@ -69,8 +80,6 @@ function GeminiTrack(HGC, ...args) {
             tile.drawnAtScale = this._xScale.copy(); // TODO:
 
             if (tile?.tileData?.zoomLevel !== maxZoomLevel) {
-                // we are in the highest zoom level
-
                 if (this.options?.spec?.zoomOutTechnique?.type === 'none') {
                     vis.drawZoomInstruction(HGC, this);
                 }
@@ -89,6 +98,7 @@ function GeminiTrack(HGC, ...args) {
                 }
             }
             else {
+                // we are in the highest zoom level
                 vis.drawVerticalBars(HGC, this, tile);
             }
         }
@@ -155,12 +165,6 @@ function GeminiTrack(HGC, ...args) {
 
             const flattenedArray = tile.tileData.dense;
 
-            // if any data is negative, switch to exponential scale
-            if (flattenedArray.filter(a => a < 0).length > 0 && this.options.valueScaling === 'linear') {
-                console.warn('Negative values present in data. Defaulting to exponential scale.');
-                this.options.valueScaling = 'exponential';
-            }
-
             const matrix = this.simpleUnFlatten(tile, flattenedArray);
 
             const maxAndMin = findExtent(matrix);
@@ -172,6 +176,40 @@ function GeminiTrack(HGC, ...args) {
             this.syncMaxAndMin();
 
             return matrix;
+        }
+
+        tabularizeTile(tile) {
+            if (tile.tabularData) return;
+
+            // TODO: These data should be came from the server
+            const N_FIELD = '__N__', Q_FIELD = '__Q__', G_FIELD = '__G__';
+            const CATEGORIES = ['A', 'T', 'G', 'C'];
+            const numericValues = tile.tileData.dense;
+            const numOfCategories = min([tile.tileData.shape[0], CATEGORIES.length]); // TODO:
+            const numOfGenomicPositions = tile.tileData.shape[1];
+            ///
+
+            const tabularData = [];
+
+            for (let i = 0; i < numOfCategories; i++) {
+                for (let j = 0; j < numOfGenomicPositions; j++) {
+                    tabularData.push({
+                        [N_FIELD]: CATEGORIES[i],
+                        [Q_FIELD]: numericValues[(numOfGenomicPositions * i) + j],
+                        [G_FIELD]: j
+                    });
+                }
+            }
+
+            tile.tabularData = tabularData;
+
+            const { min: minValue, max: maxValue } = findExtentByTrackType(tabularData, this.isStackedBarChart);
+
+            tile.maxValue = maxValue;
+            tile.minValue = minValue;
+
+            // we need to sync the domain of y-axis so that all tiles are aligned each other
+            this.syncMaxAndMin();
         }
 
         /**
@@ -298,6 +336,7 @@ function GeminiTrack(HGC, ...args) {
             for (let i = 0; i < visibleAndFetched.length; i++) {
                 const tile = visibleAndFetched[i];
                 this.unFlatten(tile);
+                this.tabularizeTile(tile);
             }
 
             this.rescaleTiles();
@@ -347,11 +386,9 @@ GeminiTrack.config = {
     orientation: '1d-horizontal',
     thumbnail: new DOMParser().parseFromString(icon, 'text/xml').documentElement,
     availableOptions: [
-        'zoomOutTechnique',
         'colorScale',
         'labelPosition',
         'labelColor',
-        'valueScaling',
         'labelTextOpacity',
         'labelBackgroundOpacity',
         'trackBorderWidth',
@@ -363,13 +400,9 @@ GeminiTrack.config = {
         'sortLargestOnTop'
     ],
     defaultOptions: {
-        zoomOutTechnique: {
-            type: 'none'
-        },
         labelPosition: 'none',
         labelColor: 'black',
         labelTextOpacity: 0.4,
-        valueScaling: 'linear',
         trackBorderWidth: 0,
         trackBorderColor: 'black',
         backgroundColor: 'white',
