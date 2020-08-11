@@ -82,15 +82,9 @@ export function compiler(track: Track | GenericType<Channel>, bb: BoundingBox): 
             options: {
                 ...defaultOptions[trackType],
                 colorScale: colorRange,
-                zoomOutTechnique
+                spec: { ...track, data: undefined }
             }
         }).addTrackSourceServers(server)
-
-        console.log({
-            ...(defaultOptions[trackType] ?? defaultOptions.default),
-            colorScale: colorRange,
-            zoomOutTechnique
-        })
 
         const chanToPos: { [k: string]: 'left' | 'right' | 'top' | 'bottom' } = {
             x: 'bottom',

@@ -1,11 +1,16 @@
 import { GeminiSpec } from '../../gemini.schema'
 
+const ALT_LOCAL_MULTIVEC = 'http://localhost:8001/api/v1/tileset_info/?d=XX4dPR0dSCGzD2n-xtlhbA'
+
 export const GEMINI_TRACK_EXAMPLE: GeminiSpec = {
   tracks: [{
-    data: { url: 'https://resgen.io/api/v1/tileset_info/?d=RTGsPv37TB2aKk9ujTIu6Q', type: 'tileset' },
+    data: {
+      url: ALT_LOCAL_MULTIVEC, //'https://resgen.io/api/v1/tileset_info/?d=RTGsPv37TB2aKk9ujTIu6Q', 
+      type: 'tileset'
+    },
     zoomOutTechnique: { type: 'auto' },
     mark: 'bar',
-    x: { field: '__G__', type: 'genomic', domain: { chromosome: '1', interval: [5000, 5500] } },
+    x: { field: '__G__', type: 'genomic', domain: { chromosome: '1', interval: [3000000, 3000500] } },
     x1: { axis: true },
     y: { field: '__Q__', type: 'quantitative' },
     color: {
@@ -30,7 +35,10 @@ export const GEMINI_TRACK_EXAMPLE: GeminiSpec = {
 
 export const GEMINI_TRACK_EXAMPLE2: GeminiSpec = {
   tracks: [{
-    data: { url: 'https://resgen.io/api/v1/tileset_info/?d=RTGsPv37TB2aKk9ujTIu6Q', type: 'tileset' },
+    data: {
+      url: ALT_LOCAL_MULTIVEC, //'https://resgen.io/api/v1/tileset_info/?d=RTGsPv37TB2aKk9ujTIu6Q', 
+      type: 'tileset'
+    },
     zoomOutTechnique: {
       type: 'alt-representation',
       spec: {
@@ -38,7 +46,7 @@ export const GEMINI_TRACK_EXAMPLE2: GeminiSpec = {
       }
     },
     mark: 'bar',
-    x: { field: '__G__', type: 'genomic', domain: { chromosome: '1', interval: [5000, 5500] } },
+    x: { field: '__G__', type: 'genomic', domain: { chromosome: '1', interval: [3000000, 3000500] } },
     x1: { axis: true },
     y: { field: '__Q__', type: 'quantitative' },
     color: {
@@ -63,7 +71,10 @@ export const GEMINI_TRACK_EXAMPLE2: GeminiSpec = {
 
 export const GEMINI_TRACK_EXAMPLE3: GeminiSpec = {
   tracks: [{
-    data: { url: 'https://resgen.io/api/v1/tileset_info/?d=RTGsPv37TB2aKk9ujTIu6Q', type: 'tileset' },
+    data: {
+      url: ALT_LOCAL_MULTIVEC, //'https://resgen.io/api/v1/tileset_info/?d=RTGsPv37TB2aKk9ujTIu6Q', 
+      type: 'tileset'
+    },
     zoomOutTechnique: {
       type: 'alt-representation',
       spec: {
@@ -71,7 +82,7 @@ export const GEMINI_TRACK_EXAMPLE3: GeminiSpec = {
       }
     },
     mark: 'bar',
-    x: { field: '__G__', type: 'genomic', domain: { chromosome: '1', interval: [5000, 5500] } },
+    x: { field: '__G__', type: 'genomic', domain: { chromosome: '1', interval: [3000000, 3000500] } },
     x1: { axis: true },
     y: { field: '__Q__', type: 'quantitative' },
     color: {

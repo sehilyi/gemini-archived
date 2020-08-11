@@ -1,5 +1,6 @@
 import { scaleLinear, scaleOrdinal, schemeCategory10, min, max } from 'd3';
-import { findExtent, getMaxZoomLevel } from './utils';
+import { findExtent, getMaxZoomLevel } from './utils/zoom';
+import vis from './visualizations';
 
 function GeminiTrack(HGC, ...args) {
     if (!new.target) {
@@ -7,9 +8,6 @@ function GeminiTrack(HGC, ...args) {
             'Uncaught TypeError: Class constructor cannot be invoked without "new"',
         );
     }
-
-    // Services
-    const { pixiRenderer } = HGC.services;
 
     // Utils
     const { colorToHex } = HGC.utils;
@@ -27,14 +25,6 @@ function GeminiTrack(HGC, ...args) {
                 max: null,
                 min: null
             };
-
-            this.zoomMask = new HGC.libraries.PIXI.Text('Zoom in to see information', {
-                fontSize: "13px",
-                fontFamily: "Arial",
-                fill: 'black',
-            });
-            this.zoomMask.anchor.x = 0.5;
-            this.zoomMask.anchor.y = 0.5;
 
             this.isGeminiTrackInit = true;
         }
@@ -69,206 +59,44 @@ function GeminiTrack(HGC, ...args) {
         renderTile(tile) {
             tile.svgData = null;
             tile.mouseOverData = null;
+            tile.graphics.clear();
+            tile.graphics.removeChildren();
+            this.pBorder.clear();
+            this.pBorder.removeChildren();
 
             const maxZoomLevel = getMaxZoomLevel();
 
-            const graphics = tile.graphics;
-
-            graphics.clear();
-            graphics.removeChildren();
-
-            tile.drawnAtScale = this._xScale.copy();
-
-            // we're setting the start of the tile to the current zoom level
-            const { tileX, tileWidth } = this.getTilePosAndDimensions(
-                tile.tileData.zoomLevel,
-                tile.tileData.tilePos,
-                this.tilesetInfo.tile_size
-            );
-
-            const matrix = this.unFlatten(tile);
-
-            this.oldDimensions = this.dimensions; // for mouseover
+            tile.drawnAtScale = this._xScale.copy(); // TODO:
 
             if (tile?.tileData?.zoomLevel !== maxZoomLevel) {
-                // we are in the highest level
-                if (this.options?.zoomOutTechnique?.type === 'none') {
-                    this.drawZoomInstruction()
+                // we are in the highest zoom level
+
+                if (this.options?.spec?.zoomOutTechnique?.type === 'none') {
+                    vis.drawZoomInstruction(HGC, this);
                 }
-                else if (this.options?.zoomOutTechnique?.type === 'aggregate') {
-                    this.distroyZoomInstruction()
-
-                    // creates a sprite containing all of the rectangles in this tile
-                    this.drawVerticalBars(
-                        this.mapOriginalColors(matrix),
-                        tileX,
-                        tileWidth,
-                        this.maxAndMin.max,
-                        this.maxAndMin.min,
-                        tile
-                    );
-
-                    graphics.addChild(tile.sprite);
+                else if (this.options?.spec?.zoomOutTechnique?.type === 'aggregate') {
+                    vis.drawVerticalBars(HGC, this, tile);
                 }
-                else if (this.options?.zoomOutTechnique?.type === 'alt-representation') {
-                    this.distroyZoomInstruction()
-
-                    if (this.options?.zoomOutTechnique?.spec?.mark) {
-                        this.drawLineCharts(tile);
+                else if (this.options?.spec?.zoomOutTechnique?.type === 'alt-representation') {
+                    if (this.options?.spec?.zoomOutTechnique?.spec?.mark) {
+                        vis.drawLineCharts(this, tile);
                     }
-                    else if (this.options?.zoomOutTechnique?.spec?.row) {
-                        this.drawMultipleBarCharts(tile);
+                    else if (this.options?.spec?.zoomOutTechnique?.spec?.row) {
+                        vis.drawMultipleBarCharts(HGC, this, tile);
                     }
-                } else if (this.options?.zoomOutTechnique?.type === 'auto') {
-                    this.distroyZoomInstruction()
-
-                    // creates a sprite containing all of the rectangles in this tile
-                    this.drawVerticalBars(
-                        this.mapOriginalColors(matrix),
-                        tileX,
-                        tileWidth,
-                        this.maxAndMin.max,
-                        this.maxAndMin.min,
-                        tile
-                    );
-
-                    graphics.addChild(tile.sprite);
+                } else if (this.options?.spec?.zoomOutTechnique?.type === 'auto') {
+                    vis.drawVerticalBars(HGC, this, tile);
                 }
             }
             else {
-                this.distroyZoomInstruction()
-
-                // creates a sprite containing all of the rectangles in this tile
-                this.drawVerticalBars(
-                    this.mapOriginalColors(matrix),
-                    tileX,
-                    tileWidth,
-                    this.maxAndMin.max,
-                    this.maxAndMin.min,
-                    tile
-                );
-
-                graphics.addChild(tile.sprite);
+                vis.drawVerticalBars(HGC, this, tile);
             }
-        }
-
-        drawZoomInstruction() {
-            this.zoomMask.x = this.position[0] + this.dimensions[0] / 2;
-            this.zoomMask.y = this.position[1] + this.dimensions[1] / 2;
-
-            // Draw the notification on the pBorder level. This is in the foreground
-            const graphics = this.pBorder;
-
-            graphics.clear();
-            graphics.removeChildren();
-
-            graphics.beginFill(0xEAEAEA);
-
-            graphics.drawRect(
-                this.position[0],
-                this.position[1],
-                this.dimensions[0],
-                this.dimensions[1]
-            );
-            graphics.addChild(this.zoomMask);
-        }
-
-        distroyZoomInstruction() {
-            const graphics = this.pBorder;
-
-            graphics.clear();
-            graphics.removeChildren();
-        }
-
-        drawLineCharts(tile) {
-            const graphics = tile.graphics;
-            graphics.clear();
-            tile.drawnAtScale = this._xScale.copy();
-
-            // we're setting the start of the tile to the current zoom level
-            const { tileX, tileWidth } = this.getTilePosAndDimensions(tile.tileData.zoomLevel,
-                tile.tileData.tilePos, this.tilesetInfo.tile_size);
-
-            const matrix = tile.matrix;
-            const trackHeight = this.dimensions[1];
-            const matrixDimensions = tile.tileData.shape;
-
-            const valueToPixels = scaleLinear()
-                .domain([0, this.maxAndMin.max])
-                .range([0, trackHeight/* / matrixDimensions[0]*/]);
-
-            for (let i = 0; i < matrix[0].length; i++) {
-                const intervals = trackHeight / matrixDimensions[0];
-                // calculates placement for a line in each interval; we subtract 1 so we can see the last line clearly
-                const linePlacement = trackHeight
-                // (i === matrix[0].length - 1) ?
-                //     (intervals * i) + ((intervals * (i + 1) - (intervals * i))) - 1 :
-                //     (intervals * i) + ((intervals * (i + 1) - (intervals * i)));
-                graphics.lineStyle(1, this.colorHexMap[this.options.colorScale[i]], 1);
-
-                for (let j = 0; j < matrix.length; j++) { // 3070 or something
-                    const x = this._xScale(tileX + (j * tileWidth / this.tilesetInfo.tile_size));
-                    const y = linePlacement - valueToPixels(matrix[j][i]);
-                    this.addSVGInfo(tile, x, y, this.options.colorScale[i]);
-                    // move draw position back to the start at beginning of each line
-                    (j === 0) ? graphics.moveTo(x, y) : graphics.lineTo(x, y);
-                }
-            }
-        }
-
-        drawMultipleBarCharts(tile) {
-            const graphics = tile.graphics;
-
-            graphics.clear();
-            graphics.removeChildren();
-
-            tile.drawnAtScale = this._xScale.copy();
-
-            let localGraphics = new HGC.libraries.PIXI.Graphics();
-
-            // we're setting the start of the tile to the current zoom level
-            const { tileX, tileWidth } = this.getTilePosAndDimensions(tile.tileData.zoomLevel,
-                tile.tileData.tilePos, this.tilesetInfo.tile_size);
-
-            if (this.options.barBorder || true) {
-                localGraphics.lineStyle(0.1, 0x000000, 1);
-                tile.barBorders = true;
-            }
-
-            const matrix = tile.matrix;
-            const trackHeight = this.dimensions[1];
-            const matrixDimensions = tile.tileData.shape;
-            const colorScale = this.options.colorScale || scaleOrdinal(schemeCategory10);
-            const width = this._xScale(tileX + (tileWidth / this.tilesetInfo.tile_size)) - this._xScale(tileX);
-            const valueToPixels = scaleLinear()
-                .domain([0, this.maxAndMin.max])
-                .range([0, trackHeight / matrixDimensions[0]]);
-
-            for (let i = 0; i < matrix[0].length; i++) { // 15
-                localGraphics.beginFill(this.colorHexMap[colorScale[i]]);
-
-                for (let j = 0; j < matrix.length; j++) { // 3000
-                    const x = this._xScale(tileX + (j * tileWidth / this.tilesetInfo.tile_size));
-                    const height = valueToPixels(matrix[j][i]);
-                    const y = ((trackHeight / matrixDimensions[0]) * (i + 1) - height);
-                    this.addSVGInfo(tile, x, y, width, height, colorScale[i]);
-                    localGraphics.drawRect(x, y, width, height);
-                }
-
-            }
-
-            const texture = pixiRenderer.generateTexture(localGraphics, HGC.libraries.PIXI.SCALE_MODES.NEAREST);
-            const sprite = new HGC.libraries.PIXI.Sprite(texture);
-            sprite.width = this._xScale(tileX + tileWidth) - this._xScale(tileX);
-            sprite.x = this._xScale(tileX);
-            graphics.addChild(sprite);
         }
 
         syncMaxAndMin() {
             const visibleAndFetched = this.visibleAndFetchedTiles();
 
             visibleAndFetched.map(tile => {
-
                 if (tile.minValue + tile.maxValue > this.maxAndMin.min + this.maxAndMin.max) {
                     this.maxAndMin.min = tile.minValue;
                     this.maxAndMin.max = tile.maxValue;
@@ -306,7 +134,7 @@ function GeminiTrack(HGC, ...args) {
          * Converts all colors in a colorScale to Hex colors.
          */
         localColorToHexScale() {
-            const colorScale = this.options.colorScale || scaleOrdinal(schemeCategory10);
+            const colorScale = this.options.colorScale;
             const colorHexMap = {};
             for (let i = 0; i < colorScale.length; i++) {
                 colorHexMap[colorScale[i]] = colorToHex(colorScale[i]);
@@ -384,7 +212,6 @@ function GeminiTrack(HGC, ...args) {
          * @return
          */
         mapOriginalColors(matrix) {
-            const colorScale = this.options.colorScale || scaleOrdinal(schemeCategory10);
 
             // mapping colors to unsorted values
             const matrixWithColors = [];
@@ -394,7 +221,7 @@ function GeminiTrack(HGC, ...args) {
                 for (let i = 0; i < matrix[j].length; i++) {
                     columnColors[i] = {
                         value: isNaN(matrix[j][i]) ? 0 : matrix[j][i],
-                        color: colorScale[i]
+                        color: this.options.colorScale[i]
                     }
                 }
 
@@ -421,95 +248,6 @@ function GeminiTrack(HGC, ...args) {
                 matrixWithColors.push([positive, negative]);
             }
             return matrixWithColors;
-        }
-
-        /**
-         * Draws graph without normalizing values.
-         *
-         * @param graphics PIXI.Graphics instance
-         * @param matrix 2d array of numbers representing nucleotides
-         * @param tileX starting position of tile
-         * @param tileWidth pre-scaled width of tile
-         * @param positiveMax the height of the tallest bar in the positive part of the graph
-         * @param negativeMax the height of the tallest bar in the negative part of the graph
-         * @param tile
-         */
-        drawVerticalBars(matrix, tileX, tileWidth, positiveMax, negativeMax, tile) {
-            let graphics = new HGC.libraries.PIXI.Graphics();
-            const trackHeight = this.dimensions[1];
-
-            // get amount of trackHeight reserved for positive and for negative
-            const unscaledHeight = positiveMax + (Math.abs(negativeMax));
-
-            // fraction of the track devoted to positive values
-            const positiveTrackHeight = (positiveMax * trackHeight) / unscaledHeight;
-
-            // fraction of the track devoted to negative values
-            const negativeTrackHeight = (Math.abs(negativeMax) * trackHeight) / unscaledHeight;
-
-            let lowestY = this.dimensions[1];
-
-            const width = 10;
-
-            // calls drawBackground in PixiTrack.js
-            this.drawBackground(matrix, graphics);
-
-            // borders around each bar
-            if (this.options.barBorder || true) {
-                graphics.lineStyle(1, 0x000000, 1);
-            }
-
-            for (let j = 0; j < matrix.length / 2.0; j++) { // jth vertical bar in the graph
-                const x = (j * width);
-
-                // draw positive values
-                const positive = matrix[j][0];
-                const valueToPixelsPositive = scaleLinear()
-                    .domain([0, positiveMax])
-                    .range([0, positiveTrackHeight]);
-                let positiveStackedHeight = 0;
-
-                for (let i = 0; i < positive.length; i++) {
-                    const height = valueToPixelsPositive(positive[i].value);
-                    const y = positiveTrackHeight - (positiveStackedHeight + height);
-                    this.addSVGInfo(tile, x, y, width, height, positive[i].color);
-                    graphics.beginFill(this.colorHexMap[positive[i].color]);
-                    graphics.drawRect(x, y, width, height);
-
-                    positiveStackedHeight = positiveStackedHeight + height;
-                    if (lowestY > y)
-                        lowestY = y;
-                }
-
-                // draw negative values, if there are any
-
-                if (Math.abs(negativeMax) > 0) {
-                    const negative = matrix[j][1];
-                    const valueToPixelsNegative = scaleLinear()
-                        .domain([-Math.abs(negativeMax), 0])
-                        .range([negativeTrackHeight, 0]);
-                    let negativeStackedHeight = 0;
-                    for (let i = 0; i < negative.length; i++) {
-                        const height = valueToPixelsNegative(negative[i].value);
-                        const y = positiveTrackHeight + negativeStackedHeight;
-                        this.addSVGInfo(tile, x, y, width, height, negative[i].color);
-                        graphics.beginFill(this.colorHexMap[negative[i].color]);
-                        graphics.drawRect(x, y, width, height);
-                        negativeStackedHeight = negativeStackedHeight + height;
-                    }
-                }
-            }
-
-            // vertical bars are drawn onto the graphics object
-            // and a texture is generated from that
-            const texture = pixiRenderer.generateTexture(
-                graphics, HGC.libraries.PIXI.SCALE_MODES.NEAREST
-            );
-            const sprite = new HGC.libraries.PIXI.Sprite(texture);
-            sprite.width = this._xScale(tileX + tileWidth) - this._xScale(tileX);
-            sprite.x = this._xScale(tileX);
-            tile.sprite = sprite;
-            tile.lowestY = lowestY;
         }
 
         /**
