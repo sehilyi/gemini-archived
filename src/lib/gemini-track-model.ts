@@ -1,4 +1,4 @@
-import { Track, getVisualizationType, IsChannelDeep, IsChannelValue } from "./gemini.schema"
+import { Track, getVisualizationType, IsChannelDeep, IsChannelValue, Channel, ChannelDeep } from "./gemini.schema"
 import merge from "lodash/merge"
 import { schemeCategory10 } from "d3"
 
@@ -41,6 +41,7 @@ export class GeminiTrackModel {
         // check with json schema
 
         // additionally check with schema that cannot be validated with a json schema file
+        // (e.g., check if certain field names actually exist in the data)
 
         return valid
     }
@@ -53,6 +54,25 @@ export class GeminiTrackModel {
         if (IsChannelDeep(track.color) && !track.color.range) {
             track.color.range = this.DEFAULT_OPTIONS.NOMINAL_COLOR as string[]
         }
+    }
+
+    public getDeepChannel(key: keyof Track, alt?: boolean): ChannelDeep | undefined {
+        if (IsChannelDeep(this.spec(alt)[key] as Channel)) {
+            return this.spec(alt)[key] as ChannelDeep
+        }
+        return undefined
+    }
+
+    // get all field names assigned in the spec
+    public getEncodedFields(alt?: boolean) {
+        const spec = this.spec(alt)
+        let encodedField = {} as { [k: string]: string }
+        ['x', 'y', 'color', 'row' /* ... */].forEach((c) => {
+            encodedField[c] = IsChannelDeep((spec as any)[c])
+                ? (spec as any)[c]['field'] // TODO: how to remove any without error?
+                : undefined
+        })
+        return encodedField
     }
 
     public getVisualizationType(alt?: boolean) {

@@ -44,6 +44,7 @@ export interface Track {
     y1e?: Channel
     // separation
     row?: Channel
+    column?: Channel
     // others
     color?: Channel
     opacity?: Channel
@@ -56,6 +57,7 @@ export interface Track {
     height?: number
     style?: TrackStyle
 }
+// export type TrackKey = keyof Track
 
 export interface TrackStyle {
     background?: string

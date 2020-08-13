@@ -1,45 +1,40 @@
-import { scaleLinear, scaleOrdinal, schemeCategory10, min, max, set } from 'd3'
-import { Track } from '../../lib/gemini.schema'
+import { scaleLinear, scaleOrdinal, max } from 'd3'
 import { GeminiTrackModel } from '../../lib/gemini-track-model'
 
 export function drawBarChart(HGC: any, trackInfo: any, tile: any, alt: boolean) {
+    /* spec */
     const geminiModel = trackInfo.geminiModel as GeminiTrackModel
 
-    const colorScale = geminiModel.getColorRange()
-
-    const graphics = tile.graphics
-
-    let localGraphics = new HGC.libraries.PIXI.Graphics()
-
-    // we're setting the start of the tile to the current zoom level
-    const { tileX, tileWidth } = trackInfo.getTilePosAndDimensions(
-        tile.tileData.zoomLevel,
-        tile.tileData.tilePos,
-        trackInfo.tilesetInfo.tile_size
-    )
-
-    if (trackInfo.options.barBorder) {
-        localGraphics.lineStyle(1, 0x333333, 0.5, 0)
-        tile.barBorders = true
-    }
-
+    /* data */
     const data = tile.tabularData as { [k: string]: number | string }[]
 
-    const matrixDimensions = tile.tileData.shape
+    /* encoding */
+    const encodedFields = geminiModel.getEncodedFields(alt)
 
+    const colorRange = geminiModel.getColorRange()
+    const colorCategories = encodedFields['color'] ? Array.from(new Set(data.map(d => d[encodedFields['color']]))) : []
+    const rowCategories = encodedFields['row'] ? Array.from(new Set(data.map(d => d[encodedFields['row']]))) : []
 
     const trackHeight = trackInfo.dimensions[1]
-    const barWidth = trackInfo._xScale(tileX + (tileWidth / trackInfo.tilesetInfo.tile_size)) - trackInfo._xScale(tileX)
     const tileSize = trackInfo.tilesetInfo.tile_size
-    const uniqueCategories = Array.from(new Set(data.map(d => d['__N__'])))
-    const rowHeight = trackHeight / uniqueCategories.length
+    const rowHeight = trackHeight / rowCategories.length
+    const { tileX, tileWidth } = trackInfo.getTilePosAndDimensions(tile.tileData.zoomLevel, tile.tileData.tilePos, tileSize)
 
     const xScale = trackInfo._xScale
     const yScale = scaleLinear()
         .domain([0, max(data.map(d => d['__Q__'] as any))])
         .range([0, rowHeight])
-    const cScale = scaleOrdinal(colorScale)
-        .domain(uniqueCategories as string[])
+    const cScale = scaleOrdinal()
+        .domain(colorCategories as string[])
+        .range(colorRange)
+    const barWidth = xScale(tileX + (tileWidth / tileSize)) - xScale(tileX)
+
+    let localGraphics = new HGC.libraries.PIXI.Graphics()
+
+    if (trackInfo.options.barBorder) {
+        localGraphics.lineStyle(1, 0x333333, 0.5, 0)
+        tile.barBorders = true
+    }
 
     data.forEach(d => {
         const category = d['__N__'] as string
@@ -47,9 +42,9 @@ export function drawBarChart(HGC: any, trackInfo: any, tile: any, alt: boolean) 
         const gposition = d['__G__'] as number
 
         const color = cScale(category)
-        const x = xScale(tileX + (gposition * tileWidth / tileSize))
+        const x = xScale(tileX + (gposition * (tileWidth / tileSize)))
         const height = yScale(value)
-        const y = (rowHeight) * (uniqueCategories.indexOf(category) + 1) - height
+        const y = (rowHeight) * (rowCategories.indexOf(category) + 1) - height
 
         // pixi
         localGraphics.beginFill(trackInfo.colorHexMap[color as string])
@@ -64,7 +59,8 @@ export function drawBarChart(HGC: any, trackInfo: any, tile: any, alt: boolean) 
     const sprite = new HGC.libraries.PIXI.Sprite(texture)
     sprite.width = xScale(tileX + tileWidth) - xScale(tileX)
     sprite.x = xScale(tileX)
-    graphics.addChild(sprite)
+
+    tile.graphics.addChild(sprite)
 }
 
 export function drawStackedBarChart(HGC: any, obj: any, tile: any, alt: boolean) {
