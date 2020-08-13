@@ -1,11 +1,11 @@
 import { GeminiSpec } from '../../gemini.schema'
 
-const ALT_LOCAL_MULTIVEC = 'http://localhost:8001/api/v1/tileset_info/?d=XX4dPR0dSCGzD2n-xtlhbA'
+const LOCAL_MULTIVEC = 'http://localhost:8001/api/v1/tileset_info/?d=XX4dPR0dSCGzD2n-xtlhbA'
 
 export const GEMINI_TRACK_EXAMPLE: GeminiSpec = {
   tracks: [{
     data: {
-      url: ALT_LOCAL_MULTIVEC, //'https://resgen.io/api/v1/tileset_info/?d=RTGsPv37TB2aKk9ujTIu6Q', 
+      url: LOCAL_MULTIVEC, //'https://resgen.io/api/v1/tileset_info/?d=RTGsPv37TB2aKk9ujTIu6Q', 
       type: 'tileset'
     },
     zoomOutTechnique: { type: 'auto' },
@@ -36,7 +36,7 @@ export const GEMINI_TRACK_EXAMPLE: GeminiSpec = {
 export const GEMINI_TRACK_EXAMPLE2: GeminiSpec = {
   tracks: [{
     data: {
-      url: ALT_LOCAL_MULTIVEC, //'https://resgen.io/api/v1/tileset_info/?d=RTGsPv37TB2aKk9ujTIu6Q', 
+      url: LOCAL_MULTIVEC, //'https://resgen.io/api/v1/tileset_info/?d=RTGsPv37TB2aKk9ujTIu6Q', 
       type: 'tileset'
     },
     zoomOutTechnique: {
@@ -72,7 +72,7 @@ export const GEMINI_TRACK_EXAMPLE2: GeminiSpec = {
 export const GEMINI_TRACK_EXAMPLE3: GeminiSpec = {
   tracks: [{
     data: {
-      url: ALT_LOCAL_MULTIVEC, //'https://resgen.io/api/v1/tileset_info/?d=RTGsPv37TB2aKk9ujTIu6Q', 
+      url: LOCAL_MULTIVEC, //'https://resgen.io/api/v1/tileset_info/?d=RTGsPv37TB2aKk9ujTIu6Q', 
       type: 'tileset'
     },
     zoomOutTechnique: {
@@ -83,39 +83,6 @@ export const GEMINI_TRACK_EXAMPLE3: GeminiSpec = {
     },
     mark: 'bar',
     x: { field: '__G__', type: 'genomic', domain: { chromosome: '1', interval: [3000000, 3000500] } },
-    x1: { axis: true },
-    y: { field: '__Q__', type: 'quantitative' },
-    color: {
-      field: '__N__',
-      type: 'nominal',
-      domain: [
-        'A', 'T', 'G', 'C', 'N', 'other'
-      ],
-      range: [
-        "#007FFF",
-        "#e8e500",
-        "#008000",
-        "#FF0038",
-        "#800080",
-        "#DCDCDC",
-      ]
-    },
-    width: 1000,
-    height: 180,
-  }]
-}
-
-export const GEMINI_TRACK_EXAMPLE4: GeminiSpec = {
-  tracks: [{
-    data: { url: 'https://resgen.io/api/v1/tileset_info/?d=RTGsPv37TB2aKk9ujTIu6Q', type: 'tileset' },
-    zoomOutTechnique: {
-      type: 'alt-representation',
-      spec: {
-        mark: 'line'
-      }
-    },
-    mark: 'bar',
-    x: { field: '__G__', type: 'genomic', domain: { chromosome: '1', interval: [5000, 5500] } },
     x1: { axis: true },
     y: { field: '__Q__', type: 'quantitative' },
     color: {

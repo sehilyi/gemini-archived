@@ -118,6 +118,10 @@ export interface ChannelDeep {
     axis?: boolean
 }
 
+export interface ChannelValue {
+    value: number | string
+}
+
 export type Domain = string[] | number[] | DomainInterval | DomainChrInterval | DomainChr | DomainGene
 export type Range = string[] | number[]
 export interface DomainChr {
@@ -137,10 +141,6 @@ export interface DomainGene {
     // For showing genes
     // TODO: Not supported yet
     gene: string | [string, string]
-}
-
-export interface ChannelValue {
-    value: number | string
 }
 
 export type Aggregate = 'max' | 'min' | 'mean'

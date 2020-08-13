@@ -2,7 +2,7 @@ import { scaleLinear, scaleOrdinal, schemeCategory10, min, max } from 'd3';
 
 export function drawLineCharts(obj, tile) {
     const graphics = tile.graphics;
-    graphics.clear();
+
     tile.drawnAtScale = obj._xScale.copy();
 
     // we're setting the start of the tile to the current zoom level

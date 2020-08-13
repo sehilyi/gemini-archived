@@ -3,6 +3,7 @@ import { LIGHT_GRAY } from "../utils/colors";
 export function drawZoomInstruction(HGC, obj) {
 
     if (!obj.zoomInstruction) {
+        // assigning to the track object since we need only one of this graphics
         obj.zoomInstruction = new HGC.libraries.PIXI.Text('Zoom in to see information', {
             fontSize: "13px",
             fontFamily: "Arial",
@@ -12,10 +13,7 @@ export function drawZoomInstruction(HGC, obj) {
         obj.zoomInstruction.anchor.y = 0.5;
     }
 
-    const graphics = obj.pBorder;
-
-    graphics.clear();
-    graphics.removeChildren();
+    const graphics = obj.pBorder;   // use pBorder not to affected by zoomming
 
     // bg
     graphics.beginFill(LIGHT_GRAY);

@@ -168,7 +168,7 @@ function Editor() {
         </select>
       </div>
       <div className='editor'>
-        <SplitPane className='split-pane-root' split='vertical' defaultSize='50%' onChange={() => { }}>
+        <SplitPane className='split-pane-root' split='vertical' defaultSize='35%' onChange={() => { }}>
           <SplitPane split='horizontal' defaultSize='50%' onChange={() => { }}>
             {/* Gemini Editor */}
             <EditorPanel

@@ -1,5 +1,6 @@
 import { scaleLinear, scaleOrdinal, schemeCategory10, min, max } from 'd3';
 import { findExtent, getMaxZoomLevel, findExtentByTrackType } from './utils/zoom';
+import merge from 'lodash/merge';
 import vis from './visualizations';
 
 function GeminiTrack(HGC, ...args) {
@@ -9,16 +10,15 @@ function GeminiTrack(HGC, ...args) {
         );
     }
 
-    // Utils
     const { colorToHex } = HGC.utils;
 
     class GeminiTrackClass extends HGC.tracks.BarTrack {
         constructor(context, options) {
             super(context, options);
-            this.initGeminiTrack();
+            this.initTrack();
         }
 
-        initGeminiTrack() {
+        initTrack() {
             if (this.isGeminiTrackInit) return;
 
             this.maxAndMin = {
@@ -26,18 +26,30 @@ function GeminiTrack(HGC, ...args) {
                 min: null
             };
 
-            this.isGeminiTrackInit = true;
-
             // TODO: this should be determined considering the zoom level and zoom tech
             this.isStackedBarChart = (
                 this.options?.spec?.color &&
                 !this.options?.spec?.row &&
                 this.options?.spec?.mark === 'bar'
             );
+
+            // store gemini spec
+            this.gmTrackSpec = {
+                original: this.options.spec,
+                regular: this.options.spec,
+                zoomOut: (this.options.spec?.zoomOutTechnique?.type === 'alt-representation') ?
+                    merge(
+                        JSON.parse(JSON.stringify(this.options.spec)),
+                        this.options.spec?.zoomOutTechnique.spec
+                    )
+                    : this.options.spec
+            }
+
+            this.isGeminiTrackInit = true;
         }
 
         initTile(tile) {
-            this.initGeminiTrack();
+            this.initTrack();
 
             // create the tile
             // should be overwritten by child classes
@@ -62,13 +74,8 @@ function GeminiTrack(HGC, ...args) {
             this.rescaleTiles();
         }
 
-        /**
-         * Draws exactly one tile.
-         *
-         * @param tile
-         */
+        // draws exactly one tile
         renderTile(tile) {
-            tile.svgData = null;
             tile.mouseOverData = null;
             tile.graphics.clear();
             tile.graphics.removeChildren();
@@ -80,11 +87,12 @@ function GeminiTrack(HGC, ...args) {
             tile.drawnAtScale = this._xScale.copy(); // TODO:
 
             if (tile?.tileData?.zoomLevel !== maxZoomLevel) {
+
                 if (this.options?.spec?.zoomOutTechnique?.type === 'none') {
                     vis.drawZoomInstruction(HGC, this);
                 }
                 else if (this.options?.spec?.zoomOutTechnique?.type === 'aggregate') {
-                    vis.drawVerticalBars(HGC, this, tile);
+                    vis.drawStackedBarChart(HGC, this, tile);
                 }
                 else if (this.options?.spec?.zoomOutTechnique?.type === 'alt-representation') {
                     if (this.options?.spec?.zoomOutTechnique?.spec?.mark) {
@@ -94,15 +102,17 @@ function GeminiTrack(HGC, ...args) {
                         vis.drawMultipleBarCharts(HGC, this, tile);
                     }
                 } else if (this.options?.spec?.zoomOutTechnique?.type === 'auto') {
-                    vis.drawVerticalBars(HGC, this, tile);
+                    vis.drawStackedBarChart(HGC, this, tile);
                 }
             }
             else {
                 // we are in the highest zoom level
-                vis.drawVerticalBars(HGC, this, tile);
+                vis.drawStackedBarChart(HGC, this, tile);
+                // vis.drawTextSequence(HGC, this, tile);
             }
         }
 
+        // y scale should be synced across all tiles
         syncMaxAndMin() {
             const visibleAndFetched = this.visibleAndFetchedTiles();
 
@@ -114,9 +124,7 @@ function GeminiTrack(HGC, ...args) {
             });
         }
 
-        /**
-         * Rescales the sprites of all visible tiles when zooming and panning.
-         */
+        // rescales the sprites of all visible tiles when zooming and panning.
         rescaleTiles() {
             const visibleAndFetched = this.visibleAndFetchedTiles();
 
@@ -133,31 +141,22 @@ function GeminiTrack(HGC, ...args) {
 
                 if (sprite) {
                     sprite.height = height;
-
                     sprite.y = y;
                 }
             });
         }
 
-
-        /**
-         * Converts all colors in a colorScale to Hex colors.
-         */
+        // converts all colors in a colorScale to Hex colors.
         localColorToHexScale() {
             const colorScale = this.options.colorScale;
             const colorHexMap = {};
-            for (let i = 0; i < colorScale.length; i++) {
-                colorHexMap[colorScale[i]] = colorToHex(colorScale[i]);
-            }
+            colorScale.forEach(color => {
+                colorHexMap[color] = colorToHex(color);
+            });
             this.colorHexMap = colorHexMap;
         }
 
-        /**
-         * un-flatten data into matrix of tile.tileData.shape[0] x tile.tileData.shape[1]
-         *
-         * @param tile
-         * @returns {Array} 2d array of numerical values for each column
-         */
+        // un-flatten data into matrix of tile.tileData.shape[0] x tile.tileData.shape[1]
         unFlatten(tile) {
             if (tile.matrix) {
                 return tile.matrix;
@@ -212,12 +211,6 @@ function GeminiTrack(HGC, ...args) {
             this.syncMaxAndMin();
         }
 
-        /**
-         *
-         * @param tile
-         * @param data array of values to reshape
-         * @returns {Array} 2D array representation of data
-         */
         simpleUnFlatten(tile, data) {
             const shapeX = tile.tileData.shape[0]; // number of different nucleotides in each bar
             const shapeY = tile.tileData.shape[1]; // number of bars
@@ -242,13 +235,8 @@ function GeminiTrack(HGC, ...args) {
         }
 
 
-        /**
-         * Map each value in every array in the matrix to a color depending on position in the array
-         * Divides each array into positive and negative sections and sorts them
-         *
-         * @param matrix 2d array of numbers representing nucleotides
-         * @return
-         */
+        // Map each value in every array in the matrix to a color depending on position in the array
+        // Divides each array into positive and negative sections and sorts them
         mapOriginalColors(matrix) {
 
             // mapping colors to unsorted values
@@ -288,25 +276,7 @@ function GeminiTrack(HGC, ...args) {
             return matrixWithColors;
         }
 
-        /**
-         * Adds information to recreate the track in SVG to the tile
-         *
-         * @param tile
-         * @param x x value of bar
-         * @param y y value of bar
-         * @param width width of bar
-         * @param height height of bar
-         * @param color color of bar (not converted to hex)
-         */
-        addSVGInfo(tile, x, y, width, height, color) {
-
-        }
-
-        /**
-         * Here, rerender all tiles every time track size is changed
-         *
-         * @param newDimensions
-         */
+        // rerender all tiles every time track size is changed
         setDimensions(newDimensions) {
             this.oldDimensions = this.dimensions;
             super.setDimensions(newDimensions);
@@ -315,8 +285,8 @@ function GeminiTrack(HGC, ...args) {
             visibleAndFetched.map(a => this.initTile(a));
         }
 
+        // rerender tiles using the new options
         rerender(newOptions) {
-            // TODO: this is being called only when the options are changed?
             super.rerender(newOptions);
 
             this.options = newOptions;
@@ -342,36 +312,10 @@ function GeminiTrack(HGC, ...args) {
             this.rescaleTiles();
         }
 
-        /**
-         * Prevent BarTracks draw method from having an effect
-         *
-         * @param tile
-         */
-        drawTile(tile) {
-
-        }
-
-        exportSVG() {
-            return null;
-        }
-
-        /**
-         * Sorts relevant data for mouseover for easy iteration later
-         *
-         * @param tile
-         */
-        makeMouseOverData(tile) {
-            return;
-        }
-
-        getMouseOverHtml(trackX, trackY) {
-            return '';
-        }
-
-        draw() {
-            super.draw();
-        }
-
+        draw() { super.draw(); }
+        drawTile() { }  // prevent BarTracks draw method from having an effect
+        exportSVG() { }
+        getMouseOverHtml() { }
     }
     return new GeminiTrackClass(...args);
 };

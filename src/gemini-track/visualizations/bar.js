@@ -3,20 +3,19 @@ import { scaleLinear, scaleOrdinal, schemeCategory10, min, max, set } from 'd3';
 export function drawMultipleBarCharts(HGC, obj, tile) {
 
     const { pixiRenderer } = HGC.services;
-    const { colorToHex } = HGC.utils;
 
     const graphics = tile.graphics;
-
-    graphics.clear();
-    graphics.removeChildren();
 
     tile.drawnAtScale = obj._xScale.copy();
 
     let localGraphics = new HGC.libraries.PIXI.Graphics();
 
     // we're setting the start of the tile to the current zoom level
-    const { tileX, tileWidth } = obj.getTilePosAndDimensions(tile.tileData.zoomLevel,
-        tile.tileData.tilePos, obj.tilesetInfo.tile_size);
+    const { tileX, tileWidth } = obj.getTilePosAndDimensions(
+        tile.tileData.zoomLevel,
+        tile.tileData.tilePos,
+        obj.tilesetInfo.tile_size
+    );
 
     if (obj.options.barBorder) {
         localGraphics.lineStyle(1, 0x333333, 0.5, 0);
@@ -52,7 +51,7 @@ export function drawMultipleBarCharts(HGC, obj, tile) {
         const y = (rowHeight) * (uniqueCategories.indexOf(category) + 1) - height;
 
         // pixi
-        localGraphics.beginFill(colorToHex(color));
+        localGraphics.beginFill(obj.colorHexMap[color]);
         localGraphics.drawRect(x, y, barWidth, height);
 
         // svg
