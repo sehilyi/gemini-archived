@@ -1,6 +1,11 @@
-export function drawTextSequence(HGC: any, trackInfo: any, tile: any, alt: boolean) {
+import { scaleLinear } from 'd3'
 
-    let graphics = new HGC.libraries.PIXI.Graphics()
+export function drawTextSequence(HGC: any, trackInfo: any, tile: any) {
+
+    if (!tile.textGraphics) {
+        tile.textGraphics = new HGC.libraries.PIXI.Graphics()
+        tile.graphics.addChild(tile.textGraphics)
+    }
 
     const { tileX, tileWidth } = trackInfo.getTilePosAndDimensions(
         tile.tileData.zoomLevel,
@@ -9,39 +14,57 @@ export function drawTextSequence(HGC: any, trackInfo: any, tile: any, alt: boole
     )
     const trackHeight = trackInfo.dimensions[1]
     const data = tile.tabularData as { [k: string]: number | string }[]
+    const uniqueCategories = Array.from(new Set(data.map(d => d['__N__'])))
     const uniquePositions = Array.from(new Set(data.map(d => d['__G__'])))
     const xScale = trackInfo._xScale.copy()
-    const barWidth = (xScale(tileX + tileWidth) - xScale(tileX)) / uniquePositions.length
+    const width = (xScale(tileX + tileWidth) - xScale(tileX)) / uniquePositions.length
+    const margin = width - 10
 
-    graphics.alpha = 1.0
+    let alphaSeq = 1.0
+
+    if (margin < 2) {
+        return
+    }
+    else if (trackHeight < 10) {
+        alphaSeq = 0
+    }
+    else if (margin < 5 && margin >= 2) {
+        // gracefully fade out
+        const alphaScale = scaleLinear()
+            .domain([2, 5])
+            .range([0, 1])
+            .clamp(true)
+        alphaSeq = alphaScale(width - 10)
+    }
+
+    tile.textGraphics.alpha = alphaSeq
 
     data.forEach(d => {
-        const x = (d['__G__'] as number) * barWidth
-        const category = d['__N__'] as string
-        const number = d['__Q__'] as number
+        // jth vertical bar in the graph
+        const x = d['__Q__'] as number * width
 
-        if (number === 0) return
+        const text = new HGC.libraries.PIXI.Text(
+            d['__N__'],
+            {
+                fontSize: '12px',
+                fontFamily: 'Arial',
+                fill: 'black',
+                fontWeight: 'bold'
+            }
+        )
+        text.width = 10
+        text.height = 10
+        text.letter = d['__N__']
 
-        const text = new HGC.libraries.PIXI.Text(category, {
-            fontSize: '32px',
-            fontFamily: 'Arial',
-            fill: 'black',
-            fontWeight: 'bold'
-        })
-        text.width = barWidth * 0.7
-        text.height = trackHeight * 0.7
-        text.letter = category
+        const txStart = xScale(tileX) + x
+        const txMiddle = txStart + width / 2 - text.width / 2
+        const tyMiddle = uniqueCategories.length / 2 - text.height / 2
 
-        const txMiddle = xScale(tileX) + x + barWidth / 2
-        const tyMiddle = trackHeight / 2
-
-        text.anchor.x = 0.5
-        text.anchor.y = 0.5
         text.position.x = txMiddle
         text.position.y = tyMiddle
 
         // pixi
-        tile.graphics.addChild(text)
+        tile.textGraphics.addChild(text)
 
         // svg
         // obj.addSVGInfoText(
