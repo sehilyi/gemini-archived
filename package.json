@@ -1,8 +1,22 @@
 {
     "name": "gemini",
-    "version": "0.1.0",
-    "private": true,
+    "author": "Sehi L'Yi",
+    "version": "0.0.1",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/sehilyi/gemini"
+    },
     "homepage": "https://sehilyi.github.io/gemini/",
+    "scripts": {
+        "predeploy": "yarn build",
+        "deploy": "gh-pages -d build",
+        "start": "react-app-rewired start",
+        "build": "react-app-rewired build",
+        "eject": "react-app-rewired eject",
+        "test": "jest test/",
+        "format": "eslint . --fix && prettier '**/*.css' --write"
+    },
     "dependencies": {
         "@testing-library/jest-dom": "^4.2.4",
         "@testing-library/react": "^9.3.2",
@@ -25,7 +39,6 @@
         "monaco-editor-webpack-plugin": "^1.9.0",
         "pixi.js": "^5.2.4",
         "react": "^16.13.1",
-        "react-app-rewired": "^2.1.6",
         "react-dom": "^16.13.1",
         "react-monaco-editor": "^0.36.0",
         "react-resize-detector": "^4.2.3",
@@ -33,16 +46,34 @@
         "react-split-pane": "^0.1.91",
         "typescript": "~3.7.2"
     },
-    "scripts": {
-        "predeploy": "yarn build",
-        "deploy": "gh-pages -d build",
-        "start": "react-app-rewired start",
-        "build": "react-app-rewired build",
-        "test": "react-app-rewired test",
-        "eject": "react-app-rewired eject"
-    },
-    "eslintConfig": {
-        "extends": "react-app"
+    "devDependencies": {
+        "@babel/core": "^7.11.1",
+        "@babel/preset-env": "^7.11.0",
+        "@babel/preset-react": "^7.10.4",
+        "@rollup/plugin-commonjs": "^15.0.0",
+        "@rollup/plugin-html": "^0.2.0",
+        "@rollup/plugin-json": "^4.1.0",
+        "@rollup/plugin-node-resolve": "^9.0.0",
+        "@types/react-resize-detector": "^4.2.0",
+        "@typescript-eslint/eslint-plugin": "^3.9.0",
+        "@typescript-eslint/parser": "^3.9.0",
+        "ajv": "^6.12.2",
+        "babel-jest": "^26.3.0",
+        "documentation": "^13.0.2",
+        "eslint": "^7.6.0",
+        "eslint-config-prettier": "^6.11.0",
+        "eslint-plugin-jest": "^23.20.0",
+        "eslint-plugin-prettier": "^3.1.4",
+        "eslint-plugin-react": "^7.20.6",
+        "jest": "^26.4.0",
+        "prettier": "^2.0.5",
+        "rollup-plugin-babel": "^4.4.0",
+        "rollup-plugin-livereload": "^1.3.0",
+        "rollup-plugin-scss": "^2.5.0",
+        "rollup-plugin-serve": "^1.0.3",
+        "rollup-plugin-terser": "^7.0.0",
+        "rollup-plugin-visualizer": "^4.1.0",
+        "sass": "^1.26.10"
     },
     "browserslist": {
         "production": [
@@ -56,8 +87,11 @@
             "last 1 safari version"
         ]
     },
-    "devDependencies": {
-        "@types/react-resize-detector": "^4.2.0",
-        "ajv": "^6.12.2"
+    "jest": {
+        "verbose": true,
+        "moduleFileExtensions": [
+            "js",
+            "ts"
+        ]
     }
 }

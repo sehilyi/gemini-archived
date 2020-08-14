@@ -1,6 +1,0 @@
-{
-"editor.formatOnSave": true,
-"editor.wordWrapColumn": 100,
-"html.format.wrapLineLength": 0,
-"editor.defaultFormatter": "vscode.typescript-language-features"
-}
