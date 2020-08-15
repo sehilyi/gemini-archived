@@ -9,7 +9,9 @@ import vis from "./visualizations";
 import { Track, getVisualizationType } from "../lib/gemini.schema";
 import { GeminiTrackModel } from "../lib/gemini-track-model";
 
-function GeminiTrack(HGC: any, ...args: any[]) {
+// @ts-ignore
+function GeminiTrack(HGC: any, ...args: any[]): any {
+  
   if (!new.target) {
     throw new Error(
       'Uncaught TypeError: Class constructor cannot be invoked without "new"'
