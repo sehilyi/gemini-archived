@@ -11,11 +11,10 @@
     "scripts": {
         "start": "webpack-dev-server --mode development",
         "build": "webpack --mode production",
-        "predeploy": "yarn build",
-        "deploy": "gh-pages -d build",
         "test": "jest test/",
         "format": "eslint . --fix && prettier '**/*.css' --write",
-        "precommit": "yarn format"
+        "predeploy": "yarn build",
+        "deploy": "gh-pages -d build"
     },
     "peerDependencies": {},
     "dependencies": {
@@ -118,5 +117,5 @@
         "hooks": {
             "pre-commit": "yarn format"
         }
-      }
+    }
 }

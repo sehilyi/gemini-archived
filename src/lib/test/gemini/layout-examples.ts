@@ -1,12 +1,15 @@
 import { GeminiSpec } from '../../gemini.schema';
 
-const LOCAL_MULTIVEC = 'http://localhost:8001/api/v1/tileset_info/?d=XX4dPR0dSCGzD2n-xtlhbA';
+const MULTIVEC_FILE = [
+    'http://localhost:8001/api/v1/tileset_info/?d=XX4dPR0dSCGzD2n-xtlhbA',
+    'https://resgen.io/api/v1/tileset_info/?d=WipsnEDMStahGPpRfH9adA'
+][1];
 
 export const GEMINI_TRACK_EXAMPLE: GeminiSpec = {
     tracks: [
         {
             data: {
-                url: LOCAL_MULTIVEC, //'https://resgen.io/api/v1/tileset_info/?d=RTGsPv37TB2aKk9ujTIu6Q',
+                url: MULTIVEC_FILE,
                 type: 'tileset'
             },
             zoomAction: { type: 'auto' },
@@ -34,7 +37,7 @@ export const GEMINI_TRACK_EXAMPLE2: GeminiSpec = {
     tracks: [
         {
             data: {
-                url: LOCAL_MULTIVEC, //'https://resgen.io/api/v1/tileset_info/?d=RTGsPv37TB2aKk9ujTIu6Q',
+                url: MULTIVEC_FILE,
                 type: 'tileset'
             },
             zoomAction: {
@@ -67,7 +70,7 @@ export const GEMINI_TRACK_EXAMPLE3: GeminiSpec = {
     tracks: [
         {
             data: {
-                url: LOCAL_MULTIVEC, //'https://resgen.io/api/v1/tileset_info/?d=RTGsPv37TB2aKk9ujTIu6Q',
+                url: MULTIVEC_FILE,
                 type: 'tileset'
             },
             zoomAction: {

@@ -1,7 +1,29 @@
 {
-    "extends": "./tsconfig.base.json",
-    "include": [
-        "src",
-        "test"
-    ]
+  "compilerOptions": {
+    "target": "es6",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "resolveJsonModule": true,
+    "isolatedModules": false,
+    "jsx": "react"
+  },
+  "files": ["index.tsx"],
+  "include": [
+    "src",
+    "test"
+  ]
 }
