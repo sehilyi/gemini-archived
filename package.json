@@ -63,6 +63,7 @@
         "@typescript-eslint/parser": "^3.9.0",
         "ajv": "^6.12.2",
         "babel-jest": "^26.3.0",
+        "codecov": "^3.7.2",
         "css-loader": "^4.2.1",
         "documentation": "^13.0.2",
         "eslint": "^7.6.0",
