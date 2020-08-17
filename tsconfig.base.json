@@ -20,5 +20,9 @@
     "resolveJsonModule": true,
     "isolatedModules": false,
     "jsx": "react"
-  }
+  },
+  "include": [
+    "src",
+    "test"
+  ]
 }

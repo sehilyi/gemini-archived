@@ -32,7 +32,7 @@ export default {
         }),
         babel({
             runtimeHelpers: true,
-            exclude: 'node_modules/**' // only transpile our source code
+            exclude: 'node_modules/**'
         }),
         replace({
             "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV)

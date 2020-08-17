@@ -1,5 +1,5 @@
 export const DEFAULT_VISUAL_PROPERTIES = {
-  opacity: 1,
+    opacity: 1
 };
 
 // gab between tracks

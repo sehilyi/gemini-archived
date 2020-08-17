@@ -4,15 +4,15 @@
  * See https://github.com/d3/d3/issues/3076
  */
 
-import { scaleLinear, scaleOrdinal } from "d3-scale";
-import { schemeCategory10 } from "d3-scale-chromatic";
-import { min, max, extent } from "d3-array";
+import { scaleLinear, scaleOrdinal } from 'd3-scale';
+import { schemeCategory10 } from 'd3-scale-chromatic';
+import { min, max, extent } from 'd3-array';
 
 export default {
-  scaleLinear,
-  scaleOrdinal,
-  schemeCategory10,
-  min,
-  max,
-  extent,
+    scaleLinear,
+    scaleOrdinal,
+    schemeCategory10,
+    min,
+    max,
+    extent
 };
